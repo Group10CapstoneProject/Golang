@@ -1,7 +1,6 @@
 package route
 
 import (
-	"github.com/Group10CapstoneProject/Golang/config"
 	pkgUserController "github.com/Group10CapstoneProject/Golang/internal/users/controller"
 	pkgUserRepostiory "github.com/Group10CapstoneProject/Golang/internal/users/repository"
 	pkgUserService "github.com/Group10CapstoneProject/Golang/internal/users/service"
@@ -20,7 +19,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 		Validator: validator.New(),
 	}
 
-	api := e.Group("/" + config.Env.API_ENV)
+	api := e.Group("/api")
 
 	//version
 	v1 := api.Group("/v1")

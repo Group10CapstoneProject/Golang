@@ -13,7 +13,6 @@ type Config struct {
 	DB_PASSWORD string
 	DB_NAME     string
 	JWT_SECRET  string
-	API_ENV     string
 }
 
 var Env *Config
