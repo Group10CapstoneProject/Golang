@@ -11,8 +11,9 @@ type User struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
-	Name      string         `gorm:"type:varchar(255);not null;uniqueIndex"`
+	Name      string         `gorm:"type:varchar(255);not null"`
 	Email     string         `gorm:"type:varchar(255);not null;uniqueIndex"`
 	Password  string         `gorm:"type:varchar(255);not null"`
+	Role      int            `gorm:"not null"`
 	MemberID  string
 }

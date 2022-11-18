@@ -17,7 +17,9 @@ func ConnectDB() (*gorm.DB, error) {
 		config.Env.DB_NAME,
 	)
 
-	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	return gorm.Open(mysql.Open(dsn), &gorm.Config{
+		SkipDefaultTransaction: true,
+	})
 }
 
 func MigrateDB(db *gorm.DB) error {

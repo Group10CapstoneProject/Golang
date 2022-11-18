@@ -1,11 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"time"
-
 	"github.com/Group10CapstoneProject/Golang/config"
 	"github.com/Group10CapstoneProject/Golang/database"
+	"github.com/Group10CapstoneProject/Golang/route"
+	"github.com/labstack/echo/v4"
 )
 
 func main() {
@@ -19,6 +18,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println("success initial")
-	fmt.Println(time.Now())
+	e := echo.New()
+	route.InitRoutes(e, db)
+	e.Logger.Fatal(e.Start(":" + config.Env.API_PORT))
 }
