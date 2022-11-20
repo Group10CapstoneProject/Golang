@@ -26,6 +26,16 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	jwtService := jwtService.NewJWTService(config.Env.JWT_SECRET_ACCESS, config.Env.JWT_SECRET_REFRESH)
 
 	api := e.Group("/api")
+	api.Use(middleware.CORSWithConfig(
+		middleware.CORSConfig{
+			AllowOrigins: []string{
+				"*",
+			},
+			AllowHeaders: []string{
+				"*",
+			},
+		},
+	))
 
 	//version
 	v1 := api.Group("/v1")

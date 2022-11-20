@@ -7,16 +7,7 @@
     },
     "servers": [
         {
-            "url":"http://{enviroment}.rnwxyz.com/api/v1",
-            "variables": {
-                "enviroment":{
-                    "default": "dev",
-                    "enum": [
-                        "dev",
-                        "prod"
-                    ]
-                }
-            }
+            "url":"http://ec2-3-85-131-211.compute-1.amazonaws.com/api/v1"
         }
     ],
     "paths": {
@@ -48,6 +39,59 @@
                         }
                     }
                 },
+                "responses": {
+                    "200": {
+                        "description": "Login success",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "type": "object",
+                                            "properties": {
+                                                "access_token":{
+                                                    "type": "string",
+                                                    "format": "jwt"
+                                                },
+                                                "refresh_token":{
+                                                    "type": "string",
+                                                    "format": "jwt"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "login success",
+                                    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOjB9.7W8I-3lyZ1X_a27VBNWHSH5yULLrf_GC8vRd2dyMOsg",
+                                    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOjB9.7W8I-3lyZ1X_a27VBNWHSH5yULLrf_GC8vRd2dyMOsg"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/internalServerError"
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "security": [
+                    {
+                        "AccessToken": []
+                    }
+                ],
+                "tags": ["Auth"],
+                "summary": "User Logout",
+                "description": "User logout remove the session id",
                 "responses": {
                     "200": {
                         "description": "Login success",
@@ -219,9 +263,76 @@
                     }
                 }
             }
+        },
+        "/users/profile": {
+            "post": {
+                "tags": ["Users"],
+                "summary": "Signup new user",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "name":{
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "required": ["true"]
+                                    },
+                                    "email":{
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "format": "email",
+                                        "required": ["true"]
+                                    },
+                                    "password":{
+                                        "type": "string",
+                                        "minLength": 6,
+                                        "required": ["true"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success signup",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "signup success"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                       "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    }
+                }
+            }
         }
     },
     "components": {
+        "securitySchemes": {
+            "AccessToken":{
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        },
         "responses": {
             "badRequest":{
                 "description": "Badrequest body",
