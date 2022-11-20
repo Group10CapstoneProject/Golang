@@ -1,0 +1,300 @@
+{
+    "openapi":"3.0.3",
+    "info": {
+      "title":"Gym Membership",
+      "version":"1.0",
+      "description": "Is documentation of API for Gym Membership capstone project by Group 10 MSIB B3"
+    },
+    "servers": [
+        {
+            "url":"http://{enviroment}.rnwxyz.com/api/v1",
+            "variables": {
+                "enviroment":{
+                    "default": "dev",
+                    "enum": [
+                        "dev",
+                        "prod"
+                    ]
+                }
+            }
+        }
+    ],
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "tags": ["Auth"],
+                "summary": "Login user",
+                "description": "Use an account is alredy registered/signup before, or use the superadmin account",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "email":{
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "format": "email",
+                                        "required": ["true"]
+                                    },
+                                    "password":{
+                                        "type": "string",
+                                        "minLength": 6,
+                                        "required": ["true"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login success",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "type": "object",
+                                            "properties": {
+                                                "access_token":{
+                                                    "type": "string",
+                                                    "format": "jwt token"
+                                                },
+                                                "refresh_token":{
+                                                    "type": "string",
+                                                    "format": "jwt token"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "login success",
+                                    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOjB9.7W8I-3lyZ1X_a27VBNWHSH5yULLrf_GC8vRd2dyMOsg",
+                                    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOjB9.7W8I-3lyZ1X_a27VBNWHSH5yULLrf_GC8vRd2dyMOsg"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/internalServerError"
+                    }
+                }
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "tags": ["Auth"],
+                "summary": "Generate new token",
+                "description": "When access_token is expired use refresh_token to generate the new token",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "refresh_token":{
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "format": "jwt token",
+                                        "required": ["true"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success generate new token",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "type": "object",
+                                            "properties": {
+                                                "access_token":{
+                                                    "type": "string",
+                                                    "format": "jwt token"
+                                                },
+                                                "refresh_token":{
+                                                    "type": "string",
+                                                    "format": "jwt token"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success refresh token",
+                                    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOjB9.7W8I-3lyZ1X_a27VBNWHSH5yULLrf_GC8vRd2dyMOsg",
+                                    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOjB9.7W8I-3lyZ1X_a27VBNWHSH5yULLrf_GC8vRd2dyMOsg"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401" :{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/users/signup": {
+            "post": {
+                "tags": ["Users"],
+                "summary": "Signup new user",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "name":{
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "required": ["true"]
+                                    },
+                                    "email":{
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "format": "email",
+                                        "required": ["true"]
+                                    },
+                                    "password":{
+                                        "type": "string",
+                                        "minLength": 6,
+                                        "required": ["true"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success signup",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "signup success"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                       "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "responses": {
+            "badRequest":{
+                "description": "Badrequest body",
+                "content": {
+                    "application/json":{
+                        "schema":{
+                            "type":"object",
+                            "properties": {
+                                "message":{
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "example": {
+                            "message": "bad request body"
+                        }
+                    }
+                }
+            },
+            "internalServerError":{
+                "description": "Internal server error",
+                "content": {
+                    "application/json":{
+                        "schema":{
+                            "type":"object",
+                            "properties": {
+                                "message":{
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "example": {
+                            "message": "server error"
+                        }
+                    }
+                }
+            },
+            "forbidden":{
+                "description": "Forbidden",
+                "content": {
+                    "application/json":{
+                        "schema":{
+                            "type":"object",
+                            "properties": {
+                                "message":{
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "example": {
+                            "message": "forbidden"
+                        }
+                    }
+                }
+            },
+            "unauthorized":{
+                "description": "Unauthorized",
+                "content": {
+                    "application/json":{
+                        "schema":{
+                            "type":"object",
+                            "properties": {
+                                "message":{
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "example": {
+                            "message": "unauthorized"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
