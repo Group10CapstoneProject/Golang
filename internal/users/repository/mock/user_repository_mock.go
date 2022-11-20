@@ -20,3 +20,13 @@ func (m *UserRepositoryMock) CheckUserIsEmpty(ctx context.Context) (bool, error)
 	args := m.Called()
 	return args.Bool(0), args.Error(1)
 }
+
+func (m *UserRepositoryMock) FindUserByEmail(email *string, ctx context.Context) (*model.User, error) {
+	args := m.Called()
+	return args.Get(0).(*model.User), args.Error(1)
+}
+
+func (m *UserRepositoryMock) FindUserByID(id *uint, ctx context.Context) (*model.User, error) {
+	args := m.Called()
+	return args.Get(0).(*model.User), args.Error(1)
+}

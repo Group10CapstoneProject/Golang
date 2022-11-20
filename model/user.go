@@ -3,6 +3,7 @@ package model
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -16,4 +17,5 @@ type User struct {
 	Password  string         `gorm:"type:varchar(255);not null"`
 	Role      int            `gorm:"not null"`
 	MemberID  string
+	SessionID uuid.UUID `gorm:"type:varchar(50)"`
 }

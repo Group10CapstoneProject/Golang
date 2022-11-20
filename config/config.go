@@ -7,13 +7,13 @@ import (
 )
 
 type Config struct {
-	API_PORT    string
-	DB_ADDRESS  string
-	DB_USERNAME string
-	DB_PASSWORD string
-	DB_NAME     string
-	JWT_SECRET  string
-	API_ENV     string
+	API_PORT           string
+	DB_ADDRESS         string
+	DB_USERNAME        string
+	DB_PASSWORD        string
+	DB_NAME            string
+	JWT_SECRET_ACCESS  string
+	JWT_SECRET_REFRESH string
 }
 
 var Env *Config

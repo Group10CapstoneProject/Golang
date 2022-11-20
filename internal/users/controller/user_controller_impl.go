@@ -4,17 +4,19 @@ import (
 	"net/http"
 
 	"github.com/Group10CapstoneProject/Golang/internal/users/dto"
-	userServ "github.com/Group10CapstoneProject/Golang/internal/users/service"
+	userService "github.com/Group10CapstoneProject/Golang/internal/users/service"
 	"github.com/labstack/echo/v4"
 )
 
 type userControllerImpl struct {
-	userService userServ.UserService
+	userService userService.UserService
 }
 
 // InitRoute implements UserController
 func (d *userControllerImpl) InitRoute(api *echo.Group) {
-	api.POST("/signup", d.Signup)
+	users := api.Group("/users")
+
+	users.POST("/signup", d.Signup)
 }
 
 // Signup implements UserController
@@ -35,11 +37,11 @@ func (d *userControllerImpl) Signup(c echo.Context) error {
 }
 
 // NewAadmin implements UserController
-func (*userControllerImpl) NewAadmin(c echo.Context) error {
+func (d *userControllerImpl) NewAadmin(c echo.Context) error {
 	panic("unimplemented")
 }
 
-func NewUserController(userService userServ.UserService) UserController {
+func NewUserController(userService userService.UserService) UserController {
 	return &userControllerImpl{
 		userService: userService,
 	}

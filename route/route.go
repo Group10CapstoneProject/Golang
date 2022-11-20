@@ -2,9 +2,13 @@ package route
 
 import (
 	"github.com/Group10CapstoneProject/Golang/config"
+	pkgAuthController "github.com/Group10CapstoneProject/Golang/internal/auth/controller"
+	pkgAuthRepostiory "github.com/Group10CapstoneProject/Golang/internal/auth/repository"
+	pkgAuthService "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	pkgUserController "github.com/Group10CapstoneProject/Golang/internal/users/controller"
 	pkgUserRepostiory "github.com/Group10CapstoneProject/Golang/internal/users/repository"
 	pkgUserService "github.com/Group10CapstoneProject/Golang/internal/users/service"
+	jwtService "github.com/Group10CapstoneProject/Golang/utils/jwt"
 	"github.com/Group10CapstoneProject/Golang/utils/password"
 	customValidator "github.com/Group10CapstoneProject/Golang/utils/validator"
 	"github.com/go-playground/validator"
@@ -19,11 +23,14 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	e.Validator = &customValidator.CustomValidator{
 		Validator: validator.New(),
 	}
+	jwtService := jwtService.NewJWTService(config.Env.JWT_SECRET_ACCESS, config.Env.JWT_SECRET_REFRESH)
 
-	api := e.Group("/" + config.Env.API_ENV)
+	api := e.Group("/api")
 
 	//version
 	v1 := api.Group("/v1")
+	protect := v1.Group("")
+	protect.Use(middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
 
 	// init user controller
 	userRepository := pkgUserRepostiory.NewUserRepository(db)
@@ -34,4 +41,10 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	}
 	userController := pkgUserController.NewUserController(userService)
 	userController.InitRoute(v1)
+
+	// init auth controller
+	authRepository := pkgAuthRepostiory.NewAuthRepository(db)
+	authService := pkgAuthService.NewAuthService(authRepository, userRepository, password.Password{}, jwtService)
+	authController := pkgAuthController.NewAuthController(authService)
+	authController.InitRoute(v1, protect)
 }
