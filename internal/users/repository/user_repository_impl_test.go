@@ -90,7 +90,7 @@ func (s *suiteUserRepository) TestCreateUser() {
 
 			// set mock result or error
 			s.mock.ExpectBegin()
-			db := s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `users` (`created_at`,`updated_at`,`deleted_at`,`name`,`email`,`password`,`role`,`member_id`) VALUES (?,?,?,?,?,?,?,?)"))
+			db := s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `users` (`created_at`,`updated_at`,`deleted_at`,`name`,`email`,`password`,`role`,`member_id`,`session_id`) VALUES (?,?,?,?,?,?,?,?,?)"))
 			if v.ExpectedErr != nil {
 				db.WillReturnError(v.MockReturn)
 				s.mock.ExpectRollback()
