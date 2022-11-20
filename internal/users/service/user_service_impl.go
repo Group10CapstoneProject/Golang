@@ -5,13 +5,13 @@ import (
 
 	"github.com/Group10CapstoneProject/Golang/constans"
 	"github.com/Group10CapstoneProject/Golang/internal/users/dto"
-	userRepo "github.com/Group10CapstoneProject/Golang/internal/users/repository"
+	userRepository "github.com/Group10CapstoneProject/Golang/internal/users/repository"
 	"github.com/Group10CapstoneProject/Golang/model"
 	"github.com/Group10CapstoneProject/Golang/utils/password"
 )
 
 type userServiceImpl struct {
-	userRepository userRepo.UserRepository
+	userRepository userRepository.UserRepository
 	password       password.PasswordHash
 }
 
@@ -64,7 +64,7 @@ func (s *userServiceImpl) CreateSuperadmin() error {
 	return err
 }
 
-func NewUserService(userRepository userRepo.UserRepository, password password.PasswordHash) UserService {
+func NewUserService(userRepository userRepository.UserRepository, password password.PasswordHash) UserService {
 	return &userServiceImpl{
 		userRepository: userRepository,
 		password:       password,
