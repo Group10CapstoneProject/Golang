@@ -55,7 +55,7 @@ func (s *suiteUserRepository) TestCreateUser() {
 				Name:     "test",
 				Email:    "test@gmail.com",
 				Password: "testtest",
-				Role:     2,
+				Role:     "user",
 			},
 			ExpectedErr: nil,
 			MockReturn:  nil,
@@ -66,7 +66,7 @@ func (s *suiteUserRepository) TestCreateUser() {
 				Name:     "test",
 				Email:    "test@gmail.com",
 				Password: "testtest",
-				Role:     2,
+				Role:     "user",
 			},
 			ExpectedErr: errors.New("other error"),
 			MockReturn:  errors.New("other error"),
@@ -77,7 +77,7 @@ func (s *suiteUserRepository) TestCreateUser() {
 				Name:     "test",
 				Email:    "test@gmail.com",
 				Password: "testtest",
-				Role:     2,
+				Role:     "user",
 			},
 			ExpectedErr: myerrors.ErrEmailAlredyExist,
 			MockReturn:  errors.New("Duplicate entry"),
@@ -90,7 +90,7 @@ func (s *suiteUserRepository) TestCreateUser() {
 
 			// set mock result or error
 			s.mock.ExpectBegin()
-			db := s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `users` (`created_at`,`updated_at`,`deleted_at`,`name`,`email`,`password`,`role`,`member_id`,`session_id`) VALUES (?,?,?,?,?,?,?,?,?)"))
+			db := s.mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `users` (`created_at`,`updated_at`,`deleted_at`,`name`,`email`,`password`,`role`,`session_id`) VALUES (?,?,?,?,?,?,?,?)"))
 			if v.ExpectedErr != nil {
 				db.WillReturnError(v.MockReturn)
 				s.mock.ExpectRollback()

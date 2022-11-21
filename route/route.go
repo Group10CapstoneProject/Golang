@@ -15,6 +15,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
+
+	_ "github.com/Group10CapstoneProject/Golang/app/docs"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 func InitRoutes(e *echo.Echo, db *gorm.DB) {
@@ -37,24 +40,27 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 		},
 	))
 
-	//version
+	// version
 	v1 := api.Group("/v1")
+
+	// swagger documentation
+	v1.GET("/swagger/*", echoSwagger.WrapHandler)
+
 	protect := v1.Group("")
 	protect.Use(middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
 
-	// init user controller
+	// init user user and auth service
 	userRepository := pkgUserRepostiory.NewUserRepository(db)
+	authRepository := pkgAuthRepostiory.NewAuthRepository(db)
+	authService := pkgAuthService.NewAuthService(authRepository, userRepository, password.Password{}, jwtService)
 	userService := pkgUserService.NewUserService(userRepository, password.Password{})
 	// create default user (superadmin)
 	if err := userService.CreateSuperadmin(); err != nil {
 		panic(err)
 	}
-	userController := pkgUserController.NewUserController(userService)
-	userController.InitRoute(v1)
-
-	// init auth controller
-	authRepository := pkgAuthRepostiory.NewAuthRepository(db)
-	authService := pkgAuthService.NewAuthService(authRepository, userRepository, password.Password{}, jwtService)
+	// init user and auth controller
+	userController := pkgUserController.NewUserController(userService, authService)
+	userController.InitRoute(v1, protect)
 	authController := pkgAuthController.NewAuthController(authService)
 	authController.InitRoute(v1, protect)
 }

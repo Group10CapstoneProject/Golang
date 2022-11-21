@@ -15,6 +15,22 @@ type userServiceImpl struct {
 	password       password.PasswordHash
 }
 
+// FindUser implements UserService
+func (r *userServiceImpl) FindUser(userId *uint, ctx context.Context) (*dto.UserResponse, error) {
+	user, err := r.userRepository.FindUserByID(userId, ctx)
+	if err != nil {
+		return nil, err
+	}
+	var userResponse dto.UserResponse
+	userResponse.FromModel(user)
+	return &userResponse, err
+}
+
+// FindUsers implements UserService
+func (r *userServiceImpl) FindUsers(page model.Pagination, ctx context.Context) (*dto.PageResponse, error) {
+	panic("unimplemented")
+}
+
 // CreateUser implements UserService
 func (s *userServiceImpl) CreateUser(user *dto.NewUser, ctx context.Context) error {
 	hashPassword, err := s.password.HashPassword(user.Password)

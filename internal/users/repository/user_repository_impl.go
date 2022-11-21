@@ -57,6 +57,28 @@ func (r *userRepositoryImpl) FindUserByID(id *uint, ctx context.Context) (*model
 	return &user, nil
 }
 
+// FindUsers implements UserRepository
+func (r *userRepositoryImpl) FindUsers(page *model.Pagination, ctx context.Context) ([]model.User, int, error) {
+	var users []model.User
+	var count int64
+	if page.Q != "" {
+		res := r.db.WithContext(ctx).Model(&model.User{}).Where("name = ? OR email = ?", "%"+page.Q+"%", "%"+page.Q+"%").
+			Offset(page.Limit * page.Page).Limit(page.Limit).Find(&users)
+		if res.Error != nil {
+			return nil, 0, res.Error
+		}
+		res.Count(&count)
+		return users, int(count), nil
+	}
+	res := r.db.WithContext(ctx).Model(&model.User{}).
+		Offset(page.Limit * page.Page).Limit(page.Limit).Find(&users)
+	if res.Error != nil {
+		return nil, 0, res.Error
+	}
+	res.Count(&count)
+	return users, int(count), nil
+}
+
 func NewUserRepository(database *gorm.DB) UserRepository {
 	return &userRepositoryImpl{
 		db: database,
