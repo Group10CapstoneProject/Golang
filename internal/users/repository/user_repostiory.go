@@ -11,4 +11,5 @@ type UserRepository interface {
 	CheckUserIsEmpty(ctx context.Context) (bool, error)
 	FindUserByEmail(email *string, ctx context.Context) (*model.User, error)
 	FindUserByID(id *uint, ctx context.Context) (*model.User, error)
+	FindUsers(page *model.Pagination, ctx context.Context) ([]model.User, int, error)
 }

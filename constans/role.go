@@ -1,5 +1,5 @@
 package constans
 
-const Role_superadmin = 0
-const Role_admin = 1
-const Role_user = 2
+const Role_superadmin = "superadmin"
+const Role_admin = "admin"
+const Role_user = "user"

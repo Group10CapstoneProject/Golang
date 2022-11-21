@@ -14,6 +14,6 @@ type AuthService interface {
 	Logout(userID uint, ctx context.Context) error
 	Refresh(token model.Token, ctx context.Context) (*model.Token, error)
 	ValidationToken(token jwt.MapClaims, ctx context.Context) error
-	ValidatationAdmin(token jwt.MapClaims, ctx context.Context) error
+	ValidatationRole(token jwt.MapClaims, role string, ctx context.Context) error
 	GetClaims(c *echo.Context) jwt.MapClaims
 }

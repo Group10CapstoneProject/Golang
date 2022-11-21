@@ -82,10 +82,10 @@ func (s *authServiceImpl) Refresh(token model.Token, ctx context.Context) (*mode
 }
 
 // ValidatationAdmin implements AuthService
-func (s *authServiceImpl) ValidatationAdmin(token jwt.MapClaims, ctx context.Context) error {
-	role := token["role"].(float64)
-	if role == constans.Role_admin || role == constans.Role_superadmin {
-		return nil
+func (s *authServiceImpl) ValidatationRole(token jwt.MapClaims, role string, ctx context.Context) error {
+	userRole := token["role"].(string)
+	if userRole == role || userRole == constans.Role_superadmin {
+		return s.ValidationToken(token, ctx)
 	}
 	return myerrors.ErrPermission
 }

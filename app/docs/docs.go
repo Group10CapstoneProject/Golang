@@ -303,7 +303,9 @@ const docTemplate = `{
                                 "example": {
                                     "message": "success get profile",
                                     "data": {
-                                        
+                                        "name":"james",
+                                        "email":"james@gmail.com",
+                                        "role":"user"
                                     }
                                 }
                             }
@@ -327,10 +329,13 @@ const docTemplate = `{
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/offset"
+                        "$ref": "#/components/parameters/page"
                     },
                     {
                         "$ref": "#/components/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/components/parameters/q"
                     }
                 ],
                 "tags": ["Users"],
@@ -432,19 +437,8 @@ const docTemplate = `{
                             "email": {
                                 "type": "string"
                             },
-                            "member":{
-                                "type": "object",
-                                "properties": {
-                                    "member_id": {
-                                        "type": "string"
-                                    },
-                                    "member_type":{
-                                        "type": "string"
-                                    },
-                                    "expired":{
-                                        "type": "string"
-                                    }
-                                }
+                            "role":{
+                                "type": "string"
                             }
                         }
                     }
@@ -526,12 +520,12 @@ const docTemplate = `{
             }
         },
         "parameters": {
-            "offset": {
+            "page": {
                 "in": "query",
-                "name": "offset",
+                "name": "page",
                 "schema":{
                     "type": "integer",
-                    "description": "The number of user to skip before starting to collect the result set (page)"
+                    "description": "The number of page (page)"
                 },
                 "example": 1
             },
@@ -543,6 +537,15 @@ const docTemplate = `{
                     "description": "The numbers of items to return (per page)"
                 },
                 "example": 10
+            },
+            "q": {
+                "in": "query",
+                "name": "q",
+                "schema": {
+                    "type": "string",
+                    "description": "Search field of name or email user"
+                },
+                "example": "james"
             }
         }
     }

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Group10CapstoneProject/Golang/internal/users/dto"
+	"github.com/Group10CapstoneProject/Golang/model"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -24,4 +25,14 @@ func (m *UserServiceMock) CreateAdmin(user *dto.NewUser, ctx context.Context) er
 func (m *UserServiceMock) CreateSuperadmin() error {
 	args := m.Called()
 	return args.Error(0)
+}
+
+func (m *UserServiceMock) FindUsers(page model.Pagination, ctx context.Context) (*dto.PageResponse, error) {
+	args := m.Called()
+	return args.Get(0).(*dto.PageResponse), args.Error(1)
+}
+
+func (m *UserServiceMock) FindUser(userId *uint, ctx context.Context) (*dto.UserResponse, error) {
+	args := m.Called()
+	return args.Get(0).(*dto.UserResponse), args.Error(1)
 }

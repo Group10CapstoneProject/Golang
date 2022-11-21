@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	authServiceMock "github.com/Group10CapstoneProject/Golang/internal/auth/service/mock"
 	userServiceMock "github.com/Group10CapstoneProject/Golang/internal/users/service/mock"
 	validatorMock "github.com/Group10CapstoneProject/Golang/utils/validator/mock"
 	"github.com/labstack/echo/v4"
@@ -17,6 +18,7 @@ import (
 type suiteUserController struct {
 	suite.Suite
 	userServiceMock *userServiceMock.UserServiceMock
+	authServiceMock *authServiceMock.AuthServiceMock
 	validaorMock    *validatorMock.CustomValidatorMock
 	userController  UserController
 	echoNew         *echo.Echo
@@ -24,8 +26,9 @@ type suiteUserController struct {
 
 func (s *suiteUserController) SetupSuit() {
 	s.userServiceMock = new(userServiceMock.UserServiceMock)
+	s.authServiceMock = new(authServiceMock.AuthServiceMock)
 	s.validaorMock = new(validatorMock.CustomValidatorMock)
-	s.userController = NewUserController(s.userServiceMock)
+	s.userController = NewUserController(s.userServiceMock, s.authServiceMock)
 	s.echoNew = echo.New()
 	s.echoNew.Validator = s.validaorMock
 }
