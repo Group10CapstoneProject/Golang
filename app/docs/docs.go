@@ -411,6 +411,421 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/classes/offline": {
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/components/parameters/q"
+                    }
+                ],
+                "tags": ["Offline Classes"],
+                "summary": "Get all offline classes",
+                "description": "To get all offline classes",
+                "responses": {
+                    "200": {
+                        "description": "Success get offline classes",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "offline_classes": {
+                                                    "type": "array",
+                                                    "items":{
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id":{
+                                                                "type": "string",
+                                                                "format": "UUID"
+                                                            },
+                                                            "title":{
+                                                                "type":"string"
+                                                            },
+                                                            "time":{
+                                                                "type":"string",
+                                                                "description": "use time format"
+                                                            },
+                                                            "duration":{
+                                                                "type": "integer",
+                                                                "description": "format minutes"
+                                                            },
+                                                            "slot":{
+                                                                "type": "integer"
+                                                            },
+                                                            "slot_ready":{
+                                                                "type": "integer",
+                                                                "description": "remaining slots"
+                                                            },
+                                                            "price": {
+                                                                "type": "integer"
+                                                            },
+                                                            "picture_path":{
+                                                                "type": "string",
+                                                                "description": "dispay picture fo the class"
+                                                            },
+                                                            "trainer_id":{
+                                                                "type": "string",
+                                                                "format": "UUID"
+                                                            },
+                                                            "description":{
+                                                                "type": "string",
+                                                                "description": "more information about the class"
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "count": {
+                                                    "type": "integer"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success get offline classes",
+                                    "data": {
+                                        "offline_classes": [
+                                            {
+                                                "id":"123e4567-e89b-12d3-a456-4266141711111",
+                                                "title": "Zumba Internasional Class",
+                                                "time": "2012-10-31 15:50:13.793654 +0000 UTC",
+                                                "duration": 60,
+                                                "slot": 50,
+                                                "slot_ready": 34,
+                                                "price": 500000,
+                                                "picture_path": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
+                                                "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
+                                                "description": "offline class zumba tingkat internasional"
+                                            },
+                                            {
+                                                "id":"123e4567-e89b-12d3-a456-4266141711112",
+                                                "title": "Zumba Internasional Class",
+                                                "time": "2012-10-31 15:50:13.793654 +0000 UTC",
+                                                "duration": 60,
+                                                "slot": 50,
+                                                "slot_ready": 34,
+                                                "price": 500000,
+                                                "picture_path": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
+                                                "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
+                                                "description": "offline class zumba tingkat internasional"
+                                            }
+                                        ],
+                                        "count": 2
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Offline Classes"],
+                "summary": "New offline class",
+                "description": "To create new offline class",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/offlineClass"
+                            },
+                            "example":{
+                                "title": "Zumba Internasional Class",
+                                "time": "2012-10-31 15:50:13.793654 +0000 UTC",
+                                "duration": 60,
+                                "slot": 50,
+                                "slot_ready": 34,
+                                "price": 500000,
+                                "picture_path": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
+                                "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
+                                "description": "offline class zumba tingkat internasional"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success create offline class",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success create offline class"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/classes/offline/{id}":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    }
+                ],
+                "tags": ["Offline Classes"],
+                "summary": "Get single offline class",
+                "description": "To get spesific offline class",
+                "responses": {
+                    "200": {
+                        "description": "Success get offline class",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "type": "object",
+                                            "properties": {
+                                                "id":{
+                                                    "type":"string",
+                                                    "format": "UUID"
+                                                },
+                                                "title":{
+                                                    "type":"string"
+                                                },
+                                                "time":{
+                                                    "type":"string",
+                                                    "description": "use time format"
+                                                },
+                                                "duration":{
+                                                    "type": "integer",
+                                                    "description": "format minutes"
+                                                },
+                                                "slot":{
+                                                    "type": "integer"
+                                                },
+                                                "slot_ready":{
+                                                    "type": "integer",
+                                                    "description": "remaining slots"
+                                                },
+                                                "price": {
+                                                    "type": "integer"
+                                                },
+                                                "picture_path":{
+                                                    "type": "string",
+                                                    "description": "dispay picture fo the class"
+                                                },
+                                                "trainer_id":{
+                                                    "type": "string",
+                                                    "format": "UUID"
+                                                },
+                                                "description":{
+                                                    "type": "string",
+                                                    "description": "more information about the class"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success get offline class",
+                                    "data": {
+                                        "id": "123e4567-e89b-12d3-a456-4266141711111",
+                                        "title": "Zumba Internasional Class",
+                                        "time": "2012-10-31 15:50:13.793654 +0000 UTC",
+                                        "duration": 60,
+                                        "slot": 50,
+                                        "slot_ready": 34,
+                                        "price": 500000,
+                                        "picture_path": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
+                                        "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
+                                        "description": "offline class zumba tingkat internasional"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    }
+                ],
+                "tags": ["Offline Classes"],
+                "summary": "Update offline class",
+                "description": "To update offline classs",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/offlineClass"
+                            },
+                            "example": {
+                                "title": "Zumba Internasional Class",
+                                "time": "2012-10-31 15:50:13.793654 +0000 UTC",
+                                "duration": 60,
+                                "slot": 50,
+                                "slot_ready": 34,
+                                "price": 500000,
+                                "picture_path": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
+                                "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
+                                "description": "offline class zumba tingkat internasional"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success update offline class",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success update offline class"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    }
+                ],
+                "tags": ["Offline Classes"],
+                "summary": "Delete offline classes",
+                "description": "To delete offline classes use the the id",
+                "responses": {
+                    "200": {
+                        "description": "Success delete offline calss",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success delete offline class"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref":"#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -443,6 +858,44 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "offlineClass": {
+                "type": "object",
+                "properties": {
+                    "title":{
+                        "type":"string"
+                    },
+                    "time":{
+                        "type":"string",
+                        "description": "use time format"
+                    },
+                    "duration":{
+                        "type": "integer",
+                        "description": "format minutes"
+                    },
+                    "slot":{
+                        "type": "integer"
+                    },
+                    "slot_ready":{
+                        "type": "integer",
+                        "description": "remaining slots"
+                    },
+                    "price": {
+                        "type": "integer"
+                    },
+                    "picture_path":{
+                        "type": "string",
+                        "description": "dispay picture fo the class"
+                    },
+                    "trainer_id":{
+                        "type": "string",
+                        "format": "UUID"
+                    },
+                    "description":{
+                        "type": "string",
+                        "description": "more information about the class"
+                    }
+                }
             }
         },
         "responses": {
@@ -460,6 +913,24 @@ const docTemplate = `{
                         },
                         "example": {
                             "message": "bad request body"
+                        }
+                    }
+                }
+            },
+            "notFound":{
+                "description": "Not found",
+                "content": {
+                    "application/json":{
+                        "schema":{
+                            "type":"object",
+                            "properties": {
+                                "message":{
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "example": {
+                            "message": "not found"
                         }
                     }
                 }
@@ -546,6 +1017,16 @@ const docTemplate = `{
                     "description": "Search field of name or email user"
                 },
                 "example": "james"
+            },
+            "id": {
+                "required": true,
+                "in": "path",
+                "name": "id",
+                "schema": {
+                    "type": "string",
+                    "description": "The spesific id for the operation"
+                },
+                "example": "123e4567-e89b-12d3-a456-426614174000"
             }
         }
     }
