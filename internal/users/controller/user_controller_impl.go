@@ -50,7 +50,7 @@ func (d *userControllerImpl) Signup(c echo.Context) error {
 // NewAadmin implements UserController
 func (d *userControllerImpl) NewAadmin(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
+	if err := d.authService.ValidationRole(claims, constans.Role_superadmin, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
 			return echo.NewHTTPError(http.StatusForbidden, err.Error())
 		}
