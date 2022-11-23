@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Group10CapstoneProject/Golang/config"
 	"github.com/Group10CapstoneProject/Golang/constans"
@@ -82,7 +81,7 @@ func (s *authServiceImpl) Refresh(token model.Token, ctx context.Context) (*mode
 }
 
 // ValidatationAdmin implements AuthService
-func (s *authServiceImpl) ValidatationRole(token jwt.MapClaims, role string, ctx context.Context) error {
+func (s *authServiceImpl) ValidationRole(token jwt.MapClaims, role string, ctx context.Context) error {
 	userRole := token["role"].(string)
 	if userRole == role || userRole == constans.Role_superadmin {
 		return s.ValidationToken(token, ctx)
@@ -98,7 +97,6 @@ func (s *authServiceImpl) ValidationToken(token jwt.MapClaims, ctx context.Conte
 		return err
 	}
 	sessionId := token["session_id"].(string)
-	fmt.Println(sessionId)
 	if user.SessionID.String() != sessionId {
 		return myerrors.ErrInvalidSession
 	}

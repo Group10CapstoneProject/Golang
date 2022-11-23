@@ -11,6 +11,6 @@ type UserService interface {
 	CreateUser(user *dto.NewUser, ctx context.Context) error
 	CreateAdmin(user *dto.NewUser, ctx context.Context) error
 	FindUser(userId *uint, ctx context.Context) (*dto.UserResponse, error)
-	FindUsers(page model.Pagination, ctx context.Context) (*dto.PageResponse, error)
+	FindUsers(page model.Pagination, role string, ctx context.Context) (*dto.PageResponse, error)
 	CreateSuperadmin() error
 }
