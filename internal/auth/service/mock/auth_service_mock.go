@@ -30,7 +30,7 @@ func (m *AuthServiceMock) ValidationToken(token jwt.MapClaims, ctx context.Conte
 	args := m.Called()
 	return args.Error(0)
 }
-func (m *AuthServiceMock) ValidatationRole(token jwt.MapClaims, role string, ctx context.Context) error {
+func (m *AuthServiceMock) ValidationRole(token jwt.MapClaims, role string, ctx context.Context) error {
 	args := m.Called()
 	return args.Error(0)
 }

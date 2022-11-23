@@ -27,7 +27,7 @@ func (m *UserServiceMock) CreateSuperadmin() error {
 	return args.Error(0)
 }
 
-func (m *UserServiceMock) FindUsers(page model.Pagination, ctx context.Context) (*dto.PageResponse, error) {
+func (m *UserServiceMock) FindUsers(page model.Pagination, role string, ctx context.Context) (*dto.PageResponse, error) {
 	args := m.Called()
 	return args.Get(0).(*dto.PageResponse), args.Error(1)
 }

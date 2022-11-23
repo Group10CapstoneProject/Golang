@@ -15,6 +15,11 @@ type userServiceImpl struct {
 	password       password.PasswordHash
 }
 
+// FindAdmins implements UserService
+func (*userServiceImpl) FindAdmins(page model.Pagination, ctx context.Context) (*dto.PageResponse, error) {
+	panic("unimplemented")
+}
+
 // FindUser implements UserService
 func (r *userServiceImpl) FindUser(userId *uint, ctx context.Context) (*dto.UserResponse, error) {
 	user, err := r.userRepository.FindUserByID(userId, ctx)
@@ -27,8 +32,15 @@ func (r *userServiceImpl) FindUser(userId *uint, ctx context.Context) (*dto.User
 }
 
 // FindUsers implements UserService
-func (r *userServiceImpl) FindUsers(page model.Pagination, ctx context.Context) (*dto.PageResponse, error) {
-	panic("unimplemented")
+func (r *userServiceImpl) FindUsers(page model.Pagination, role string, ctx context.Context) (*dto.PageResponse, error) {
+	users, count, err := r.userRepository.FindUsers(&page, role, ctx)
+	if err != nil {
+		return nil, err
+	}
+	var response dto.PageResponse
+	response.Users.FromModel(users)
+	response.Count = count
+	return &response, nil
 }
 
 // CreateUser implements UserService

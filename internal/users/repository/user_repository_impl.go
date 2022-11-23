@@ -58,24 +58,42 @@ func (r *userRepositoryImpl) FindUserByID(id *uint, ctx context.Context) (*model
 }
 
 // FindUsers implements UserRepository
-func (r *userRepositoryImpl) FindUsers(page *model.Pagination, ctx context.Context) ([]model.User, int, error) {
+func (r *userRepositoryImpl) FindUsers(page *model.Pagination, role string, ctx context.Context) ([]model.User, int, error) {
 	var users []model.User
 	var count int64
+	offset := (page.Limit * page.Page) - page.Limit
+
 	if page.Q != "" {
-		res := r.db.WithContext(ctx).Model(&model.User{}).Where("name = ? OR email = ?", "%"+page.Q+"%", "%"+page.Q+"%").
-			Offset(page.Limit * page.Page).Limit(page.Limit).Find(&users)
-		if res.Error != nil {
-			return nil, 0, res.Error
+		err := r.db.WithContext(ctx).Model(&model.User{}).
+			Where("(name LIKE ? OR email LIKE ?) AND role = ?", "%"+page.Q+"%", "%"+page.Q+"%", role).
+			Offset(offset).
+			Limit(page.Limit).
+			Find(&users).Error
+		if err != nil {
+			return nil, 0, err
 		}
-		res.Count(&count)
+
+		err = r.db.WithContext(ctx).Model(&model.User{}).Where("(name LIKE ? OR email LIKE ?) AND role = ?", "%"+page.Q+"%", "%"+page.Q+"%", role).Count(&count).Error
+		if err != nil {
+			return nil, 0, err
+		}
+
 		return users, int(count), nil
 	}
-	res := r.db.WithContext(ctx).Model(&model.User{}).
-		Offset(page.Limit * page.Page).Limit(page.Limit).Find(&users)
-	if res.Error != nil {
-		return nil, 0, res.Error
+
+	err := r.db.WithContext(ctx).Model(&model.User{}).
+		Where("role = ?", role).
+		Offset(offset).
+		Limit(page.Limit).
+		Find(&users).Error
+	if err != nil {
+		return nil, 0, err
 	}
-	res.Count(&count)
+
+	err = r.db.WithContext(ctx).Model(&model.User{}).Where("role = ?", role).Count(&count).Error
+	if err != nil {
+		return nil, 0, err
+	}
 	return users, int(count), nil
 }
 

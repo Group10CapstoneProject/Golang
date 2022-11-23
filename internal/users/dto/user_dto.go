@@ -39,5 +39,5 @@ func (u *UsersResponse) FromModel(model []model.User) {
 
 type PageResponse struct {
 	Users UsersResponse `json:"users"`
-	Count int
+	Count int           `json:"count"`
 }

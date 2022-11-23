@@ -3,9 +3,12 @@ package controller
 import (
 	"net/http"
 
+	"github.com/Group10CapstoneProject/Golang/constans"
 	authService "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	"github.com/Group10CapstoneProject/Golang/internal/users/dto"
 	userService "github.com/Group10CapstoneProject/Golang/internal/users/service"
+	"github.com/Group10CapstoneProject/Golang/model"
+	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"github.com/labstack/echo/v4"
 )
 
@@ -20,8 +23,11 @@ func (d *userControllerImpl) InitRoute(api *echo.Group, protect *echo.Group) {
 	protectUsers := protect.Group("/users")
 
 	users.POST("/signup", d.Signup)
-	protectUsers.GET("/profile", d.GetUser)
 	protectUsers.GET("", d.GetUser)
+	protectUsers.GET("", d.GetUsers)
+	protectUsers.GET("/profile", d.GetUser)
+	protectUsers.POST("/admin", d.NewAadmin)
+	protectUsers.GET("/admin", d.GetAdmins)
 }
 
 // Signup implements UserController
@@ -43,7 +49,26 @@ func (d *userControllerImpl) Signup(c echo.Context) error {
 
 // NewAadmin implements UserController
 func (d *userControllerImpl) NewAadmin(c echo.Context) error {
-	panic("unimplemented")
+	claims := d.authService.GetClaims(&c)
+	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
+		if err == myerrors.ErrPermission {
+			return echo.NewHTTPError(http.StatusForbidden, err.Error())
+		}
+		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+	}
+	var user dto.NewUser
+	if err := c.Bind(&user); err != nil {
+		return err
+	}
+	if err := c.Validate(user); err != nil {
+		return err
+	}
+	if err := d.userService.CreateAdmin(&user, c.Request().Context()); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "new admin success created",
+	})
 }
 
 // GetUser implements UserController
@@ -64,8 +89,47 @@ func (d *userControllerImpl) GetUser(c echo.Context) error {
 }
 
 // GetUsers implements UserController
-func (*userControllerImpl) GetUsers(c echo.Context) error {
-	panic("unimplemented")
+func (d *userControllerImpl) GetUsers(c echo.Context) error {
+	claims := d.authService.GetClaims(&c)
+	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
+		if err == myerrors.ErrPermission {
+			return echo.NewHTTPError(http.StatusForbidden, err.Error())
+		}
+		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+	}
+	var query model.Pagination
+	query.NewPageQuery(c)
+
+	users, err := d.userService.FindUsers(query, constans.Role_user, c.Request().Context())
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "success get users",
+		"data":    users,
+	})
+}
+
+// GetAdmins implements UserController
+func (d *userControllerImpl) GetAdmins(c echo.Context) error {
+	claims := d.authService.GetClaims(&c)
+	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
+		if err == myerrors.ErrPermission {
+			return echo.NewHTTPError(http.StatusForbidden, err.Error())
+		}
+		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+	}
+	var query model.Pagination
+	query.NewPageQuery(c)
+
+	users, err := d.userService.FindUsers(query, constans.Role_admin, c.Request().Context())
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "success get admins",
+		"data":    users,
+	})
 }
 
 func NewUserController(userService userService.UserService, authService authService.AuthService) UserController {

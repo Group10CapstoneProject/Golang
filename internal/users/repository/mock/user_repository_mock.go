@@ -31,7 +31,7 @@ func (m *UserRepositoryMock) FindUserByID(id *uint, ctx context.Context) (*model
 	return args.Get(0).(*model.User), args.Error(1)
 }
 
-func (m *UserRepositoryMock) FindUsers(page *model.Pagination, ctx context.Context) ([]model.User, int, error) {
+func (m *UserRepositoryMock) FindUsers(page *model.Pagination, role string, ctx context.Context) ([]model.User, int, error) {
 	args := m.Called()
 	return args.Get(0).([]model.User), args.Get(1).(int), args.Error(2)
 }
