@@ -49,4 +49,4 @@ jobs:
           cd docs
           wget https://raw.githubusercontent.com/Group10CapstoneProject/Golang/development/docs/api-documentation.json
           cd ..
-          sudo docker-compose up
+          sudo docker-compose up -d
