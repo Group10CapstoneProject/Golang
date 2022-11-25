@@ -3,7 +3,7 @@ package dto
 import "github.com/Group10CapstoneProject/Golang/model"
 
 type NewUser struct {
-	Name     string `json:"name" validate:"required"`
+	Name     string `json:"name" validate:"required,personname"`
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required,min=6"`
 }
@@ -16,12 +16,14 @@ func (u *NewUser) ToModel() *model.User {
 }
 
 type UserResponse struct {
+	ID    uint   `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
 	Role  string `json:"role"`
 }
 
 func (u *UserResponse) FromModel(model *model.User) {
+	u.ID = model.ID
 	u.Name = model.Name
 	u.Email = model.Email
 	u.Role = model.Role

@@ -45,6 +45,30 @@ func (s *authServiceImpl) Login(credential dto.UserCredential, ctx context.Conte
 	return &newToken, err
 }
 
+// LoginAdmin implements AuthService
+func (s *authServiceImpl) LoginAdmin(credential dto.UserCredential, ctx context.Context) (*model.Token, error) {
+	user, err := s.usersRepository.FindUserByEmail(&credential.Email, ctx)
+	if err != nil {
+		return nil, myerrors.ErrInvalidEmailPassword
+	}
+	if user.Role == constans.Role_user {
+		return nil, myerrors.ErrPermission
+	}
+	if !s.password.CheckPasswordHash(credential.Password, user.Password) {
+		return nil, myerrors.ErrInvalidEmailPassword
+	}
+	user.SessionID = uuid.New()
+	var newToken model.Token
+	newToken.AccessToken, newToken.RefreshToken, err = s.jwtService.GenerateToken(user)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.authRepository.UpdateSessionID(user.ID, user.SessionID, ctx); err != nil {
+		return nil, err
+	}
+	return &newToken, err
+}
+
 // Logout implements AuthService
 func (s *authServiceImpl) Logout(userID uint, ctx context.Context) error {
 	err := s.authRepository.UpdateSessionID(userID, uuid.Nil, ctx)

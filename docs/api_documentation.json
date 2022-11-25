@@ -98,6 +98,84 @@
                 }
             }
         },
+        "/auth/admin/login": {
+            "post": {
+                "tags": ["Auth"],
+                "summary": "Login admin",
+                "description": "Use an account is alredy with role admin or superadmin, or use the superadmin account",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "email":{
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "format": "email",
+                                        "required": ["true"]
+                                    },
+                                    "password":{
+                                        "type": "string",
+                                        "minLength": 6,
+                                        "required": ["true"]
+                                    }
+                                }
+                            },
+                            "example": {
+                                "email": "james@gmail.com",
+                                "password": "james123"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login success",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "type": "object",
+                                            "properties": {
+                                                "access_token":{
+                                                    "type": "string",
+                                                    "format": "jwt"
+                                                },
+                                                "refresh_token":{
+                                                    "type": "string",
+                                                    "format": "jwt"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "login success",
+                                    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOjB9.7W8I-3lyZ1X_a27VBNWHSH5yULLrf_GC8vRd2dyMOsg",
+                                    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOjB9.7W8I-3lyZ1X_a27VBNWHSH5yULLrf_GC8vRd2dyMOsg"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/internalServerError"
+                    }
+                }
+            }
+        },
         "/auth/logout": {
             "post": {
                 "security": [
@@ -309,6 +387,7 @@
                                 "example": {
                                     "message": "success get profile",
                                     "data": {
+                                        "id": 1,
                                         "name":"james",
                                         "email":"james@gmail.com",
                                         "role":"user"
@@ -346,7 +425,7 @@
                 ],
                 "tags": ["Users"],
                 "summary": "Get all admins",
-                "description": "To get all admins",
+                "description": "To get all admins and only admin account can use this endpoint",
                 "responses": {
                     "200": {
                         "description": "Success get adminns",
@@ -374,6 +453,9 @@
                                                             },
                                                             "email": {
                                                                 "type": "string"
+                                                            },
+                                                            "role":{
+                                                                "type":"string"
                                                             }
                                                         }
                                                     }
@@ -392,12 +474,14 @@
                                             {
                                                 "id": 2,
                                                 "name": "james",
-                                                "email": "james@gmail.com"
+                                                "email": "james@gmail.com",
+                                                "role": "admin"
                                             },
                                             {
                                                 "id": 3,
                                                 "name": "yanto",
-                                                "email": "yanto@gmail.com"
+                                                "email": "yanto@gmail.com",
+                                                "role": "admin"
                                             }
                                         ],
                                         "count": 2
@@ -534,6 +618,9 @@
                                                             },
                                                             "email": {
                                                                 "type": "string"
+                                                            },
+                                                            "role":{
+                                                                "type": "string"
                                                             }
                                                         }
                                                     }
@@ -552,12 +639,14 @@
                                             {
                                                 "id": 2,
                                                 "name": "james",
-                                                "email": "james@gmail.com"
+                                                "email": "james@gmail.com",
+                                                "role":"user"
                                             },
                                             {
                                                 "id": 3,
                                                 "name": "yanto",
-                                                "email": "yanto@gmail.com"
+                                                "email": "yanto@gmail.com",
+                                                "role":"user"
                                             }
                                         ],
                                         "count": 2
@@ -1723,6 +1812,9 @@
                     "data": {
                         "type": "object",
                         "properties": {
+                            "id":{
+                                "type": "string"
+                            },
                             "name": {
                                 "type": "string"
                             },
