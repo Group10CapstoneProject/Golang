@@ -47,6 +47,7 @@ jobs:
           sudo docker rmi rnwxyz/gym-membership-dev:latest
           sudo docker pull rnwxyz/gym-membership-dev:latest
           cd docs
+          rm api_documentation.json
           wget https://raw.githubusercontent.com/Group10CapstoneProject/Golang/development/docs/api-documentation.json
           cd ..
           sudo docker-compose up -d
