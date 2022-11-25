@@ -11,7 +11,6 @@ import (
 	jwtService "github.com/Group10CapstoneProject/Golang/utils/jwt"
 	"github.com/Group10CapstoneProject/Golang/utils/password"
 	customValidator "github.com/Group10CapstoneProject/Golang/utils/validator"
-	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
@@ -20,28 +19,21 @@ import (
 func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	e.Use(middleware.Recover())
 
-	e.Validator = &customValidator.CustomValidator{
-		Validator: validator.New(),
-	}
-	jwtService := jwtService.NewJWTService(config.Env.JWT_SECRET_ACCESS, config.Env.JWT_SECRET_REFRESH)
+	customValidator.NewCustomValidator(e)
 
-	api := e.Group("/api")
-	api.Use(middleware.CORSWithConfig(
+	jwtService := jwtService.NewJWTService(config.Env.JWT_SECRET_ACCESS, config.Env.JWT_SECRET_REFRESH)
+	e.Use(middleware.CORSWithConfig(
 		middleware.CORSConfig{
 			AllowOrigins: []string{
-				"*",
-			},
-			AllowHeaders: []string{
 				"*",
 			},
 		},
 	))
 
+	api := e.Group("/api")
+
 	// version
 	v1 := api.Group("/v1")
-
-	protect := v1.Group("")
-	protect.Use(middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
 
 	// init user user and auth service
 	userRepository := pkgUserRepostiory.NewUserRepository(db)
@@ -54,7 +46,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	}
 	// init user and auth controller
 	userController := pkgUserController.NewUserController(userService, authService)
-	userController.InitRoute(v1, protect)
+	userController.InitRoute(v1)
 	authController := pkgAuthController.NewAuthController(authService)
-	authController.InitRoute(v1, protect)
+	authController.InitRoute(v1)
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/Group10CapstoneProject/Golang/internal/auth/dto"
 	authService "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	"github.com/Group10CapstoneProject/Golang/model"
+	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"github.com/labstack/echo/v4"
 )
 
@@ -14,13 +15,13 @@ type authControllerImpl struct {
 }
 
 // InitRoute implements AuthController
-func (d *authControllerImpl) InitRoute(api *echo.Group, protect *echo.Group) {
+func (d *authControllerImpl) InitRoute(api *echo.Group) {
 	auth := api.Group("/auth")
-
 	auth.POST("/login", d.Login)
 	auth.POST("/refresh", d.RefreshToken)
+	auth.POST("/admin/login", d.LoginAdmin)
 
-	protect.POST("/auth/logout", d.Logout)
+	auth.POST("auth/logout", d.Logout)
 }
 
 // Login implements AuthController
@@ -73,6 +74,28 @@ func (d *authControllerImpl) RefreshToken(c echo.Context) error {
 	return c.JSON(http.StatusOK, echo.Map{
 		"message": "refresh success",
 		"data":    newToken,
+	})
+}
+
+// LoginAdmin implements AuthController
+func (d *authControllerImpl) LoginAdmin(c echo.Context) error {
+	var credential dto.UserCredential
+	if err := c.Bind(&credential); err != nil {
+		return err
+	}
+	if err := c.Validate(credential); err != nil {
+		return err
+	}
+	token, err := d.authService.LoginAdmin(credential, c.Request().Context())
+	if err != nil {
+		if err == myerrors.ErrPermission {
+			return echo.NewHTTPError(http.StatusForbidden, err.Error())
+		}
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "login success",
+		"data":    token,
 	})
 }
 

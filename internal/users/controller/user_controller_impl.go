@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 
+	"github.com/Group10CapstoneProject/Golang/config"
 	"github.com/Group10CapstoneProject/Golang/constans"
 	authService "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	"github.com/Group10CapstoneProject/Golang/internal/users/dto"
@@ -10,6 +11,7 @@ import (
 	"github.com/Group10CapstoneProject/Golang/model"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type userControllerImpl struct {
@@ -18,16 +20,14 @@ type userControllerImpl struct {
 }
 
 // InitRoute implements UserController
-func (d *userControllerImpl) InitRoute(api *echo.Group, protect *echo.Group) {
+func (d *userControllerImpl) InitRoute(api *echo.Group) {
 	users := api.Group("/users")
-	protectUsers := protect.Group("/users")
 
 	users.POST("/signup", d.Signup)
-	protectUsers.GET("", d.GetUser)
-	protectUsers.GET("", d.GetUsers)
-	protectUsers.GET("/profile", d.GetUser)
-	protectUsers.POST("/admin", d.NewAadmin)
-	protectUsers.GET("/admin", d.GetAdmins)
+	users.GET("", d.GetUsers, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	users.GET("/profile", d.GetUser, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	users.POST("/admin", d.NewAadmin, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	users.GET("/admin", d.GetAdmins, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
 }
 
 // Signup implements UserController

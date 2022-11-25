@@ -3,6 +3,7 @@ package validator
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
@@ -33,6 +34,9 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 			case "min":
 				msg := fmt.Sprintf("%s must be minimum %s characters", each.Field(), each.Param())
 				return echo.NewHTTPError(http.StatusBadRequest, msg)
+			case "personname":
+				msg := fmt.Sprintf("%s not a person name", each.Field())
+				return echo.NewHTTPError(http.StatusBadRequest, msg)
 			default:
 				msg := fmt.Sprintf("Invalid field %s", each.Field())
 				return echo.NewHTTPError(http.StatusBadRequest, msg)
@@ -41,4 +45,22 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 	}
 
 	return nil
+}
+
+func NewCustomValidator(e *echo.Echo) {
+	validator := validator.New()
+
+	// register the custom validator
+	if err := validator.RegisterValidation("personname", personNameValidator); err != nil {
+		panic(err)
+	}
+
+	e.Validator = &CustomValidator{validator}
+}
+
+// write custom validator here
+
+func personNameValidator(fl validator.FieldLevel) bool {
+	nameRegex := regexp.MustCompile("^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$")
+	return nameRegex.MatchString(fl.Field().String())
 }
