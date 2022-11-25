@@ -42,7 +42,7 @@ jobs:
         key: ${{ secrets.EC2_KEY }}
         port: ${{ secrets.EC2_PORT }}
         script: |
-          cd gym-membership
+          cd gym_membership
           sudo docker-compose down
           sudo docker rmi rnwxyz/gym-membership-dev:latest
           sudo docker pull rnwxyz/gym-membership-dev:latest
