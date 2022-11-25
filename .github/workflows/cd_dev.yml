@@ -8,7 +8,7 @@ jobs:
   deploy:
     name: deploy to development
     runs-on: ubuntu-latest
-    environment: Production
+    environment: development
     steps:
     - uses: actions/checkout@v3
 
@@ -42,7 +42,11 @@ jobs:
         key: ${{ secrets.EC2_KEY }}
         port: ${{ secrets.EC2_PORT }}
         script: |
-          sudo docker stop gym-membership-dev
-          sudo docker rm gym-membership-dev
+          cd gym-membership
+          sudo docker-compose down
+          sudo docker rmi rnwxyz/gym-membership-dev:latest
           sudo docker pull rnwxyz/gym-membership-dev:latest
-          sudo docker run -d -v  $PWD/gym_membership/dev/.env:/.env -p 80:80 --name gym-membership-dev rnwxyz/gym-membership-dev:latest
+          cd docs
+          wget https://raw.githubusercontent.com/Group10CapstoneProject/Golang/development/docs/api-documentation.json
+          cd ..
+          sudo docker-compose up
