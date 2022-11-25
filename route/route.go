@@ -15,9 +15,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
-
-	_ "github.com/Group10CapstoneProject/Golang/app/docs"
-	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 func InitRoutes(e *echo.Echo, db *gorm.DB) {
@@ -42,9 +39,6 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 
 	// version
 	v1 := api.Group("/v1")
-
-	// swagger documentation
-	v1.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	protect := v1.Group("")
 	protect.Use(middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
