@@ -51,7 +51,9 @@ func NewCustomValidator(e *echo.Echo) {
 	validator := validator.New()
 
 	// register the custom validator
-	validator.RegisterValidation("personname", personNameValidator)
+	if err := validator.RegisterValidation("personname", personNameValidator); err != nil {
+		panic(err)
+	}
 
 	e.Validator = &CustomValidator{validator}
 }
