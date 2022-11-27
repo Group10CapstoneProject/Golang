@@ -3,11 +3,13 @@ package controller
 import (
 	"net/http"
 
+	"github.com/Group10CapstoneProject/Golang/config"
 	"github.com/Group10CapstoneProject/Golang/internal/auth/dto"
 	authService "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	"github.com/Group10CapstoneProject/Golang/model"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type authControllerImpl struct {
@@ -20,8 +22,7 @@ func (d *authControllerImpl) InitRoute(api *echo.Group) {
 	auth.POST("/login", d.Login)
 	auth.POST("/refresh", d.RefreshToken)
 	auth.POST("/admin/login", d.LoginAdmin)
-
-	auth.POST("auth/logout", d.Logout)
+	auth.POST("/logout", d.Logout, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
 }
 
 // Login implements AuthController

@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url":"http://{enviroment}.rnwxyz.codes/api/v1",
+            "url":"https://{enviroment}.rnwxyz.codes/api/v1",
             "variables": {
                 "enviroment":{
                     "default": "dev",
@@ -188,7 +188,7 @@
                 "description": "User logout remove the session id",
                 "responses": {
                     "200": {
-                        "description": "Login success",
+                        "description": "Logout success",
                         "content": {
                             "application/json":{
                                 "schema":{
@@ -196,26 +196,11 @@
                                     "properties": {
                                         "message":{
                                             "type": "string"
-                                        },
-                                        "data":{
-                                            "type": "object",
-                                            "properties": {
-                                                "access_token":{
-                                                    "type": "string",
-                                                    "format": "jwt token"
-                                                },
-                                                "refresh_token":{
-                                                    "type": "string",
-                                                    "format": "jwt token"
-                                                }
-                                            }
                                         }
                                     }
                                 },
                                 "example": {
-                                    "message": "login success",
-                                    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOjB9.7W8I-3lyZ1X_a27VBNWHSH5yULLrf_GC8vRd2dyMOsg",
-                                    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOjB9.7W8I-3lyZ1X_a27VBNWHSH5yULLrf_GC8vRd2dyMOsg"
+                                    "message": "logout success"
                                 }
                             }
                         }
