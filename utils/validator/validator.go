@@ -37,6 +37,18 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 			case "personname":
 				msg := fmt.Sprintf("%s not a person name", each.Field())
 				return echo.NewHTTPError(http.StatusBadRequest, msg)
+			case "name":
+				msg := fmt.Sprintf("%s use an invalid character", each.Field())
+				return echo.NewHTTPError(http.StatusBadRequest, msg)
+			case "alpha":
+				msg := fmt.Sprintf("%s must alphabet character", each.Field())
+				return echo.NewHTTPError(http.StatusBadRequest, msg)
+			case "url":
+				msg := fmt.Sprintf("%s not a url", each.Field())
+				return echo.NewHTTPError(http.StatusBadRequest, msg)
+			case "unique":
+				msg := fmt.Sprintf("%s have duplicate data", each.Field())
+				return echo.NewHTTPError(http.StatusBadRequest, msg)
 			default:
 				msg := fmt.Sprintf("Invalid field %s", each.Field())
 				return echo.NewHTTPError(http.StatusBadRequest, msg)
@@ -54,6 +66,9 @@ func NewCustomValidator(e *echo.Echo) {
 	if err := validator.RegisterValidation("personname", personNameValidator); err != nil {
 		panic(err)
 	}
+	if err := validator.RegisterValidation("name", nameValidator); err != nil {
+		panic(err)
+	}
 
 	e.Validator = &CustomValidator{validator}
 }
@@ -62,5 +77,10 @@ func NewCustomValidator(e *echo.Echo) {
 
 func personNameValidator(fl validator.FieldLevel) bool {
 	nameRegex := regexp.MustCompile("^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$")
+	return nameRegex.MatchString(fl.Field().String())
+}
+
+func nameValidator(fl validator.FieldLevel) bool {
+	nameRegex := regexp.MustCompile("^[a-zA-Z0-9]+(([',. -][a-zA-Z0-9 ])?[a-zA-Z0-9]*)*$")
 	return nameRegex.MatchString(fl.Field().String())
 }

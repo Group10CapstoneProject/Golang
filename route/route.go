@@ -5,6 +5,9 @@ import (
 	pkgAuthController "github.com/Group10CapstoneProject/Golang/internal/auth/controller"
 	pkgAuthRepostiory "github.com/Group10CapstoneProject/Golang/internal/auth/repository"
 	pkgAuthService "github.com/Group10CapstoneProject/Golang/internal/auth/service"
+	pkgMemberController "github.com/Group10CapstoneProject/Golang/internal/members/controller"
+	pkgMemberRepostiory "github.com/Group10CapstoneProject/Golang/internal/members/repository"
+	pkgMemberService "github.com/Group10CapstoneProject/Golang/internal/members/service"
 	pkgUserController "github.com/Group10CapstoneProject/Golang/internal/users/controller"
 	pkgUserRepostiory "github.com/Group10CapstoneProject/Golang/internal/users/repository"
 	pkgUserService "github.com/Group10CapstoneProject/Golang/internal/users/service"
@@ -44,9 +47,16 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	if err := userService.CreateSuperadmin(); err != nil {
 		panic(err)
 	}
+
 	// init user and auth controller
 	userController := pkgUserController.NewUserController(userService, authService)
 	userController.InitRoute(v1)
 	authController := pkgAuthController.NewAuthController(authService)
 	authController.InitRoute(v1)
+
+	// init member route
+	memberRepository := pkgMemberRepostiory.NewMemberRepository(db)
+	memberService := pkgMemberService.NewMemberService(memberRepository)
+	memberController := pkgMemberController.NewMemberController(memberService, authService)
+	memberController.InitRoute(v1)
 }
