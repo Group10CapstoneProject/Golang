@@ -54,8 +54,8 @@ func (r *memberRepositoryImpl) CheckMemberTypeIsDeleted(body *model.MemberType) 
 }
 
 // DeleteMember implements MemberRepository
-func (r *memberRepositoryImpl) DeleteMember(model *model.Member, ctx context.Context) error {
-	res := r.db.WithContext(ctx).Delete(model)
+func (r *memberRepositoryImpl) DeleteMember(body *model.Member, ctx context.Context) error {
+	res := r.db.WithContext(ctx).Delete(body)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -66,8 +66,8 @@ func (r *memberRepositoryImpl) DeleteMember(model *model.Member, ctx context.Con
 }
 
 // DeleteMemberType implements MemberRepository
-func (r *memberRepositoryImpl) DeleteMemberType(model *model.MemberType, ctx context.Context) error {
-	res := r.db.WithContext(ctx).Delete(model)
+func (r *memberRepositoryImpl) DeleteMemberType(body *model.MemberType, ctx context.Context) error {
+	res := r.db.WithContext(ctx).Delete(body)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -91,7 +91,7 @@ func (r *memberRepositoryImpl) FindMemberById(id uint, ctx context.Context) (*mo
 // FindMemberByUser implements MemberRepository
 func (r *memberRepositoryImpl) FindMemberByUser(userId uint, ctx context.Context) ([]model.Member, error) {
 	members := []model.Member{}
-	err := r.db.WithContext(ctx).Where("user_id = ? AND status != ?", userId, model.INACTIVE).
+	err := r.db.WithContext(ctx).Where("user_id = ?", userId).
 		Preload("User").
 		Preload("MemberType").
 		Preload("PaymentMethod").
@@ -111,9 +111,9 @@ func (r *memberRepositoryImpl) FindMemberTypes(ctx context.Context) ([]model.Mem
 
 // FindMemberTypeById implements MemberRepository
 func (r *memberRepositoryImpl) FindMemberTypeById(id uint, ctx context.Context) (*model.MemberType, error) {
-	memberTypes := model.MemberType{}
-	err := r.db.WithContext(ctx).Where("id = ?", id).First(&memberTypes).Error
-	return &memberTypes, err
+	memberType := model.MemberType{}
+	err := r.db.WithContext(ctx).Where("id = ?", id).First(&memberType).Error
+	return &memberType, err
 }
 
 // FindMembers implements MemberRepository

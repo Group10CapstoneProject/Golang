@@ -11,7 +11,7 @@ type PaymentMethod struct {
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 	DeletedAt     gorm.DeletedAt `gorm:"index"`
-	Name          string         `gorm:"type:varchar(255);unique"`
+	Name          string         `gorm:"type:varchar(255);uniqueIndex"`
+	PaymentNumber string         `gorm:"type:varchar(255)"`
 	Description   string
-	PaymentNumber string `gorm:"type:varchar(255)"`
 }

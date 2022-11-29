@@ -8,6 +8,9 @@ import (
 	pkgMemberController "github.com/Group10CapstoneProject/Golang/internal/members/controller"
 	pkgMemberRepostiory "github.com/Group10CapstoneProject/Golang/internal/members/repository"
 	pkgMemberService "github.com/Group10CapstoneProject/Golang/internal/members/service"
+	pkgPaymentMethodController "github.com/Group10CapstoneProject/Golang/internal/paymentMethods/controller"
+	pkgPaymentMethodRepostiory "github.com/Group10CapstoneProject/Golang/internal/paymentMethods/repository"
+	pkgPaymentMethodService "github.com/Group10CapstoneProject/Golang/internal/paymentMethods/service"
 	pkgUserController "github.com/Group10CapstoneProject/Golang/internal/users/controller"
 	pkgUserRepostiory "github.com/Group10CapstoneProject/Golang/internal/users/repository"
 	pkgUserService "github.com/Group10CapstoneProject/Golang/internal/users/service"
@@ -59,4 +62,10 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	memberService := pkgMemberService.NewMemberService(memberRepository)
 	memberController := pkgMemberController.NewMemberController(memberService, authService)
 	memberController.InitRoute(v1)
+
+	// init payment method route
+	paymentMethodRepository := pkgPaymentMethodRepostiory.NewPaymentMethodRepository(db)
+	paymentMethodService := pkgPaymentMethodService.NewPaymentMethodService(paymentMethodRepository)
+	paymentMethodController := pkgPaymentMethodController.NewPaymentMethodController(paymentMethodService, authService)
+	paymentMethodController.InitRoute(v1)
 }

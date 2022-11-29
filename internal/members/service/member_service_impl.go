@@ -17,7 +17,7 @@ type memberServiceImpl struct {
 // CreateMember implements MemberService
 func (s *memberServiceImpl) CreateMember(request *dto.MemberStoreRequest, ctx context.Context) error {
 	member := request.ToModel()
-	member.ExpiredAt = time.Time{}.Add(24 * time.Hour)
+	member.ExpiredAt = time.Now().Add(24 * time.Hour)
 	member.Status = model.PENDING
 	err := s.memberRepository.CreateMember(member, ctx)
 	return err
@@ -53,6 +53,17 @@ func (s *memberServiceImpl) FindMemberById(id uint, ctx context.Context) (*dto.M
 	member, err := s.memberRepository.FindMemberById(id, ctx)
 	if err != nil {
 		return nil, err
+	}
+	if member.Status != model.INACTIVE && time.Now().After(member.ExpiredAt) {
+		member.Status = model.INACTIVE
+		body := model.Member{
+			ID:     member.ID,
+			Status: model.INACTIVE,
+		}
+		err := s.memberRepository.UpdateMember(&body, ctx)
+		if err != nil {
+			return nil, err
+		}
 	}
 	var result dto.MemberDetailResource
 	result.FromModel(member)
@@ -116,14 +127,20 @@ func (s *memberServiceImpl) UpdateMember(request *dto.MemberUpdateRequest, ctx c
 		return err
 	}
 
-	if member.Status == model.ACTIVE && check.Status != model.ACTIVE {
-		member.ExpiredAt = time.Now().Add(24 * 30 * time.Duration(member.Duration) * time.Hour)
+	if member.Status == model.ACTIVE && check.Status != model.ACTIVE && check.Status != model.INACTIVE {
+		member.ExpiredAt = time.Now().Add(24 * 30 * time.Duration(check.Duration) * time.Hour)
 		member.Code = uuid.New()
-	} else if member.Status == model.INACTIVE && check.Status != model.INACTIVE {
+	} else if member.Status == model.REJECT && check.Status != model.REJECT {
 		member.ExpiredAt = time.Now()
+	} else if member.ProofPayment != "" {
+		member.ExpiredAt = time.Now().Add(24 * time.Hour)
+		member.Status = model.WAITING
+	}
+	if time.Now().After(check.ExpiredAt) {
+		member.Status = model.INACTIVE
 	}
 
-	err = s.memberRepository.CreateMember(member, ctx)
+	err = s.memberRepository.UpdateMember(member, ctx)
 	return err
 }
 

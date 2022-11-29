@@ -31,7 +31,7 @@ type MemberUpdateRequest struct {
 	MemberTypeID    uint             `json:"member_type_id,omitempty" validate:"omitempty,gte=1"`
 	Duration        uint             `json:"duration,omitempty" validate:"omitempty,gte=1"`
 	PaymentMethodId uint             `json:"payment_method_id,omitempty" validate:"omitempty,gte=1"`
-	Status          model.StatusType `json:"status,omitempty" validate:"omitempty,alpha"`
+	Status          model.StatusType `json:"status,omitempty" validate:"omitempty,alpha,status"`
 	ProofPayment    string           `json:"proof_payment,omitempty" validate:"omitempty,url"`
 }
 

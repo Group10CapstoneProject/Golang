@@ -9,6 +9,7 @@ import (
 	authServ "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	"github.com/Group10CapstoneProject/Golang/internal/members/dto"
 	memberServ "github.com/Group10CapstoneProject/Golang/internal/members/service"
+	"github.com/Group10CapstoneProject/Golang/model"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -238,7 +239,10 @@ func (d *memberControllerImpl) GetMembers(c echo.Context) error {
 		}
 		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
-	members, err := d.memberService.FindMemberByUser(uint(claims["user_id"].(float64)), c.Request().Context())
+	var query model.Pagination
+	query.NewPageQuery(c)
+
+	members, err := d.memberService.FindMembers(&query, c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -251,7 +255,7 @@ func (d *memberControllerImpl) GetMembers(c echo.Context) error {
 // UpdateMember implements MemberController
 func (d *memberControllerImpl) UpdateMember(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
+	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
 			return echo.NewHTTPError(http.StatusForbidden, err.Error())
 		}
