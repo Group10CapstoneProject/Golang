@@ -1696,6 +1696,56 @@
                 }
             }
         },
+        "/members/user":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Members"],
+                "summary": "Get user member history",
+                "description": "Get membersip history from user login or from user token",
+                "responses": {
+                    "200": {
+                        "description": "Success get members",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 4,
+                                            "user_name": "superadmin",
+                                            "member_type_name": "silver",
+                                            "expired_at": "2022-12-30T00:12:43.638+08:00",
+                                            "updated_at": "2022-11-30T00:12:43.638+08:00",
+                                            "duration": 1,
+                                            "status": "ACTIVE"
+                                        },
+                                        {
+                                            "id": 5,
+                                            "user_name": "superadmin",
+                                            "member_type_name": "silver",
+                                            "expired_at": "2022-12-01T16:50:12.976+08:00",
+                                            "updated_at": "2022-11-30T16:50:12.976+08:00",
+                                            "duration": 1,
+                                            "status": "PENDING"
+                                        }
+                                    ],
+                                    "message": "success get members"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            }
+        },
         "/paymentMethods":{
             "get": {
                 "security": [
