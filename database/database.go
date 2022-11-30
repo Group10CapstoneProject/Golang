@@ -7,6 +7,7 @@ import (
 	"github.com/Group10CapstoneProject/Golang/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func ConnectDB() (*gorm.DB, error) {
@@ -19,11 +20,15 @@ func ConnectDB() (*gorm.DB, error) {
 
 	return gorm.Open(mysql.Open(dsn), &gorm.Config{
 		SkipDefaultTransaction: true,
+		Logger:                 logger.Default.LogMode(logger.Info),
 	})
 }
 
 func MigrateDB(db *gorm.DB) error {
 	return db.AutoMigrate(
 		model.User{},
+		model.PaymentMethod{},
+		model.MemberType{},
+		model.Member{},
 	)
 }
