@@ -83,6 +83,7 @@ func (s *userServiceImpl) CreateSuperadmin() error {
 		return err
 	}
 	superadmin := model.User{
+		ID:       1,
 		Name:     constans.Superadmin_name,
 		Email:    constans.Superadmin_email,
 		Role:     constans.Role_superadmin,

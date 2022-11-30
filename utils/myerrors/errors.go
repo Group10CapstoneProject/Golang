@@ -12,4 +12,6 @@ var (
 	ErrTokenExpired         = errors.New("token expired")
 	ErrPermission           = errors.New("not have permission to access")
 	ErrInvalidSession       = errors.New("invalid session id")
+	ErrDuplicateRecord      = errors.New("duplicate record")
+	ErrRecordNotFound       = errors.New("record not found")
 )

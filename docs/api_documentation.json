@@ -1074,9 +1074,20 @@
                         "AccessToken":[]
                     }
                 ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/components/parameters/q"
+                    }
+                ],
                 "tags": ["Members"],
                 "summary": "Get member  or all members",
-                "description": "To get all members",
+                "description": "To get all members and only admin or superadmin account have permission to this feature",
                 "responses": {
                     "200": {
                         "description": "Success get members",
@@ -1091,61 +1102,64 @@
                                         "data":{
                                             "type": "object",
                                             "properties": {
-                                                "id":{
-                                                    "type":"string",
-                                                    "format": "UUID"
+                                                "members":{
+                                                    "type": "array",
+                                                    "items":{
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id":{
+                                                                "type":"integer"
+                                                            },
+                                                            "user_name":{
+                                                                "type": "string"
+                                                            },
+                                                            "member_type_name":{
+                                                                "type": "string"
+                                                            },
+                                                            "updated_at":{
+                                                                "type": "string"
+                                                            },
+                                                            "duration":{
+                                                                "type": "integer"
+                                                            },
+                                                            "status":{
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    }
                                                 },
-                                                "title":{
-                                                    "type":"string"
-                                                },
-                                                "time":{
-                                                    "type":"string",
-                                                    "description": "use time format"
-                                                },
-                                                "duration":{
-                                                    "type": "integer",
-                                                    "description": "format minutes"
-                                                },
-                                                "slot":{
+                                                "count":{
                                                     "type": "integer"
-                                                },
-                                                "slot_ready":{
-                                                    "type": "integer",
-                                                    "description": "remaining slots"
-                                                },
-                                                "price": {
-                                                    "type": "integer"
-                                                },
-                                                "picture_path":{
-                                                    "type": "string",
-                                                    "description": "dispay picture fo the class"
-                                                },
-                                                "trainer_id":{
-                                                    "type": "string",
-                                                    "format": "UUID"
-                                                },
-                                                "description":{
-                                                    "type": "string",
-                                                    "description": "more information about the class"
                                                 }
                                             }
                                         }
                                     }
                                 },
                                 "example": {
-                                    "message": "success get offline class",
                                     "data": {
-                                        "id": "123e4567-e89b-12d3-a456-4266141711111",
-                                        "title": "Zumba Internasional Class",
-                                        "time": "2012-10-31 15:50:13.793654 +0000 UTC",
-                                        "duration": 60,
-                                        "slot": 50,
-                                        "slot_ready": 34,
-                                        "price": 500000,
-                                        "picture_path": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
-                                        "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
-                                        "description": "offline class zumba tingkat internasional"
-                                    }
+                                        "members": [
+                                            {
+                                                "id": 3,
+                                                "user_name": "superadmin",
+                                                "member_type_name": "silver",
+                                                "expired_at": "2022-12-01T00:11:45.988+08:00",
+                                                "updated_at": "2022-11-30T00:11:45.988+08:00",
+                                                "duration": 3,
+                                                "status": "WAITING"
+                                            },
+                                            {
+                                                "id": 4,
+                                                "user_name": "superadmin",
+                                                "member_type_name": "silver",
+                                                "expired_at": "2022-12-30T00:12:43.638+08:00",
+                                                "updated_at": "2022-11-30T00:12:43.638+08:00",
+                                                "duration": 1,
+                                                "status": "ACTIVE"
+                                            }
+                                        ],
+                                        "count": 2
+                                    },
+                                    "message": "success get members"
                                 }
                             }
                         }
@@ -1170,38 +1184,28 @@
                         "AccessToken":[]
                     }
                 ],
-                "parameters": [
-                    {
-                        "$ref": "#/components/parameters/id"
-                    }
-                ],
                 "tags": ["Members"],
                 "summary": "Create new members or booking",
-                "description": "To update offline classs",
+                "description": "To create or booking membership",
                 "requestBody":{
                     "required": true,
                     "content": {
                         "application/json":{
                             "schema":{
-                                "$ref": "#/components/schemas/offlineClass"
+                                "$ref": "#/components/schemas/member"
                             },
                             "example": {
-                                "title": "Zumba Internasional Class",
-                                "time": "2012-10-31 15:50:13.793654 +0000 UTC",
-                                "duration": 60,
-                                "slot": 50,
-                                "slot_ready": 34,
-                                "price": 500000,
-                                "picture_path": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
-                                "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
-                                "description": "offline class zumba tingkat internasional"
+                                "member_type_id": 1,
+                                "duration": 1,
+                                "payment_method_id": 1,
+                                "total": 200000
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "Success update offline class",
+                        "description": "Success create new member",
                         "content": {
                             "application/json":{
                                 "schema":{
@@ -1213,7 +1217,73 @@
                                     }
                                 },
                                 "example": {
-                                    "message": "success update offline class"
+                                    "message": "new member success created"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/members/{id}":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Members"],
+                "summary": "Get single or details member",
+                "description": "To spesific member or detail member",
+                "responses": {
+                    "200": {
+                        "description": "Success get members",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": {
+                                        "id": 4,
+                                        "user_id": 1,
+                                        "user_name": "superadmin",
+                                        "user_email": "superadmin@gmail.com",
+                                        "member_type": {
+                                            "id": 1,
+                                            "name": "silver",
+                                            "price": 200000,
+                                            "description": "test member",
+                                            "access_offline_class": true,
+                                            "access_online_class": true,
+                                            "access_trainer": true,
+                                            "access_gym": false
+                                        },
+                                        "expired_at": "2022-12-30T00:12:43.638+08:00",
+                                        "updated_at": "2022-11-30T00:12:43.638+08:00",
+                                        "duration": 1,
+                                        "proof_payment": "http://google.com",
+                                        "payment_method": {
+                                            "name": "ShoopePay",
+                                            "description": "Bisa bayar dimanapun dan kapanpun",
+                                            "payment_number": "0812342331512"
+                                        },
+                                        "total": 200000,
+                                        "code": "3fb4b25e-07f1-4794-83a6-d576e95cdd29",
+                                        "status": "ACTIVE"
+                                    },
+                                    "message": "success get member"
                                 }
                             }
                         }
@@ -1226,92 +1296,30 @@
                     },
                     "401":{
                         "$ref": "#/components/responses/unauthorized"
-                    },
-                    "403":{
-                        "$ref": "#/components/responses/forbidden"
                     }
                 }
-            }
-        },
-        "/members/{id}":{
-            "get": {
+            },
+            "delete": {
                 "security": [
                     {
                         "AccessToken":[]
                     }
                 ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
                 "tags": ["Members"],
-                "summary": "Get single member",
-                "description": "To spesific member or detail member",
+                "summary": "Delete member",
+                "description": "Only admin can delete member",
                 "responses": {
                     "200": {
-                        "description": "Success get members",
+                        "description": "Success delete member",
                         "content": {
                             "application/json":{
-                                "schema":{
-                                    "type":"object",
-                                    "properties": {
-                                        "message":{
-                                            "type": "string"
-                                        },
-                                        "data":{
-                                            "type": "object",
-                                            "properties": {
-                                                "id":{
-                                                    "type":"string",
-                                                    "format": "UUID"
-                                                },
-                                                "title":{
-                                                    "type":"string"
-                                                },
-                                                "time":{
-                                                    "type":"string",
-                                                    "description": "use time format"
-                                                },
-                                                "duration":{
-                                                    "type": "integer",
-                                                    "description": "format minutes"
-                                                },
-                                                "slot":{
-                                                    "type": "integer"
-                                                },
-                                                "slot_ready":{
-                                                    "type": "integer",
-                                                    "description": "remaining slots"
-                                                },
-                                                "price": {
-                                                    "type": "integer"
-                                                },
-                                                "picture_path":{
-                                                    "type": "string",
-                                                    "description": "dispay picture fo the class"
-                                                },
-                                                "trainer_id":{
-                                                    "type": "string",
-                                                    "format": "UUID"
-                                                },
-                                                "description":{
-                                                    "type": "string",
-                                                    "description": "more information about the class"
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
                                 "example": {
-                                    "message": "success get offline class",
-                                    "data": {
-                                        "id": "123e4567-e89b-12d3-a456-4266141711111",
-                                        "title": "Zumba Internasional Class",
-                                        "time": "2012-10-31 15:50:13.793654 +0000 UTC",
-                                        "duration": 60,
-                                        "slot": 50,
-                                        "slot_ready": 34,
-                                        "price": 500000,
-                                        "picture_path": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
-                                        "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
-                                        "description": "offline class zumba tingkat internasional"
-                                    }
+                                    "message": "success delete member"
                                 }
                             }
                         }
@@ -1338,36 +1346,61 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/id"
+                        "$ref": "#/components/parameters/idUint"
                     }
                 ],
                 "tags": ["Members"],
-                "summary": "Update status member",
-                "description": "To update member status",
+                "summary": "Update member",
+                "description": "Update member from user or from admin",
                 "requestBody":{
                     "required": true,
                     "content": {
                         "application/json":{
                             "schema":{
-                                "$ref": "#/components/schemas/offlineClass"
+                                "type": "object",
+                                "properties": {
+                                    "status":{
+                                        "type": "string"
+                                    }
+                                }
                             },
-                            "example": {
-                                "title": "Zumba Internasional Class",
-                                "time": "2012-10-31 15:50:13.793654 +0000 UTC",
-                                "duration": 60,
-                                "slot": 50,
-                                "slot_ready": 34,
-                                "price": 500000,
-                                "picture_path": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
-                                "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
-                                "description": "offline class zumba tingkat internasional"
+                            "examples": {
+                                "user update":{
+                                    "value":{
+                                        "member_type_id": 1,
+                                        "duration": 3,
+                                        "payment_method_id": 1,
+                                        "total": 200000
+                                    }
+                                },
+                                "set status only":{
+                                    "value":{
+                                        "status":"ACTIVE"
+                                    },
+                                    "description": "status allowed ACTIVE INACTIVE REJECT"
+                                },
+                                "admin update":{
+                                    "value":{
+                                        "member_type_id": 1,
+                                        "duration": 3,
+                                        "payment_method_id": 1,
+                                        "total": 200000,
+                                        "status": "ACTIVE"
+                                    }
+                                },
+                                "post proof payment":{
+                                    "value":{
+                                        "proof_payment":"https://google.com"
+                                    },
+                                    "description": "link picture from upload"
+                                }
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "Success update offline class",
+                        "description": "Success update member",
                         "content": {
                             "application/json":{
                                 "schema":{
@@ -1379,7 +1412,7 @@
                                     }
                                 },
                                 "example": {
-                                    "message": "success update offline class"
+                                    "message": "success update member"
                                 }
                             }
                         }
@@ -1392,9 +1425,6 @@
                     },
                     "401":{
                         "$ref": "#/components/responses/unauthorized"
-                    },
-                    "403":{
-                        "$ref": "#/components/responses/forbidden"
                     }
                 }
             }
@@ -1406,93 +1436,47 @@
                         "AccessToken":[]
                     }
                 ],
-                "tags": ["Members"],
+                "tags": ["Member Types"],
                 "summary": "Get all member types",
-                "description": "To get all members",
+                "description": "To get all member types",
                 "responses": {
                     "200": {
-                        "description": "Success get members",
+                        "description": "Success get member types",
                         "content": {
                             "application/json":{
-                                "schema":{
-                                    "type":"object",
-                                    "properties": {
-                                        "message":{
-                                            "type": "string"
-                                        },
-                                        "data":{
-                                            "type": "object",
-                                            "properties": {
-                                                "id":{
-                                                    "type":"string",
-                                                    "format": "UUID"
-                                                },
-                                                "title":{
-                                                    "type":"string"
-                                                },
-                                                "time":{
-                                                    "type":"string",
-                                                    "description": "use time format"
-                                                },
-                                                "duration":{
-                                                    "type": "integer",
-                                                    "description": "format minutes"
-                                                },
-                                                "slot":{
-                                                    "type": "integer"
-                                                },
-                                                "slot_ready":{
-                                                    "type": "integer",
-                                                    "description": "remaining slots"
-                                                },
-                                                "price": {
-                                                    "type": "integer"
-                                                },
-                                                "picture_path":{
-                                                    "type": "string",
-                                                    "description": "dispay picture fo the class"
-                                                },
-                                                "trainer_id":{
-                                                    "type": "string",
-                                                    "format": "UUID"
-                                                },
-                                                "description":{
-                                                    "type": "string",
-                                                    "description": "more information about the class"
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
                                 "example": {
-                                    "message": "success get offline class",
-                                    "data": {
-                                        "id": "123e4567-e89b-12d3-a456-4266141711111",
-                                        "title": "Zumba Internasional Class",
-                                        "time": "2012-10-31 15:50:13.793654 +0000 UTC",
-                                        "duration": 60,
-                                        "slot": 50,
-                                        "slot_ready": 34,
-                                        "price": 500000,
-                                        "picture_path": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
-                                        "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
-                                        "description": "offline class zumba tingkat internasional"
-                                    }
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "name": "silver",
+                                            "price": 200000,
+                                            "description": "test member",
+                                            "access_offline_class": true,
+                                            "access_online_class": true,
+                                            "access_trainer": true,
+                                            "access_gym": false
+                                        },
+                                        {
+                                            "id": 11,
+                                            "name": "gold",
+                                            "price": 400000,
+                                            "description": "test member",
+                                            "access_offline_class": true,
+                                            "access_online_class": true,
+                                            "access_trainer": true,
+                                            "access_gym": true
+                                        }
+                                    ],
+                                    "message": "success get member types"
                                 }
                             }
                         }
-                    },
-                    "404":{
-                        "$ref": "#/components/responses/notFound"
                     },
                     "500":{
                         "$ref": "#/components/responses/internalServerError"
                     },
                     "401":{
                         "$ref": "#/components/responses/unauthorized"
-                    },
-                    "403":{
-                        "$ref": "#/components/responses/forbidden"
                     }
                 }
             },
@@ -1502,38 +1486,31 @@
                         "AccessToken":[]
                     }
                 ],
-                "parameters": [
-                    {
-                        "$ref": "#/components/parameters/id"
-                    }
-                ],
-                "tags": ["Members"],
+                "tags": ["Member Types"],
                 "summary": "Create new member types",
-                "description": "To update offline classs",
+                "description": "Only admin can create member type",
                 "requestBody":{
                     "required": true,
                     "content": {
                         "application/json":{
                             "schema":{
-                                "$ref": "#/components/schemas/offlineClass"
+                                "$ref": "#/components/schemas/memberType"
                             },
                             "example": {
-                                "title": "Zumba Internasional Class",
-                                "time": "2012-10-31 15:50:13.793654 +0000 UTC",
-                                "duration": 60,
-                                "slot": 50,
-                                "slot_ready": 34,
-                                "price": 500000,
-                                "picture_path": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
-                                "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
-                                "description": "offline class zumba tingkat internasional"
+                                "name": "gold",
+                                "price": 400000,
+                                "description": "test member",
+                                "access_offline_class": true,
+                                "access_online_class": true,
+                                "access_trainer": true,
+                                "access_gym": true
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "Success update offline class",
+                        "description": "Success create member type",
                         "content": {
                             "application/json":{
                                 "schema":{
@@ -1545,13 +1522,10 @@
                                     }
                                 },
                                 "example": {
-                                    "message": "success update offline class"
+                                    "message": "new member type success created"
                                 }
                             }
                         }
-                    },
-                    "404":{
-                        "$ref": "#/components/responses/notFound"
                     },
                     "500":{
                         "$ref": "#/components/responses/internalServerError"
@@ -1572,78 +1546,25 @@
                         "AccessToken":[]
                     }
                 ],
-                "tags": ["Members"],
-                "summary": "Get detail member types",
-                "description": "To get all members",
+                "tags": ["Member Types"],
+                "summary": "Get detail or single member types",
                 "responses": {
                     "200": {
-                        "description": "Success get members",
+                        "description": "Success get member type",
                         "content": {
                             "application/json":{
-                                "schema":{
-                                    "type":"object",
-                                    "properties": {
-                                        "message":{
-                                            "type": "string"
-                                        },
-                                        "data":{
-                                            "type": "object",
-                                            "properties": {
-                                                "id":{
-                                                    "type":"string",
-                                                    "format": "UUID"
-                                                },
-                                                "title":{
-                                                    "type":"string"
-                                                },
-                                                "time":{
-                                                    "type":"string",
-                                                    "description": "use time format"
-                                                },
-                                                "duration":{
-                                                    "type": "integer",
-                                                    "description": "format minutes"
-                                                },
-                                                "slot":{
-                                                    "type": "integer"
-                                                },
-                                                "slot_ready":{
-                                                    "type": "integer",
-                                                    "description": "remaining slots"
-                                                },
-                                                "price": {
-                                                    "type": "integer"
-                                                },
-                                                "picture_path":{
-                                                    "type": "string",
-                                                    "description": "dispay picture fo the class"
-                                                },
-                                                "trainer_id":{
-                                                    "type": "string",
-                                                    "format": "UUID"
-                                                },
-                                                "description":{
-                                                    "type": "string",
-                                                    "description": "more information about the class"
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
                                 "example": {
-                                    "message": "success get offline class",
                                     "data": {
-                                        "id": "123e4567-e89b-12d3-a456-4266141711111",
-                                        "title": "Zumba Internasional Class",
-                                        "time": "2012-10-31 15:50:13.793654 +0000 UTC",
-                                        "duration": 60,
-                                        "slot": 50,
-                                        "slot_ready": 34,
-                                        "price": 500000,
-                                        "picture_path": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
-                                        "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
-                                        "description": "offline class zumba tingkat internasional"
-                                    }
+                                        "id": 1,
+                                        "name": "silver",
+                                        "price": 200000,
+                                        "description": "test member",
+                                        "access_offline_class": true,
+                                        "access_online_class": true,
+                                        "access_trainer": true,
+                                        "access_gym": false
+                                    },
+                                    "message": "success get member type"
                                 }
                             }
                         }
@@ -1656,9 +1577,6 @@
                     },
                     "401":{
                         "$ref": "#/components/responses/unauthorized"
-                    },
-                    "403":{
-                        "$ref": "#/components/responses/forbidden"
                     }
                 }
             },
@@ -1670,18 +1588,18 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/id"
+                        "$ref": "#/components/parameters/idUint"
                     }
                 ],
-                "tags": ["Members"],
+                "tags": ["Member Types"],
                 "summary": "Update member types",
-                "description": "To update offline classs",
+                "description": "Only admin can update member types",
                 "requestBody":{
                     "required": true,
                     "content": {
                         "application/json":{
                             "schema":{
-                                "$ref": "#/components/schemas/offlineClass"
+                                "$ref": "#/components/schemas/memberType"
                             },
                             "example": {
                                 "title": "Zumba Internasional Class",
@@ -1738,15 +1656,15 @@
                 ],
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/id"
+                        "$ref": "#/components/parameters/idUint"
                     }
                 ],
-                "tags": ["Members"],
+                "tags": ["Member Types"],
                 "summary": "Delete member types",
-                "description": "To delete offline classes use the the id",
+                "description": "Only admin can delete member type",
                 "responses": {
                     "200": {
-                        "description": "Success delete offline calss",
+                        "description": "Success delete member type",
                         "content": {
                             "application/json":{
                                 "schema":{
@@ -1758,7 +1676,306 @@
                                     }
                                 },
                                 "example": {
-                                    "message": "success delete offline class"
+                                    "message": "success delete member types"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref":"#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/members/user":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Members"],
+                "summary": "Get user member history",
+                "description": "Get membersip history from user login or from user token",
+                "responses": {
+                    "200": {
+                        "description": "Success get members",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 4,
+                                            "user_name": "superadmin",
+                                            "member_type_name": "silver",
+                                            "expired_at": "2022-12-30T00:12:43.638+08:00",
+                                            "updated_at": "2022-11-30T00:12:43.638+08:00",
+                                            "duration": 1,
+                                            "status": "ACTIVE"
+                                        },
+                                        {
+                                            "id": 5,
+                                            "user_name": "superadmin",
+                                            "member_type_name": "silver",
+                                            "expired_at": "2022-12-01T16:50:12.976+08:00",
+                                            "updated_at": "2022-11-30T16:50:12.976+08:00",
+                                            "duration": 1,
+                                            "status": "PENDING"
+                                        }
+                                    ],
+                                    "message": "success get members"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/paymentMethods":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Payment Methods"],
+                "summary": "Get all payment methods",
+                "responses": {
+                    "200": {
+                        "description": "Success get payment methods",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "name": "ShoopePay",
+                                            "payment_number": "0812342331512",
+                                            "description": "Bisa bayar dimanapun dan kapanpun"
+                                        },
+                                        {
+                                            "id": 4,
+                                            "name": "Transfer Bank BNI",
+                                            "payment_number": "1123612712221",
+                                            "description": "Langsung transfer"
+                                        }
+                                    ],
+                                    "message": "success get payment methods"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Payment Methods"],
+                "summary": "Create new member types",
+                "description": "Only admin can create member type",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/paymentMethods"
+                            },
+                            "example": {
+                                "name":"Transfer Bank BNI",
+                                "payment_number":"1123612712221",
+                                "description":"Langsung transfer"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success create payment method",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "new payment method success created"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/paymentMethods/{id}":{
+            "get": {
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Payment Methods"],
+                "summary": "Get detail payment method",
+                "responses": {
+                    "200": {
+                        "description": "Success get payment method",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "name": "ShoopePay",
+                                        "payment_number": "0812342331512",
+                                        "description": "Bisa bayar dimanapun dan kapanpun"
+                                    },
+                                    "message": "success get payment method"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Payment Methods"],
+                "summary": "Update payment method",
+                "description": "Only admin can payment method",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/paymentMethods"
+                            },
+                            "example": {
+                                "name":"ShoopePay",
+                                "payment_number":"0812342331512",
+                                "description":"Bisa bayar dimanapun dan kapanpun test update"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success update payment method",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success update payment method"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Payment Methods"],
+                "summary": "Delete payment methods",
+                "description": "Only admin can delete payment method",
+                "responses": {
+                    "200": {
+                        "description": "Success delete payment method",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success delete payment method"
                                 }
                             }
                         }
@@ -1810,6 +2027,63 @@
                                 "type": "string"
                             }
                         }
+                    }
+                }
+            },
+            "member":{
+                "type":"object",
+                "properties": {
+                    "member_type_id":{
+                        "type": "integer"
+                    },
+                    "duration":{
+                        "type": "integer"
+                    },
+                    "payment_method_id": {
+                        "type": "integer"
+                    },
+                    "total": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "memberType":{
+                "type":"object",
+                "properties": {
+                    "name":{
+                        "type": "string"
+                    },
+                    "price":{
+                        "type": "integer"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "access_offline_class": {
+                        "type": "boolean"
+                    },
+                    "access_online_class": {
+                        "type": "boolean"
+                    },
+                    "access_gym": {
+                        "type": "boolean"
+                    },
+                    "access_trainer": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "paymentMethods":{
+                "type":"object",
+                "properties": {
+                    "name":{
+                        "type": "string"
+                    },
+                    "payment_number": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
                     }
                 }
             },
@@ -1981,6 +2255,16 @@
                     "description": "The spesific id for the operation"
                 },
                 "example": "123e4567-e89b-12d3-a456-426614174000"
+            },
+            "idUint": {
+                "required": true,
+                "in": "path",
+                "name": "id",
+                "schema": {
+                    "type": "integer",
+                    "description": "The spesific id for the operation"
+                },
+                "example": 1
             }
         }
     }
