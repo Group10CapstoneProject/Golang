@@ -1365,7 +1365,7 @@
                                 }
                             },
                             "examples": {
-                                "user update":{
+                                "update":{
                                     "value":{
                                         "member_type_id": 1,
                                         "duration": 3,
@@ -1373,26 +1373,11 @@
                                         "total": 200000
                                     }
                                 },
-                                "set status only":{
-                                    "value":{
-                                        "status":"ACTIVE"
-                                    },
-                                    "description": "status allowed ACTIVE INACTIVE REJECT"
-                                },
-                                "admin update":{
-                                    "value":{
-                                        "member_type_id": 1,
-                                        "duration": 3,
-                                        "payment_method_id": 1,
-                                        "total": 200000,
-                                        "status": "ACTIVE"
-                                    }
-                                },
                                 "post proof payment":{
                                     "value":{
                                         "proof_payment":"https://google.com"
                                     },
-                                    "description": "link picture from upload"
+                                    "description": "link picture from upload result"
                                 }
                             }
                         }
@@ -1742,6 +1727,73 @@
                     },
                     "401":{
                         "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/members/setStatus/{id}":{
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Members"],
+                "summary": "Set member status",
+                "description": "Only admin can set member status. Status set allowed (ACTIVE, INACTIVE, REJECT)",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "status":{
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "example": {
+                                "status":"ACTIVE"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success set status",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success set status"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
                     }
                 }
             }

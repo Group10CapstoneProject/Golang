@@ -30,6 +30,7 @@ func (d *memberControllerImpl) InitRoute(api *echo.Group) {
 	members.GET("/:id", d.GetMemberDetail)
 	members.PUT("/:id", d.UpdateMember)
 	members.DELETE("/:id", d.DeleteMember)
+	members.POST("/setStatus/:id", d.SetStatusMember)
 
 	memberType := members.Group("/types")
 	memberType.POST("", d.CreateMemberType)
@@ -309,6 +310,36 @@ func (d *memberControllerImpl) UpdateMemberType(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, echo.Map{
 		"message": "success update member type",
+	})
+}
+
+// SetStatusMember implements MemberController
+func (d *memberControllerImpl) SetStatusMember(c echo.Context) error {
+	claims := d.authService.GetClaims(&c)
+	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
+		if err == myerrors.ErrPermission {
+			return echo.NewHTTPError(http.StatusForbidden, err.Error())
+		}
+		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+	}
+	param := c.Param("id")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "record not found")
+	}
+	var status dto.SetStatusMember
+	if err := c.Bind(&status); err != nil {
+		return err
+	}
+	if err := c.Validate(status); err != nil {
+		return err
+	}
+	status.ID = uint(id)
+	if err := d.memberService.SetStatusMember(&status, c.Request().Context()); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "success set status",
 	})
 }
 

@@ -77,6 +77,9 @@ func (r *paymentMethodRepositoryImpl) FindPaymentMethods(ctx context.Context) ([
 func (r *paymentMethodRepositoryImpl) UpdatePaymentMethod(body *model.PaymentMethod, ctx context.Context) error {
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
+		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+			return myerrors.ErrDuplicateRecord
+		}
 		return res.Error
 	}
 	if res.RowsAffected == 0 {

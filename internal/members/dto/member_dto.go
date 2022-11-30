@@ -27,12 +27,12 @@ func (u *MemberStoreRequest) ToModel() *model.Member {
 }
 
 type MemberUpdateRequest struct {
-	ID              uint             `json:"id,omitempty"`
-	MemberTypeID    uint             `json:"member_type_id,omitempty" validate:"omitempty,gte=1"`
-	Duration        uint             `json:"duration,omitempty" validate:"omitempty,gte=1"`
-	PaymentMethodId uint             `json:"payment_method_id,omitempty" validate:"omitempty,gte=1"`
-	Status          model.StatusType `json:"status,omitempty" validate:"omitempty,alpha,status"`
-	ProofPayment    string           `json:"proof_payment,omitempty" validate:"omitempty,url"`
+	ID              uint   `json:"id,omitempty"`
+	MemberTypeID    uint   `json:"member_type_id,omitempty" validate:"omitempty,gte=1"`
+	Duration        uint   `json:"duration,omitempty" validate:"omitempty,gte=1"`
+	PaymentMethodId uint   `json:"payment_method_id,omitempty" validate:"omitempty,gte=1"`
+	ProofPayment    string `json:"proof_payment,omitempty" validate:"omitempty,url"`
+	Total           uint   `json:"total" validate:"omitempty,required,gte=1"`
 }
 
 func (u *MemberUpdateRequest) ToModel() *model.Member {
@@ -41,8 +41,8 @@ func (u *MemberUpdateRequest) ToModel() *model.Member {
 		MemberTypeID:    u.MemberTypeID,
 		Duration:        u.Duration,
 		PaymentMethodId: u.PaymentMethodId,
-		Status:          u.Status,
 		ProofPayment:    u.ProofPayment,
+		Total:           u.Total,
 	}
 }
 
@@ -130,4 +130,16 @@ func (u *PaymentMethodResource) FromModel(m *model.PaymentMethod) {
 	u.Name = m.Name
 	u.Description = m.Description
 	u.PaymentNumber = m.PaymentNumber
+}
+
+type SetStatusMember struct {
+	ID     uint
+	Status model.StatusType `json:"status" validate:"required,status"`
+}
+
+func (u *SetStatusMember) ToModel() *model.Member {
+	return &model.Member{
+		ID:     u.ID,
+		Status: u.Status,
+	}
 }

@@ -10,6 +10,7 @@ type MemberController interface {
 	GetMemberDetail(c echo.Context) error
 	GetMemberUser(c echo.Context) error
 	UpdateMember(c echo.Context) error
+	SetStatusMember(c echo.Context) error
 	DeleteMember(c echo.Context) error
 
 	// member type
