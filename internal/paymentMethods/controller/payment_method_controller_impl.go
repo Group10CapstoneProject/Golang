@@ -49,7 +49,7 @@ func (d *paymentMehtodControllerImpl) CreatePaymentMethod(c echo.Context) error 
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "new payment method created",
+		"message": "new payment method succcess created",
 	})
 }
 

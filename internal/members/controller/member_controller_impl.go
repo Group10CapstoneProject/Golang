@@ -42,7 +42,7 @@ func (d *memberControllerImpl) InitRoute(api *echo.Group) {
 // CreateMember implements MemberController
 func (d *memberControllerImpl) CreateMember(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
+	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
 			return echo.NewHTTPError(http.StatusForbidden, err.Error())
 		}
@@ -60,7 +60,7 @@ func (d *memberControllerImpl) CreateMember(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "new member created",
+		"message": "new member success created",
 	})
 }
 
@@ -84,7 +84,7 @@ func (d *memberControllerImpl) CreateMemberType(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "new member type created",
+		"message": "new member type success created",
 	})
 }
 

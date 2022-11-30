@@ -133,8 +133,12 @@ func (s *memberServiceImpl) UpdateMember(request *dto.MemberUpdateRequest, ctx c
 	} else if member.Status == model.REJECT && check.Status != model.REJECT {
 		member.ExpiredAt = time.Now()
 	} else if member.ProofPayment != "" {
-		member.ExpiredAt = time.Now().Add(24 * time.Hour)
-		member.Status = model.WAITING
+		if check.ProofPayment == "" {
+			member.ExpiredAt = time.Now().Add(24 * time.Hour)
+			member.Status = model.WAITING
+		} else {
+			member.ProofPayment = check.ProofPayment
+		}
 	}
 	if time.Now().After(check.ExpiredAt) {
 		member.Status = model.INACTIVE
