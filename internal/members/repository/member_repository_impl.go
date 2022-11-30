@@ -140,6 +140,9 @@ func (r *memberRepositoryImpl) FindMembers(page *model.Pagination, ctx context.C
 func (r *memberRepositoryImpl) UpdateMember(body *model.Member, ctx context.Context) error {
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
+		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+			return myerrors.ErrDuplicateRecord
+		}
 		return res.Error
 	}
 	if res.RowsAffected == 0 {
@@ -152,6 +155,9 @@ func (r *memberRepositoryImpl) UpdateMember(body *model.Member, ctx context.Cont
 func (r *memberRepositoryImpl) UpdateMemberType(body *model.MemberType, ctx context.Context) error {
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
+		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+			return myerrors.ErrDuplicateRecord
+		}
 		return res.Error
 	}
 	if res.RowsAffected == 0 {

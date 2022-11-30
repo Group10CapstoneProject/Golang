@@ -127,12 +127,7 @@ func (s *memberServiceImpl) UpdateMember(request *dto.MemberUpdateRequest, ctx c
 		return err
 	}
 
-	if member.Status == model.ACTIVE && check.Status != model.ACTIVE && check.Status != model.INACTIVE {
-		member.ExpiredAt = time.Now().Add(24 * 30 * time.Duration(check.Duration) * time.Hour)
-		member.Code = uuid.New()
-	} else if member.Status == model.REJECT && check.Status != model.REJECT {
-		member.ExpiredAt = time.Now()
-	} else if member.ProofPayment != "" {
+	if member.ProofPayment != "" {
 		if check.ProofPayment == "" {
 			member.ExpiredAt = time.Now().Add(24 * time.Hour)
 			member.Status = model.WAITING
@@ -152,6 +147,29 @@ func (s *memberServiceImpl) UpdateMember(request *dto.MemberUpdateRequest, ctx c
 func (s *memberServiceImpl) UpdateMemberType(request *dto.MemberTypeUpdateRequest, ctx context.Context) error {
 	memberType := request.ToModel()
 	err := s.memberRepository.UpdateMemberType(memberType, ctx)
+	return err
+}
+
+// SetStatusMember implements MemberService
+func (s *memberServiceImpl) SetStatusMember(request *dto.SetStatusMember, ctx context.Context) error {
+	member := request.ToModel()
+	check, err := s.memberRepository.FindMemberById(request.ID, ctx)
+	if err != nil {
+		return err
+	}
+
+	if member.Status == model.ACTIVE && check.Status != model.ACTIVE && check.Status != model.INACTIVE {
+		member.ExpiredAt = time.Now().Add(24 * 30 * time.Duration(check.Duration) * time.Hour)
+		member.Code = uuid.New()
+	} else if member.Status == model.REJECT && check.Status != model.REJECT {
+		member.ExpiredAt = time.Now()
+	}
+
+	if time.Now().After(check.ExpiredAt) {
+		member.Status = model.INACTIVE
+	}
+
+	err = s.memberRepository.UpdateMember(member, ctx)
 	return err
 }
 
