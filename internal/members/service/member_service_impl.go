@@ -161,6 +161,7 @@ func (s *memberServiceImpl) SetStatusMember(request *dto.SetStatusMember, ctx co
 	if member.Status == model.ACTIVE && check.Status != model.ACTIVE && check.Status != model.INACTIVE {
 		member.ExpiredAt = time.Now().Add(24 * 30 * time.Duration(check.Duration) * time.Hour)
 		member.Code = uuid.New()
+		member.ActivedAt = time.Now()
 	} else if member.Status == model.REJECT && check.Status != model.REJECT {
 		member.ExpiredAt = time.Now()
 	}
