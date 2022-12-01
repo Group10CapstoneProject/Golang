@@ -5,6 +5,8 @@ import (
 	pkgAuthController "github.com/Group10CapstoneProject/Golang/internal/auth/controller"
 	pkgAuthRepostiory "github.com/Group10CapstoneProject/Golang/internal/auth/repository"
 	pkgAuthService "github.com/Group10CapstoneProject/Golang/internal/auth/service"
+	pkgFileController "github.com/Group10CapstoneProject/Golang/internal/file/controller"
+	pkgFileService "github.com/Group10CapstoneProject/Golang/internal/file/service"
 	pkgMemberController "github.com/Group10CapstoneProject/Golang/internal/members/controller"
 	pkgMemberRepostiory "github.com/Group10CapstoneProject/Golang/internal/members/repository"
 	pkgMemberService "github.com/Group10CapstoneProject/Golang/internal/members/service"
@@ -14,6 +16,7 @@ import (
 	pkgUserController "github.com/Group10CapstoneProject/Golang/internal/users/controller"
 	pkgUserRepostiory "github.com/Group10CapstoneProject/Golang/internal/users/repository"
 	pkgUserService "github.com/Group10CapstoneProject/Golang/internal/users/service"
+	"github.com/Group10CapstoneProject/Golang/utils/imgkit"
 	jwtService "github.com/Group10CapstoneProject/Golang/utils/jwt"
 	"github.com/Group10CapstoneProject/Golang/utils/password"
 	customValidator "github.com/Group10CapstoneProject/Golang/utils/validator"
@@ -23,11 +26,10 @@ import (
 )
 
 func InitRoutes(e *echo.Echo, db *gorm.DB) {
-	e.Use(middleware.Recover())
 
-	customValidator.NewCustomValidator(e)
-
+	// utils service
 	jwtService := jwtService.NewJWTService(config.Env.JWT_SECRET_ACCESS, config.Env.JWT_SECRET_REFRESH)
+	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(
 		middleware.CORSConfig{
 			AllowOrigins: []string{
@@ -35,6 +37,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 			},
 		},
 	))
+	customValidator.NewCustomValidator(e)
 
 	api := e.Group("/api")
 
@@ -68,4 +71,12 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	paymentMethodService := pkgPaymentMethodService.NewPaymentMethodService(paymentMethodRepository)
 	paymentMethodController := pkgPaymentMethodController.NewPaymentMethodController(paymentMethodService, authService)
 	paymentMethodController.InitRoute(v1)
+
+	// file route
+	fileService := pkgFileService.NewFileService(imgkit.ImagekitService{
+		PRIVATE_KEY: config.Env.IMAGEKIT_PRIVKEY,
+		PUBLIC_KEY:  config.Env.IMAGEKIT_PUBKEY,
+	})
+	fileController := pkgFileController.NewFileController(fileService, authService)
+	fileController.InitRoute(v1)
 }

@@ -14,6 +14,8 @@ type Config struct {
 	DB_NAME            string
 	JWT_SECRET_ACCESS  string
 	JWT_SECRET_REFRESH string
+	IMAGEKIT_PRIVKEY   string
+	IMAGEKIT_PUBKEY    string
 }
 
 var Env *Config
