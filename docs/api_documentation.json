@@ -2046,6 +2046,56 @@
                     }
                 }
             }
+        },
+        "/files/upload":{
+            "post": {
+                "tags": ["File"],
+                "summary": "upload file",
+                "description": "only support image file (validation from extention file)",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "title":{
+                                        "type": "string",
+                                        "description": "title or transaction name. Only allowed [member, offline_class, online_class, trainer, profile]",
+                                        "required": ["true"]
+                                    },
+                                    "file":{
+                                        "type": "string",
+                                        "format": "binary",
+                                        "required": ["true"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success upload",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": {
+                                        "url": "https://ik.imagekit.io/rnwxyz/member/81592b8d-19c8-4229-95f4-261a287fbf3a"
+                                    },
+                                    "message": "success upload"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                       "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    }
+                }
+            }
         }
     },
     "components": {

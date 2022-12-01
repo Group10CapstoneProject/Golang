@@ -19,7 +19,7 @@ type Member struct {
 	ExpiredAt       time.Time
 	Duration        uint
 	Status          StatusType `gorm:"type:enum('PENDING', 'WAITING', 'ACTIVE', 'INACTIVE', 'REJECT', 'DONE', 'CENCEL');column:status"`
-	ProofPayment    string     `gorm:"type:varchar(50)"`
+	ProofPayment    string
 	PaymentMethodId uint
 	PaymentMethod   PaymentMethod
 	Total           uint
