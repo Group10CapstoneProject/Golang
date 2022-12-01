@@ -2051,6 +2051,11 @@
             "post": {
                 "tags": ["File"],
                 "summary": "upload file",
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
                 "description": "only support image file (validation from extention file)",
                 "requestBody": {
                     "required": true,
