@@ -38,7 +38,7 @@ func (d *fileControllerImpl) Upload(c echo.Context) error {
 	}
 	src, err := form.Open()
 	if err != nil {
-		echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	defer src.Close()
 	body := dto.FileStoreRequest{
@@ -52,7 +52,7 @@ func (d *fileControllerImpl) Upload(c echo.Context) error {
 	fmt.Println(body.FileName)
 	result, err := d.fileService.Upload(body, c.Request().Context())
 	if err != nil {
-		echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
 		"message": "success upload",
