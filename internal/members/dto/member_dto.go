@@ -52,7 +52,7 @@ type MemberResource struct {
 	UserName       string           `json:"user_name"`
 	MemberTypeName string           `json:"member_type_name"`
 	ExpiredAt      time.Time        `json:"expired_at"`
-	UpdatedAt      time.Time        `json:"updated_at"`
+	ActivedAt      time.Time        `json:"actived_at"`
 	Duration       uint             `json:"duration"`
 	Status         model.StatusType `json:"status"`
 }
@@ -62,7 +62,7 @@ func (u *MemberResource) FromModel(m *model.Member) {
 	u.UserName = m.User.Name
 	u.MemberTypeName = m.MemberType.Name
 	u.ExpiredAt = m.ExpiredAt
-	u.UpdatedAt = m.UpdatedAt
+	u.ActivedAt = m.ActivedAt
 	u.Duration = m.Duration
 	u.Status = m.Status
 }
@@ -85,12 +85,10 @@ type MemberResponses struct {
 // member detail resource
 type MemberDetailResource struct {
 	ID            uint                  `json:"id"`
-	UserID        uint                  `json:"user_id"`
-	UserName      string                `json:"user_name"`
-	UserEmail     string                `json:"user_email"`
+	User          UserResource          `json:"user"`
 	MemberType    MemberTypeResource    `json:"member_type"`
 	ExpiredAt     time.Time             `json:"expired_at"`
-	UpdatedAt     time.Time             `json:"updated_at"`
+	ActivedAt     time.Time             `json:"actived_at"`
 	Duration      uint                  `json:"duration"`
 	ProofPayment  string                `json:"proof_payment"`
 	PaymentMethod PaymentMethodResource `json:"payment_method"`
@@ -104,14 +102,14 @@ func (u *MemberDetailResource) FromModel(m *model.Member) {
 	memberType.FromModel(&m.MemberType)
 	paymentMethod := PaymentMethodResource{}
 	paymentMethod.FromModel(&m.PaymentMethod)
+	user := UserResource{}
+	user.FromModel(&m.User)
 
 	u.ID = m.ID
-	u.UserID = m.UserID
-	u.UserName = m.User.Name
-	u.UserEmail = m.User.Email
+	u.User = user
 	u.MemberType = memberType
 	u.ExpiredAt = m.ExpiredAt
-	u.UpdatedAt = m.UpdatedAt
+	u.ActivedAt = m.ActivedAt
 	u.Duration = m.Duration
 	u.ProofPayment = m.ProofPayment
 	u.PaymentMethod = paymentMethod
@@ -121,15 +119,29 @@ func (u *MemberDetailResource) FromModel(m *model.Member) {
 }
 
 type PaymentMethodResource struct {
+	ID            uint   `json:"id"`
 	Name          string `json:"name"`
 	Description   string `json:"description"`
 	PaymentNumber string `json:"payment_number"`
 }
 
 func (u *PaymentMethodResource) FromModel(m *model.PaymentMethod) {
+	u.ID = m.ID
 	u.Name = m.Name
 	u.Description = m.Description
 	u.PaymentNumber = m.PaymentNumber
+}
+
+type UserResource struct {
+	ID    uint   `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
+func (u *UserResource) FromModel(m *model.User) {
+	u.ID = m.ID
+	u.Name = m.Name
+	u.Email = m.Email
 }
 
 type SetStatusMember struct {

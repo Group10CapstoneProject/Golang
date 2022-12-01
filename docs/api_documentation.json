@@ -652,7 +652,7 @@
                 }
             }
         },
-        "/classes/offline": {
+        "/offlineClasses": {
             "get": {
                 "security": [
                     {
@@ -849,7 +849,7 @@
                 }
             }
         },
-        "/classes/offline/{id}":{
+        "/offlineClasses/{id}":{
             "get": {
                 "security": [
                     {
@@ -1116,7 +1116,7 @@
                                                             "member_type_name":{
                                                                 "type": "string"
                                                             },
-                                                            "updated_at":{
+                                                            "actived_at":{
                                                                 "type": "string"
                                                             },
                                                             "duration":{
@@ -1127,6 +1127,12 @@
                                                             }
                                                         }
                                                     }
+                                                },
+                                                "page":{
+                                                    "type": "integer"
+                                                },
+                                                "limit":{
+                                                    "type": "integer"
                                                 },
                                                 "count":{
                                                     "type": "integer"
@@ -1143,7 +1149,7 @@
                                                 "user_name": "superadmin",
                                                 "member_type_name": "silver",
                                                 "expired_at": "2022-12-01T00:11:45.988+08:00",
-                                                "updated_at": "2022-11-30T00:11:45.988+08:00",
+                                                "actived_at": "2022-11-30T00:11:45.988+08:00",
                                                 "duration": 3,
                                                 "status": "WAITING"
                                             },
@@ -1152,11 +1158,13 @@
                                                 "user_name": "superadmin",
                                                 "member_type_name": "silver",
                                                 "expired_at": "2022-12-30T00:12:43.638+08:00",
-                                                "updated_at": "2022-11-30T00:12:43.638+08:00",
+                                                "actived_at": "2022-11-30T00:12:43.638+08:00",
                                                 "duration": 1,
                                                 "status": "ACTIVE"
                                             }
                                         ],
+                                        "page": 1,
+                                        "limit": 10,
                                         "count": 2
                                     },
                                     "message": "success get members"
@@ -1234,6 +1242,689 @@
                 }
             }
         },
+        "/onlineClass":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Online Classes"],
+                "summary": "Get all online classes",
+                "description": "To get all online class availabble",
+                "responses": {
+                    "200": {
+                        "description": "Success get members",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/onlineClass"
+                                },
+                                "example": {
+                                    "data": {
+                                        "online_class": [
+                                            {
+                                                "id": 3,
+                                                "title": "Workout Dirumah Aja",
+                                                "price": 25000,
+                                                "link": "https://youtu.be/CPTbVoobeiw",
+                                                "description": "deskripsi apa aja",
+                                                "path": "CPTbVoobeiw"
+                                            },
+                                            {
+                                                "id": 4,
+                                                "title": "Cara Push Up",
+                                                "price": 25000,
+                                                "link": "https://youtu.be/adAdaEqwds",
+                                                "description": "deskripsi apa aja",
+                                                "path": "adAdaEqwds"
+                                            }
+                                        ]
+                                    },
+                                    "message": "success get members"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Online Classes"],
+                "summary": "Create new online class",
+                "description": "To create new online class and only admin have access to this service",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/onlineClass"
+                            },
+                            "example": {
+                                "title": "Workout Dirumah Aja",
+                                "price": 25000,
+                                "link": "https://youtu.be/CPTbVoobeiw",
+                                "description": "deskripsi apa aja"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success create new online class",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "new online class success created"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/onlineClass/{id}":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Online Classes"],
+                "summary": "Get single or detail online class",
+                "description": "To spesific online class or detail online class",
+                "responses": {
+                    "200": {
+                        "description": "Success get online class",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": {
+                                        "id": 3,
+                                        "title": "Workout Dirumah Aja",
+                                        "price": 25000,
+                                        "link": "https://youtu.be/CPTbVoobeiw",
+                                        "description": "deskripsi apa aja",
+                                        "path": "CPTbVoobeiw",
+                                        "access": true
+                                    },
+                                    "message": "success get online class"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Online Classes"],
+                "summary": "Delete member",
+                "description": "Only admin can delete online class",
+                "responses": {
+                    "200": {
+                        "description": "Success delete online class",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "success delete online class"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Online Classes"],
+                "summary": "Update online class",
+                "description": "Update online class only admin can access",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref":"#/components/schemas/onlineClass"
+                            },
+                            "example": {
+                                "title": "Workout Dirumah Aja",
+                                "price": 25000,
+                                "link": "https://youtu.be/CPTbVoobeiw",
+                                "description": "deskripsi apa aja"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success update online class",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success update online class"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/onlineClass/booking":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Online Classes"],
+                "summary": "Get all online class booking or transaction",
+                "description": "To get all online class booking or transaction, only admin can access",
+                "responses": {
+                    "200": {
+                        "description": "Success get online class transaction",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/onlineClassBooking"
+                                },
+                                "example": {
+                                    "data": {
+                                        "online_classes": [
+                                            {
+                                                "id": 3,
+                                                "user_name": "James Audi",
+                                                "online_class_title": "Workout Dimana Aja",
+                                                "expired_at": "2022-12-01T00:11:45.988+08:00",
+                                                "actived_at": "2022-11-30T00:11:45.988+08:00",
+                                                "duration": 3,
+                                                "status": "WAITING"
+                                            },
+                                            {
+                                                "id": 4,
+                                                "user_name": "James Mudi",
+                                                "online_class_title": "Workout Dimana Aja",
+                                                "expired_at": "2022-12-01T00:11:45.988+08:00",
+                                                "actived_at": "2022-11-30T00:11:45.988+08:00",
+                                                "duration": 3,
+                                                "status": "WAITING"
+                                            }
+                                        ],
+                                        "page": 1,
+                                        "limit": 10,
+                                        "count": 2
+                                    },
+                                    "message": "success get members"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Online Classes"],
+                "summary": "Create new online class booking or transaction",
+                "description": "To create new online class booking or new transaction",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/onlineClassBooking"
+                            },
+                            "example": {
+                                "online_class_id": 1,
+                                "duration": 2,
+                                "payment_method_id": 1,
+                                "total": 25000
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success create new online class",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "new online class success created"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/onlineClass/booking/{id}":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Online Classes"],
+                "summary": "Get single or details online class booking",
+                "description": "To spesific online class booking or detail online class booking",
+                "responses": {
+                    "200": {
+                        "description": "Success get online class booking",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": {
+                                        "id": 4,
+                                        "user":{
+                                            "id": 1,
+                                            "name": "superadmin",
+                                            "email": "superadmin@gmail.com"
+                                        },
+                                        "online_class": {
+                                            "id": 3,
+                                            "title": "Workout Dirumah Aja",
+                                            "price": 25000,
+                                            "link": "https://youtu.be/CPTbVoobeiw",
+                                            "description": "deskripsi apa aja",
+                                            "path": "CPTbVoobeiw"
+                                        },
+                                        "expired_at": "2022-12-30T00:12:43.638+08:00",
+                                        "actived_at": "2022-11-30T00:12:43.638+08:00",
+                                        "duration": 1,
+                                        "proof_payment": "http://google.com",
+                                        "payment_method": {
+                                            "id": 1,
+                                            "name": "ShoopePay",
+                                            "description": "Bisa bayar dimanapun dan kapanpun",
+                                            "payment_number": "0812342331512"
+                                        },
+                                        "total": 200000,
+                                        "status": "ACTIVE"
+                                    },
+                                    "message": "success get online class booking"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Online Classes"],
+                "summary": "Delete online class booking",
+                "description": "Only admin can delete online class booking",
+                "responses": {
+                    "200": {
+                        "description": "Success delete online class booking",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "success delete online class booking"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Online Classes"],
+                "summary": "Update online class",
+                "description": "Update online class from user or from admin",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref":"#/components/schemas/onlineClassBooking"
+                            },
+                            "example": {
+                                "online_class_id": 1,
+                                "duration": 3,
+                                "payment_method_id": 1,
+                                "total": 200000
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success update online class",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success update member"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/onlineClass/booking/setStatus/{id}":{
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Online Classes"],
+                "summary": "Set online class booking status",
+                "description": "Only admin can set online class booking status. Status set allowed (ACTIVE, INACTIVE, REJECT)",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "status":{
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "example": {
+                                "status":"ACTIVE"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success set status",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success set status"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/onlineClass/booking/pay/{id}":{
+            "post": {
+                "tags": ["Online Classes"],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "summary": "Upload proof of online class payment, id is online class booking id",
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "description": "only support image file (validation from extention file)",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "id":{
+                                        "type": "string",
+                                        "description": "online class book id",
+                                        "required": ["true"]
+                                    },
+                                    "file":{
+                                        "type": "string",
+                                        "format": "binary",
+                                        "required": ["true"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment success",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "payment success"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                       "$ref": "#/components/responses/badRequest"
+                    },
+                    "404":{
+                       "$ref": "#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    }
+                }
+            }
+        },
         "/members/{id}":{
             "get": {
                 "security": [
@@ -1257,9 +1948,11 @@
                                 "example": {
                                     "data": {
                                         "id": 4,
-                                        "user_id": 1,
-                                        "user_name": "superadmin",
-                                        "user_email": "superadmin@gmail.com",
+                                        "user":{
+                                            "id": 1,
+                                            "name": "superadmin",
+                                            "email": "superadmin@gmail.com"
+                                        },
                                         "member_type": {
                                             "id": 1,
                                             "name": "silver",
@@ -1271,10 +1964,11 @@
                                             "access_gym": false
                                         },
                                         "expired_at": "2022-12-30T00:12:43.638+08:00",
-                                        "updated_at": "2022-11-30T00:12:43.638+08:00",
+                                        "actived_at": "2022-11-30T00:12:43.638+08:00",
                                         "duration": 1,
                                         "proof_payment": "http://google.com",
                                         "payment_method": {
+                                            "id": 1,
                                             "name": "ShoopePay",
                                             "description": "Bisa bayar dimanapun dan kapanpun",
                                             "payment_number": "0812342331512"
@@ -2047,6 +2741,66 @@
                 }
             }
         },
+        "/members/pay/{id}":{
+            "post": {
+                "tags": ["Members"],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "summary": "Upload proof of membership payment",
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "description": "only support image file (validation from extention file)",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "id":{
+                                        "type": "string",
+                                        "description": "member id",
+                                        "required": ["true"]
+                                    },
+                                    "file":{
+                                        "type": "string",
+                                        "format": "binary",
+                                        "required": ["true"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment success",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "payment success"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                       "$ref": "#/components/responses/badRequest"
+                    },
+                    "404":{
+                       "$ref": "#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    }
+                }
+            }
+        },
         "/files/upload":{
             "post": {
                 "tags": ["File"],
@@ -2095,6 +2849,66 @@
                     },
                     "400":{
                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    }
+                }
+            }
+        },
+        "/notification":{
+            "get": {
+                "tags": ["Notification"],
+                "summary": "Notification in admin",
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "description": "when a user makes a payment or uploads proof of payment, the admin will get a notification according to the type of transaction",
+                "responses": {
+                    "200": {
+                        "description": "Success get notification",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": {
+                                        "notifications":[
+                                            {
+                                                "id": 1,
+                                                "transaction_id": 1,
+                                                "transaction_type": "/member/",
+                                                "title": "Member",
+                                                "user_name": "James",
+                                                "created_at": "2023-01-01T01:01:29.867+08:00"
+                                            },
+                                            {
+                                                "id": 2,
+                                                "transaction_id": 4,
+                                                "transaction_type": "/onlineClass/booking/",
+                                                "title": "Online Class",
+                                                "user_name": "Roki",
+                                                "created_at": "2023-01-01T01:01:29.867+08:00"
+                                            }
+                                        ],
+                                        "count": 2
+                                    },
+                                    "message": "success get notification"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                       "$ref": "#/components/responses/badRequest"
+                    },
+                    "404":{
+                       "$ref": "#/components/responses/notFound"
+                    },
+                    "403":{
+                       "$ref": "#/components/responses/forbidden"
+                    },
+                    "401":{
+                       "$ref": "#/components/responses/unauthorized"
                     },
                     "500":{
                         "$ref": "#/components/responses/internalServerError"
@@ -2151,6 +2965,68 @@
                     },
                     "total": {
                         "type": "integer"
+                    }
+                }
+            },
+            "onlineClass":{
+                "type":"object",
+                "properties": {
+                    "id":{
+                        "type": "integer"
+                    },
+                    "title":{
+                        "type": "integer"
+                    },
+                    "price": {
+                        "type": "integer"
+                    },
+                    "link": {
+                        "type": "string",
+                        "description": "full link video"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "unique id from link video"
+                    }
+                }
+            },
+            "onlineClassBooking":{
+                "type":"object",
+                "properties": {
+                    "id":{
+                        "type": "integer"
+                    },
+                    "user_id":{
+                        "type": "integer"
+                    },
+                    "online_class_id": {
+                        "type": "integer"
+                    },
+                    "duration": {
+                        "type": "string",
+                        "description": "booking duration or access duration (week or month)"
+                    },
+                    "expired_at": {
+                        "type": "string"
+                    },
+                    "actived_at": {
+                        "type": "string"
+                    },
+                    "payment_method_id": {
+                        "type": "integer"
+                    },
+                    "proof_payment": {
+                        "type": "string"
+                    },
+                    "total": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "description": "same as status in member"
                     }
                 }
             },

@@ -101,7 +101,7 @@ func (d *memberControllerImpl) DeleteMember(c echo.Context) error {
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "record not found")
+		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
 	if err := d.memberService.DeleteMember(uint(id), c.Request().Context()); err != nil {
 		if err == myerrors.ErrRecordNotFound {
@@ -126,7 +126,7 @@ func (d *memberControllerImpl) DeleteMemberType(c echo.Context) error {
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "record not found")
+		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
 	if err := d.memberService.DeleteMemberType(uint(id), c.Request().Context()); err != nil {
 		if err == myerrors.ErrRecordNotFound {
@@ -151,7 +151,7 @@ func (d *memberControllerImpl) GetMemberDetail(c echo.Context) error {
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "record not found")
+		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
 	member, err := d.memberService.FindMemberById(uint(id), c.Request().Context())
 	if err != nil {
@@ -178,7 +178,7 @@ func (d *memberControllerImpl) GetMemberTypeDetail(c echo.Context) error {
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "record not found")
+		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
 	memberType, err := d.memberService.FindMemberTypeById(uint(id), c.Request().Context())
 	if err != nil {
@@ -265,7 +265,7 @@ func (d *memberControllerImpl) UpdateMember(c echo.Context) error {
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "record not found")
+		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
 	var member dto.MemberUpdateRequest
 	if err := c.Bind(&member); err != nil {
@@ -295,7 +295,7 @@ func (d *memberControllerImpl) UpdateMemberType(c echo.Context) error {
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "record not found")
+		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
 	var memberType dto.MemberTypeUpdateRequest
 	if err := c.Bind(&memberType); err != nil {
@@ -325,7 +325,7 @@ func (d *memberControllerImpl) SetStatusMember(c echo.Context) error {
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "record not found")
+		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
 	var status dto.SetStatusMember
 	if err := c.Bind(&status); err != nil {
