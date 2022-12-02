@@ -18,9 +18,9 @@ func (m *AuthServiceMock) Login(credential dto.UserCredential, ctx context.Conte
 	args := m.Called()
 	return args.Get(0).(*model.Token), args.Error(1)
 }
-func (m *AuthServiceMock) LoginAdmin(credential dto.UserCredential, ctx context.Context) (*model.Token, error) {
+func (m *AuthServiceMock) LoginAdmin(credential dto.UserCredential, ctx context.Context) (*model.AdminToken, error) {
 	args := m.Called()
-	return args.Get(0).(*model.Token), args.Error(1)
+	return args.Get(0).(*model.AdminToken), args.Error(1)
 }
 func (m *AuthServiceMock) Logout(userID uint, ctx context.Context) error {
 	args := m.Called()

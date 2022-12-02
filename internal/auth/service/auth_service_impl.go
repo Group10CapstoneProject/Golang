@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/Group10CapstoneProject/Golang/config"
 	"github.com/Group10CapstoneProject/Golang/constans"
@@ -46,7 +47,7 @@ func (s *authServiceImpl) Login(credential dto.UserCredential, ctx context.Conte
 }
 
 // LoginAdmin implements AuthService
-func (s *authServiceImpl) LoginAdmin(credential dto.UserCredential, ctx context.Context) (*model.Token, error) {
+func (s *authServiceImpl) LoginAdmin(credential dto.UserCredential, ctx context.Context) (*model.AdminToken, error) {
 	user, err := s.usersRepository.FindUserByEmail(&credential.Email, ctx)
 	if err != nil {
 		return nil, myerrors.ErrInvalidEmailPassword
@@ -66,7 +67,17 @@ func (s *authServiceImpl) LoginAdmin(credential dto.UserCredential, ctx context.
 	if err := s.authRepository.UpdateSessionID(user.ID, user.SessionID, ctx); err != nil {
 		return nil, err
 	}
-	return &newToken, err
+	adminToken := model.AdminToken{
+		Access: model.Access{
+			AccessAccessToken: newToken.AccessToken,
+			ExpiredAt:         time.Now().Add(constans.ExpAccessToken),
+		},
+		Refresh: model.Refresh{
+			RefreshToken: newToken.RefreshToken,
+			ExpiredAt:    time.Now().Add(constans.ExpRefreshToken),
+		},
+	}
+	return &adminToken, err
 }
 
 // Logout implements AuthService
