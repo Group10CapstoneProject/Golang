@@ -3,7 +3,6 @@ package controller
 import "github.com/labstack/echo/v4"
 
 type MemberController interface {
-	InitRoute(api *echo.Group)
 	// member
 	CreateMember(c echo.Context) error
 	GetMembers(c echo.Context) error
@@ -11,6 +10,7 @@ type MemberController interface {
 	GetMemberUser(c echo.Context) error
 	UpdateMember(c echo.Context) error
 	SetStatusMember(c echo.Context) error
+	MemberPayment(c echo.Context) error
 	DeleteMember(c echo.Context) error
 
 	// member type

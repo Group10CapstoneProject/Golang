@@ -122,16 +122,18 @@ func (r *memberRepositoryImpl) FindMembers(page *model.Pagination, ctx context.C
 	var count int64
 	offset := (page.Limit * page.Page) - page.Limit
 
-	query := r.db.WithContext(ctx)
+	query := r.db.WithContext(ctx).Model(&model.Member{})
 	if page.Q != "" {
 		query.Where("users.name LIKE ? OR users.email LIKE ? OR MemberType.name OR MemberType.price", "%"+page.Q+"%", "%"+page.Q+"%", "%"+page.Q+"%", "%"+page.Q+"%")
 	}
 	err := query.
 		Preload("User").
 		Preload("MemberType").
+		Count(&count).
 		Offset(offset).
 		Limit(page.Limit).
-		Find(&members).Count(&count).Error
+		Find(&members).
+		Error
 
 	return members, int(count), err
 }

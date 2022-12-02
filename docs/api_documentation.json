@@ -445,6 +445,12 @@
                                                         }
                                                     }
                                                 },
+                                                "page": {
+                                                    "type": "integer"
+                                                },
+                                                "limit": {
+                                                    "type": "integer"
+                                                },
                                                 "count": {
                                                     "type": "integer"
                                                 }
@@ -469,6 +475,8 @@
                                                 "role": "admin"
                                             }
                                         ],
+                                        "page": 1,
+                                        "limit": 10,
                                         "count": 2
                                     }
                                 }
@@ -610,6 +618,12 @@
                                                         }
                                                     }
                                                 },
+                                                "page": {
+                                                    "type": "integer"
+                                                },
+                                                "limit": {
+                                                    "type": "integer"
+                                                },
                                                 "count": {
                                                     "type": "integer"
                                                 }
@@ -634,6 +648,8 @@
                                                 "role":"user"
                                             }
                                         ],
+                                        "page": 1,
+                                        "limit": 10,
                                         "count": 2
                                     }
                                 }
@@ -1919,6 +1935,12 @@
                     "404":{
                        "$ref": "#/components/responses/notFound"
                     },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                     },
+                     "403":{
+                        "$ref": "#/components/responses/forbidden"
+                     },
                     "500":{
                         "$ref": "#/components/responses/internalServerError"
                     }
@@ -2763,11 +2785,6 @@
                             "schema":{
                                 "type": "object",
                                 "properties": {
-                                    "id":{
-                                        "type": "string",
-                                        "description": "member id",
-                                        "required": ["true"]
-                                    },
                                     "file":{
                                         "type": "string",
                                         "format": "binary",
@@ -2794,6 +2811,12 @@
                     },
                     "404":{
                        "$ref": "#/components/responses/notFound"
+                    },
+                    "401":{
+                       "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                       "$ref": "#/components/responses/forbidden"
                     },
                     "500":{
                         "$ref": "#/components/responses/internalServerError"

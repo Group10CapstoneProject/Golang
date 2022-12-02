@@ -7,12 +7,15 @@ import (
 	"github.com/google/uuid"
 )
 
-type ImagekitService struct {
+type ImagekitService interface {
+	Upload(title string, file interface{}) (url string, err error)
+}
+type imagekitServiceImpl struct {
 	PRIVATE_KEY string
 	PUBLIC_KEY  string
 }
 
-func (i *ImagekitService) Upload(title string, file interface{}) (url string, err error) {
+func (i *imagekitServiceImpl) Upload(title string, file interface{}) (url string, err error) {
 	opts := imagekit.Options{
 		PrivateKey: i.PRIVATE_KEY,
 		PublicKey:  i.PUBLIC_KEY,
@@ -39,4 +42,11 @@ func (i *ImagekitService) Upload(title string, file interface{}) (url string, er
 	}
 
 	return upr.URL, nil
+}
+
+func NewImageKitService(privkey string, pubkey string) ImagekitService {
+	return &imagekitServiceImpl{
+		PRIVATE_KEY: privkey,
+		PUBLIC_KEY:  pubkey,
+	}
 }
