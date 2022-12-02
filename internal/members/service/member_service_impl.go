@@ -209,7 +209,7 @@ func (s *memberServiceImpl) MemberPayment(request *dto.PaymMemberStoreRequest, c
 		ExpiredAt:    time.Now().Add(24 * time.Hour),
 		Status:       model.WAITING,
 	}
-	s.memberRepository.UpdateMember(&body, ctx)
+	err = s.memberRepository.UpdateMember(&body, ctx)
 	if err != nil {
 		return err
 	}
