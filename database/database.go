@@ -29,6 +29,7 @@ func MigrateDB(db *gorm.DB) error {
 		model.User{},
 		model.PaymentMethod{},
 		model.MemberType{},
+		model.Notification{},
 		model.Member{},
 	)
 }

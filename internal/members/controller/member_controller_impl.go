@@ -1,43 +1,25 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
-	"github.com/Group10CapstoneProject/Golang/config"
 	"github.com/Group10CapstoneProject/Golang/constans"
 	authServ "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	"github.com/Group10CapstoneProject/Golang/internal/members/dto"
 	memberServ "github.com/Group10CapstoneProject/Golang/internal/members/service"
+	dtoNotif "github.com/Group10CapstoneProject/Golang/internal/notifications/dto"
+	notifServ "github.com/Group10CapstoneProject/Golang/internal/notifications/service"
 	"github.com/Group10CapstoneProject/Golang/model"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 )
 
 type memberControllerImpl struct {
-	memberService memberServ.MemberService
-	authService   authServ.AuthService
-}
-
-// InitRoute implements MemberController
-func (d *memberControllerImpl) InitRoute(api *echo.Group) {
-	members := api.Group("/members", middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-
-	members.POST("", d.CreateMember)
-	members.GET("", d.GetMembers)
-	members.GET("/user", d.GetMemberUser)
-	members.GET("/:id", d.GetMemberDetail)
-	members.PUT("/:id", d.UpdateMember)
-	members.DELETE("/:id", d.DeleteMember)
-	members.POST("/setStatus/:id", d.SetStatusMember)
-
-	memberType := members.Group("/types")
-	memberType.POST("", d.CreateMemberType)
-	memberType.GET("", d.GetMemberTypes)
-	memberType.GET("/:id", d.GetMemberTypeDetail)
-	memberType.PUT("/:id", d.UpdateMemberType)
-	memberType.DELETE("/:id", d.DeleteMemberType)
+	memberService       memberServ.MemberService
+	authService         authServ.AuthService
+	notificationService notifServ.NotificationService
 }
 
 // CreateMember implements MemberController
@@ -159,6 +141,15 @@ func (d *memberControllerImpl) GetMemberDetail(c echo.Context) error {
 			return echo.NewHTTPError(http.StatusNotFound, err.Error())
 		}
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	if claims["role"].(string) == constans.Role_superadmin || claims["role"].(string) == constans.Role_admin {
+		notif := dtoNotif.NotificationReadRequest{
+			TransactionID: uint(id),
+			Title:         "Member",
+		}
+		if err := d.notificationService.ReadNotification(&notif, c.Request().Context()); err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
 	}
 	return c.JSON(http.StatusOK, echo.Map{
 		"message": "success get member",
@@ -343,9 +334,55 @@ func (d *memberControllerImpl) SetStatusMember(c echo.Context) error {
 	})
 }
 
-func NewMemberController(memberService memberServ.MemberService, authService authServ.AuthService) MemberController {
+// MemberPayment implements MemberController
+func (d *memberControllerImpl) MemberPayment(c echo.Context) error {
+	claims := d.authService.GetClaims(&c)
+	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
+		if err == myerrors.ErrPermission {
+			return echo.NewHTTPError(http.StatusForbidden, err.Error())
+		}
+		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+	}
+	param := c.Param("id")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "not found")
+	}
+	form, err := c.FormFile("file")
+	if err != nil {
+		return err
+	}
+	src, err := form.Open()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	defer src.Close()
+	body := dto.PaymMemberStoreRequest{
+		ID:       uint(id),
+		UserID:   uint(claims["user_id"].(float64)),
+		FileName: form.Filename,
+		File:     src,
+	}
+	if err := c.Validate(body); err != nil {
+		return err
+	}
+	fmt.Println(body.FileName)
+	err = d.memberService.MemberPayment(&body, c.Request().Context())
+	if err != nil {
+		if err == myerrors.ErrPermission {
+			return echo.NewHTTPError(http.StatusForbidden, err.Error())
+		}
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "payment success",
+	})
+}
+
+func NewMemberController(memberService memberServ.MemberService, authService authServ.AuthService, notificationService notifServ.NotificationService) MemberController {
 	return &memberControllerImpl{
-		memberService: memberService,
-		authService:   authService,
+		memberService:       memberService,
+		authService:         authService,
+		notificationService: notificationService,
 	}
 }

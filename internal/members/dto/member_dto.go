@@ -27,12 +27,11 @@ func (u *MemberStoreRequest) ToModel() *model.Member {
 }
 
 type MemberUpdateRequest struct {
-	ID              uint   `json:"id,omitempty"`
-	MemberTypeID    uint   `json:"member_type_id,omitempty" validate:"omitempty,gte=1"`
-	Duration        uint   `json:"duration,omitempty" validate:"omitempty,gte=1"`
-	PaymentMethodId uint   `json:"payment_method_id,omitempty" validate:"omitempty,gte=1"`
-	ProofPayment    string `json:"proof_payment,omitempty" validate:"omitempty,url"`
-	Total           uint   `json:"total" validate:"omitempty,required,gte=1"`
+	ID              uint `json:"id,omitempty"`
+	MemberTypeID    uint `json:"member_type_id,omitempty" validate:"omitempty,gte=1"`
+	Duration        uint `json:"duration,omitempty" validate:"omitempty,gte=1"`
+	PaymentMethodId uint `json:"payment_method_id,omitempty" validate:"omitempty,gte=1"`
+	Total           uint `json:"total" validate:"omitempty,required,gte=1"`
 }
 
 func (u *MemberUpdateRequest) ToModel() *model.Member {
@@ -41,7 +40,6 @@ func (u *MemberUpdateRequest) ToModel() *model.Member {
 		MemberTypeID:    u.MemberTypeID,
 		Duration:        u.Duration,
 		PaymentMethodId: u.PaymentMethodId,
-		ProofPayment:    u.ProofPayment,
 		Total:           u.Total,
 	}
 }
@@ -79,6 +77,8 @@ func (u *MemberResources) FromModel(m []model.Member) {
 
 type MemberResponses struct {
 	Members MemberResources `json:"members"`
+	Page    uint            `json:"page"`
+	Limit   uint            `json:"limit"`
 	Count   uint            `json:"count"`
 }
 

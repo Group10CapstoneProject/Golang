@@ -7,5 +7,4 @@ type AuthController interface {
 	LoginAdmin(c echo.Context) error
 	RefreshToken(c echo.Context) error
 	Logout(c echo.Context) error
-	InitRoute(api *echo.Group)
 }

@@ -4,29 +4,17 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Group10CapstoneProject/Golang/config"
 	"github.com/Group10CapstoneProject/Golang/constans"
 	authServ "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	"github.com/Group10CapstoneProject/Golang/internal/paymentMethods/dto"
 	paymentMethodServ "github.com/Group10CapstoneProject/Golang/internal/paymentMethods/service"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 )
 
 type paymentMehtodControllerImpl struct {
 	paymentMethodService paymentMethodServ.PaymentMethodService
 	authService          authServ.AuthService
-}
-
-// InitRoute implements PaymentMethodController
-func (d *paymentMehtodControllerImpl) InitRoute(api *echo.Group) {
-	paymentMethod := api.Group("/paymentMethods", middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	paymentMethod.POST("", d.CreatePaymentMethod)
-	paymentMethod.GET("", d.GetPaymentMethods)
-	paymentMethod.GET("/:id", d.GetPaymentMethodDetail)
-	paymentMethod.PUT("/:id", d.UpdatePaymentMethod)
-	paymentMethod.DELETE("/:id", d.DeletePaymentMethod)
 }
 
 // CreatePaymentMethod implements PaymentMethodController

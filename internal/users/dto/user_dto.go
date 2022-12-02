@@ -41,5 +41,7 @@ func (u *UsersResponse) FromModel(model []model.User) {
 
 type PageResponse struct {
 	Users UsersResponse `json:"users"`
+	Page  uint          `json:"page"`
+	Limit uint          `json:"limit"`
 	Count int           `json:"count"`
 }

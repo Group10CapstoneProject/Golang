@@ -3,7 +3,6 @@ package controller
 import (
 	"net/http"
 
-	"github.com/Group10CapstoneProject/Golang/config"
 	"github.com/Group10CapstoneProject/Golang/constans"
 	authService "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	"github.com/Group10CapstoneProject/Golang/internal/users/dto"
@@ -11,23 +10,11 @@ import (
 	"github.com/Group10CapstoneProject/Golang/model"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 )
 
 type userControllerImpl struct {
 	userService userService.UserService
 	authService authService.AuthService
-}
-
-// InitRoute implements UserController
-func (d *userControllerImpl) InitRoute(api *echo.Group) {
-	users := api.Group("/users")
-
-	users.POST("/signup", d.Signup)
-	users.GET("", d.GetUsers, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	users.GET("/profile", d.GetUser, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	users.POST("/admin", d.NewAadmin, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	users.GET("/admin", d.GetAdmins, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
 }
 
 // Signup implements UserController

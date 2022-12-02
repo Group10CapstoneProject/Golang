@@ -4,23 +4,16 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Group10CapstoneProject/Golang/config"
 	authServ "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	"github.com/Group10CapstoneProject/Golang/internal/file/dto"
 	fileServ "github.com/Group10CapstoneProject/Golang/internal/file/service"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 )
 
 type fileControllerImpl struct {
 	fileService fileServ.FileService
 	authService authServ.AuthService
-}
-
-func (d *fileControllerImpl) InitRoute(api *echo.Group) {
-	file := api.Group("/files", middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	file.POST("/upload", d.Upload)
 }
 
 func (d *fileControllerImpl) Upload(c echo.Context) error {

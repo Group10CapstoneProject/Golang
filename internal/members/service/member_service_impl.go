@@ -1,17 +1,25 @@
 package service
 
 import (
+	"bytes"
 	"context"
+	"errors"
+	"io"
 	"time"
 
 	"github.com/Group10CapstoneProject/Golang/internal/members/dto"
 	memberRepo "github.com/Group10CapstoneProject/Golang/internal/members/repository"
+	notifRepo "github.com/Group10CapstoneProject/Golang/internal/notifications/repository"
 	"github.com/Group10CapstoneProject/Golang/model"
+	"github.com/Group10CapstoneProject/Golang/utils/imgkit"
+	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"github.com/google/uuid"
 )
 
 type memberServiceImpl struct {
-	memberRepository memberRepo.MemberRepository
+	memberRepository       memberRepo.MemberRepository
+	notificationRepository notifRepo.NotificationRepository
+	imagekitService        imgkit.ImagekitService
 }
 
 // CreateMember implements MemberService
@@ -114,6 +122,8 @@ func (s *memberServiceImpl) FindMembers(page *model.Pagination, ctx context.Cont
 
 	response := dto.MemberResponses{
 		Members: result,
+		Page:    uint(page.Page),
+		Limit:   uint(page.Limit),
 		Count:   uint(count),
 	}
 	return &response, nil
@@ -125,15 +135,6 @@ func (s *memberServiceImpl) UpdateMember(request *dto.MemberUpdateRequest, ctx c
 	check, err := s.memberRepository.FindMemberById(request.ID, ctx)
 	if err != nil {
 		return err
-	}
-
-	if member.ProofPayment != "" {
-		if check.ProofPayment == "" {
-			member.ExpiredAt = time.Now().Add(24 * time.Hour)
-			member.Status = model.WAITING
-		} else {
-			member.ProofPayment = check.ProofPayment
-		}
 	}
 	if time.Now().After(check.ExpiredAt) {
 		member.Status = model.INACTIVE
@@ -174,8 +175,61 @@ func (s *memberServiceImpl) SetStatusMember(request *dto.SetStatusMember, ctx co
 	return err
 }
 
-func NewMemberService(memberRepository memberRepo.MemberRepository) MemberService {
+// MemberPayment implements MemberService
+func (s *memberServiceImpl) MemberPayment(request *dto.PaymMemberStoreRequest, ctx context.Context) error {
+	// check member id
+	id := request.ID
+	member, err := s.memberRepository.FindMemberById(id, ctx)
+	if err != nil {
+		return err
+	}
+	if member.UserID != request.UserID {
+		return myerrors.ErrPermission
+	}
+	if member.ProofPayment != "" {
+		return errors.New("member already paid")
+	}
+	// create file buffer
+	buf := bytes.NewBuffer(nil)
+
+	if _, err := io.Copy(buf, request.File); err != nil {
+		return err
+	}
+	url, err := s.imagekitService.Upload("member", buf.Bytes())
+	if err != nil {
+		return err
+	}
+	if url == "" {
+		return myerrors.ErrFailedUpload
+	}
+	// update member
+	body := model.Member{
+		ID:           id,
+		ProofPayment: url,
+		ExpiredAt:    time.Now().Add(24 * time.Hour),
+		Status:       model.WAITING,
+	}
+	s.memberRepository.UpdateMember(&body, ctx)
+	if err != nil {
+		return err
+	}
+	// push or create notification
+	notif := model.Notification{
+		UserID:          member.UserID,
+		TransactionID:   id,
+		TransactionType: "/members/",
+		Title:           "Member",
+	}
+	if err := s.notificationRepository.CreateNotification(&notif, ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
+func NewMemberService(memberRepository memberRepo.MemberRepository, imagekit imgkit.ImagekitService, notificationRepository notifRepo.NotificationRepository) MemberService {
 	return &memberServiceImpl{
-		memberRepository: memberRepository,
+		memberRepository:       memberRepository,
+		notificationRepository: notificationRepository,
+		imagekitService:        imagekit,
 	}
 }

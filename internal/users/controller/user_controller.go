@@ -8,5 +8,4 @@ type UserController interface {
 	GetUser(c echo.Context) error
 	GetUsers(c echo.Context) error
 	GetAdmins(c echo.Context) error
-	InitRoute(api *echo.Group)
 }

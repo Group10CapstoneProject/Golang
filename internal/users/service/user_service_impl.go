@@ -37,9 +37,15 @@ func (r *userServiceImpl) FindUsers(page model.Pagination, role string, ctx cont
 	if err != nil {
 		return nil, err
 	}
-	var response dto.PageResponse
-	response.Users.FromModel(users)
-	response.Count = count
+	var result dto.UsersResponse
+	result.FromModel(users)
+
+	response := dto.PageResponse{
+		Users: result,
+		Page:  uint(page.Page),
+		Limit: uint(page.Limit),
+		Count: count,
+	}
 	return &response, nil
 }
 

@@ -15,6 +15,7 @@ type MemberService interface {
 	FindMemberByUser(userId uint, ctx context.Context) (*dto.MemberResources, error)
 	UpdateMember(request *dto.MemberUpdateRequest, ctx context.Context) error
 	SetStatusMember(request *dto.SetStatusMember, ctx context.Context) error
+	MemberPayment(request *dto.PaymMemberStoreRequest, ctx context.Context) error
 	DeleteMember(id uint, ctx context.Context) error
 
 	// member type
