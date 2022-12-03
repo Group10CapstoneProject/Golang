@@ -78,6 +78,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	auth.POST("/login", authController.Login)
 	auth.POST("/refresh", authController.RefreshToken)
 	auth.POST("/admin/login", authController.LoginAdmin)
+	auth.POST("/admin/refresh", authController.RefreshAdminToken)
 	auth.POST("/logout", authController.Logout, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
 	// users
 	users := v1.Group("/users")

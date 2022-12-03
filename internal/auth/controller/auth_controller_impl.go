@@ -2,7 +2,9 @@ package controller
 
 import (
 	"net/http"
+	"time"
 
+	"github.com/Group10CapstoneProject/Golang/constans"
 	"github.com/Group10CapstoneProject/Golang/internal/auth/dto"
 	authService "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	"github.com/Group10CapstoneProject/Golang/model"
@@ -64,6 +66,35 @@ func (d *authControllerImpl) RefreshToken(c echo.Context) error {
 	return c.JSON(http.StatusOK, echo.Map{
 		"message": "refresh success",
 		"data":    newToken,
+	})
+}
+
+// RefreshAdminToken implements AuthController
+func (d *authControllerImpl) RefreshAdminToken(c echo.Context) error {
+	var token model.Token
+	if err := c.Bind(&token); err != nil {
+		return err
+	}
+	if err := c.Validate(token); err != nil {
+		return err
+	}
+	newToken, err := d.authService.Refresh(token, c.Request().Context())
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	response := model.AdminToken{
+		Access: model.Access{
+			AccessAccessToken: newToken.AccessToken,
+			ExpiredAt:         time.Now().Add(constans.ExpAccessToken),
+		},
+		Refresh: model.Refresh{
+			RefreshToken: newToken.RefreshToken,
+			ExpiredAt:    time.Now().Add(constans.ExpRefreshToken),
+		},
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "refresh success",
+		"data":    response,
 	})
 }
 
