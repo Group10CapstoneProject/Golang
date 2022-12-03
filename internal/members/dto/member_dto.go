@@ -48,6 +48,7 @@ func (u *MemberUpdateRequest) ToModel() *model.Member {
 type MemberResource struct {
 	ID             uint             `json:"id"`
 	UserName       string           `json:"user_name"`
+	UserEmail      string           `json:"user_email"`
 	MemberTypeName string           `json:"member_type_name"`
 	ExpiredAt      time.Time        `json:"expired_at"`
 	ActivedAt      time.Time        `json:"actived_at"`
@@ -58,6 +59,7 @@ type MemberResource struct {
 func (u *MemberResource) FromModel(m *model.Member) {
 	u.ID = m.ID
 	u.UserName = m.User.Name
+	u.UserEmail = m.User.Email
 	u.MemberTypeName = m.MemberType.Name
 	u.ExpiredAt = m.ExpiredAt
 	u.ActivedAt = m.ActivedAt

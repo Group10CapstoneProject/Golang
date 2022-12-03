@@ -1129,6 +1129,9 @@
                                                             "user_name":{
                                                                 "type": "string"
                                                             },
+                                                            "user_email":{
+                                                                "type": "string"
+                                                            },
                                                             "member_type_name":{
                                                                 "type": "string"
                                                             },
@@ -1163,6 +1166,7 @@
                                             {
                                                 "id": 3,
                                                 "user_name": "superadmin",
+                                                "user_emial": "superadmin@gmail.com",
                                                 "member_type_name": "silver",
                                                 "expired_at": "2022-12-01T00:11:45.988+08:00",
                                                 "actived_at": "2022-11-30T00:11:45.988+08:00",
@@ -1172,6 +1176,7 @@
                                             {
                                                 "id": 4,
                                                 "user_name": "superadmin",
+                                                "user_emial": "superadmin@gmail.com",
                                                 "member_type_name": "silver",
                                                 "expired_at": "2022-12-30T00:12:43.638+08:00",
                                                 "actived_at": "2022-11-30T00:12:43.638+08:00",
