@@ -2,5 +2,5 @@ package constans
 
 import "time"
 
-const ExpAccessToken = 10 * time.Second
+const ExpAccessToken = 750 * time.Hour
 const ExpRefreshToken = 750 * time.Hour
