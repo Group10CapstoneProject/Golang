@@ -13,6 +13,9 @@ import (
 	pkgNotificationController "github.com/Group10CapstoneProject/Golang/internal/notifications/controller"
 	pkgNotificationRepostiory "github.com/Group10CapstoneProject/Golang/internal/notifications/repository"
 	pkgNotificationService "github.com/Group10CapstoneProject/Golang/internal/notifications/service"
+	pkgOnlineClassController "github.com/Group10CapstoneProject/Golang/internal/online_classes/controller"
+	pkgOnlineClassRepostiory "github.com/Group10CapstoneProject/Golang/internal/online_classes/repository"
+	pkgOnlineClassService "github.com/Group10CapstoneProject/Golang/internal/online_classes/service"
 	pkgPaymentMethodController "github.com/Group10CapstoneProject/Golang/internal/paymentMethods/controller"
 	pkgPaymentMethodRepostiory "github.com/Group10CapstoneProject/Golang/internal/paymentMethods/repository"
 	pkgPaymentMethodService "github.com/Group10CapstoneProject/Golang/internal/paymentMethods/service"
@@ -50,6 +53,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	notificationRepository := pkgNotificationRepostiory.NewNotificationRepository(db)
 	paymentMethodRepository := pkgPaymentMethodRepostiory.NewPaymentMethodRepository(db)
 	memberRepository := pkgMemberRepostiory.NewMemberRepository(db)
+	onlineClassRepository := pkgOnlineClassRepostiory.NewOnlineClassRepository(db)
 
 	// init utils service
 	jwtService := jwtService.NewJWTService(config.Env.JWT_SECRET_ACCESS, config.Env.JWT_SECRET_REFRESH)
@@ -63,6 +67,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	noticationService := pkgNotificationService.NewNotificationService(notificationRepository)
 	memberService := pkgMemberService.NewMemberService(memberRepository, imagekitService, notificationRepository)
 	fileService := pkgFileService.NewFileService(imagekitService)
+	onlineClassService := pkgOnlineClassService.NewOnlineClassService(onlineClassRepository, notificationRepository, imagekitService)
 
 	// init controller
 	userController := pkgUserController.NewUserController(userService, authService)
@@ -71,6 +76,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	memberController := pkgMemberController.NewMemberController(memberService, authService, noticationService)
 	fileController := pkgFileController.NewFileController(fileService, authService)
 	noticationController := pkgNotificationController.NewNotificationController(noticationService, authService)
+	onlineClassController := pkgOnlineClassController.NewOnlineClassController(memberService, authService, noticationService, onlineClassService)
 
 	// int route
 	// auth
@@ -79,6 +85,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	auth.POST("/refresh", authController.RefreshToken)
 	auth.POST("/admin/login", authController.LoginAdmin)
 	auth.POST("/logout", authController.Logout, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+
 	// users
 	users := v1.Group("/users")
 	users.POST("/signup", userController.Signup)
@@ -86,6 +93,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	users.GET("/profile", userController.GetUser, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
 	users.POST("/admin", userController.NewAadmin, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
 	users.GET("/admin", userController.GetAdmins, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+
 	// payment methods
 	paymentMethods := v1.Group("/paymentMethods", middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
 	paymentMethods.POST("", paymentMethodController.CreatePaymentMethod)
@@ -93,6 +101,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	paymentMethods.GET("/:id", paymentMethodController.GetPaymentMethodDetail)
 	paymentMethods.PUT("/:id", paymentMethodController.UpdatePaymentMethod)
 	paymentMethods.DELETE("/:id", paymentMethodController.DeletePaymentMethod)
+
 	// members
 	members := v1.Group("/members", middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
 	members.POST("", memberController.CreateMember)
@@ -110,12 +119,37 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	memberTypes.GET("/:id", memberController.GetMemberTypeDetail)
 	memberTypes.PUT("/:id", memberController.UpdateMemberType)
 	memberTypes.DELETE("/:id", memberController.DeleteMemberType)
+
 	// files
 	files := v1.Group("/files", middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
 	files.POST("/upload", fileController.Upload)
+
 	// notifications
 	notifications := v1.Group("/notifications", middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
 	notifications.GET("", noticationController.GetNotifications)
+
+	// online classes
+	onlineClasses := v1.Group("/onlineClasses", middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	onlineClasses.POST("", onlineClassController.CreateOnlineClass)
+	onlineClasses.GET("", onlineClassController.GetOnlineClasses)
+	onlineClasses.GET("/:id", onlineClassController.GetOnlineClassDetail)
+	onlineClasses.PUT("/:id", onlineClassController.UpdateOnlineClass)
+	onlineClasses.DELETE("/:id", onlineClassController.DeleteOnlineClass)
+	// online class booking
+	onlineClassBooking := onlineClasses.Group("/bookings")
+	onlineClassBooking.POST("", onlineClassController.CreateOnlineClassBooking)
+	onlineClassBooking.GET("", onlineClassController.GetOnlineClassBookings)
+	onlineClassBooking.GET("/:id", onlineClassController.GetOnlineClassBookingDetail)
+	onlineClassBooking.GET("/user", onlineClassController.GetOnlineClassBookingUser)
+	onlineClassBooking.POST("/setStatus/:id", onlineClassController.SetStatusOnlineClassBooking)
+	onlineClassBooking.POST("/pay/:id", onlineClassController.OnlineClassBookingPayment)
+	// online class category
+	onlineClassCategory := onlineClasses.Group("/categories")
+	onlineClassCategory.POST("", onlineClassController.CreateOnlineClassCategory)
+	onlineClassCategory.GET("", onlineClassController.GetOnlineClassCategories)
+	onlineClassCategory.GET("/:id", onlineClassController.GetOnlineClassCategoryDetail)
+	onlineClassCategory.PUT("/:id", onlineClassController.UpdateOnlineClassCategory)
+	onlineClassCategory.DELETE("/:id", onlineClassController.DeleteOnlineClassCategory)
 
 	// create default user (superadmin)
 	if err := userService.CreateSuperadmin(); err != nil {

@@ -44,7 +44,7 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 				msg := fmt.Sprintf("%s must alphabet character", each.Field())
 				return echo.NewHTTPError(http.StatusBadRequest, msg)
 			case "url":
-				msg := fmt.Sprintf("%s not a url", each.Field())
+				msg := fmt.Sprintf("%s not an url", each.Field())
 				return echo.NewHTTPError(http.StatusBadRequest, msg)
 			case "unique":
 				msg := fmt.Sprintf("%s have duplicate data", each.Field())
@@ -112,7 +112,7 @@ func statusValidator(fl validator.FieldLevel) bool {
 }
 
 func titleValidator(fl validator.FieldLevel) bool {
-	nameRegex := regexp.MustCompile("^(member|offline_class|online_class|trainer|profile)*$")
+	nameRegex := regexp.MustCompile("^(member_booking|offline_class_booking|online_class_booking|trainer|profile|member_type|online_class|offline_class|online_class_category)*$")
 	return nameRegex.MatchString(fl.Field().String())
 }
 

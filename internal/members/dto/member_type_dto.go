@@ -9,6 +9,7 @@ type MemberTypeStoreRequest struct {
 	Name               string `json:"name" validate:"required,name"`
 	Price              uint   `json:"price" validate:"required,gte=0"`
 	Description        string `json:"description,omitempty"`
+	Picture            string `json:"picture" validate:"required,url"`
 	AccessOfflineClass bool   `json:"access_offline_class"`
 	AccessOnlineClass  bool   `json:"access_online_class"`
 	AccessTrainer      bool   `json:"access_trainer"`
@@ -20,10 +21,11 @@ func (u *MemberTypeStoreRequest) ToModel() *model.MemberType {
 		Name:               u.Name,
 		Price:              u.Price,
 		Description:        u.Description,
-		AccessOfflineClass: u.AccessOfflineClass,
-		AccessOnlineClass:  u.AccessOnlineClass,
-		AccessTrainer:      u.AccessTrainer,
-		AccessGym:          u.AccessGym,
+		Picture:            u.Picture,
+		AccessOfflineClass: &u.AccessOfflineClass,
+		AccessOnlineClass:  &u.AccessOnlineClass,
+		AccessTrainer:      &u.AccessTrainer,
+		AccessGym:          &u.AccessGym,
 	}
 }
 
@@ -32,10 +34,11 @@ type MemberTypeUpdateRequest struct {
 	Name               string `json:"name,omitempty" validate:"omitempty,name"`
 	Price              uint   `json:"price,omitempty" validate:"omitempty,gte=0"`
 	Description        string `json:"description,omitempty"`
-	AccessOfflineClass bool   `json:"access_offline_class,omitempty"`
-	AccessOnlineClass  bool   `json:"access_online_class,omitempty"`
-	AccessTrainer      bool   `json:"access_trainer,omitempty"`
-	AccessGym          bool   `json:"access_gym,omitempty"`
+	Picture            string `json:"picture,omitempty" validate:"omitempty,url"`
+	AccessOfflineClass *bool  `json:"access_offline_class,omitempty"`
+	AccessOnlineClass  *bool  `json:"access_online_class,omitempty"`
+	AccessTrainer      *bool  `json:"access_trainer,omitempty"`
+	AccessGym          *bool  `json:"access_gym,omitempty"`
 }
 
 func (u *MemberTypeUpdateRequest) ToModel() *model.MemberType {
@@ -44,6 +47,7 @@ func (u *MemberTypeUpdateRequest) ToModel() *model.MemberType {
 		Name:               u.Name,
 		Price:              u.Price,
 		Description:        u.Description,
+		Picture:            u.Picture,
 		AccessOfflineClass: u.AccessOfflineClass,
 		AccessOnlineClass:  u.AccessOnlineClass,
 		AccessTrainer:      u.AccessTrainer,
@@ -57,6 +61,7 @@ type MemberTypeResource struct {
 	Name               string `json:"name"`
 	Price              uint   `json:"price"`
 	Description        string `json:"description"`
+	Picture            string `json:"picture"`
 	AccessOfflineClass bool   `json:"access_offline_class"`
 	AccessOnlineClass  bool   `json:"access_online_class"`
 	AccessTrainer      bool   `json:"access_trainer"`
@@ -68,10 +73,11 @@ func (u *MemberTypeResource) FromModel(m *model.MemberType) {
 	u.Name = m.Name
 	u.Price = m.Price
 	u.Description = m.Description
-	u.AccessOfflineClass = m.AccessOfflineClass
-	u.AccessOnlineClass = m.AccessOnlineClass
-	u.AccessTrainer = m.AccessOnlineClass
-	u.AccessGym = m.AccessGym
+	u.Picture = m.Picture
+	u.AccessOfflineClass = *m.AccessOfflineClass
+	u.AccessOnlineClass = *m.AccessOnlineClass
+	u.AccessTrainer = *m.AccessTrainer
+	u.AccessGym = *m.AccessGym
 }
 
 type MemberTypeResources []MemberTypeResource

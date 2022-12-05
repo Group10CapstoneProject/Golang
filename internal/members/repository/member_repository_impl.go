@@ -89,17 +89,20 @@ func (r *memberRepositoryImpl) FindMemberById(id uint, ctx context.Context) (*mo
 }
 
 // FindMemberByUser implements MemberRepository
-func (r *memberRepositoryImpl) FindMemberByUser(userId uint, ctx context.Context) ([]model.Member, error) {
-	members := []model.Member{}
-	err := r.db.WithContext(ctx).Where("user_id = ?", userId).
+func (r *memberRepositoryImpl) FindMemberByUser(userId uint, ctx context.Context) (*model.Member, error) {
+	member := model.Member{}
+	err := r.db.WithContext(ctx).Where("user_id = ? AND status = ?", userId, model.ACTIVE).
 		Preload("User").
 		Preload("MemberType").
 		Preload("PaymentMethod").
-		Find(&members).Error
+		First(&member).Error
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, myerrors.ErrRecordNotFound
+		}
 		return nil, err
 	}
-	return members, nil
+	return &member, nil
 }
 
 // FindMemberTypes implements MemberRepository
@@ -124,7 +127,7 @@ func (r *memberRepositoryImpl) FindMembers(page *model.Pagination, ctx context.C
 
 	query := r.db.WithContext(ctx).Model(&model.Member{})
 	if page.Q != "" {
-		query.Where("users.name LIKE ? OR users.email LIKE ? OR MemberType.name OR MemberType.price", "%"+page.Q+"%", "%"+page.Q+"%", "%"+page.Q+"%", "%"+page.Q+"%")
+		query.Where("users.name LIKE ? OR users.email LIKE ? OR MemberType.name", "%"+page.Q+"%", "%"+page.Q+"%", "%"+page.Q+"%")
 	}
 	err := query.
 		Preload("User").
