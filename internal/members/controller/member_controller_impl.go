@@ -357,7 +357,7 @@ func (d *memberControllerImpl) MemberPayment(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	defer src.Close()
-	body := dto.PaymMemberStoreRequest{
+	body := model.PaymentRequest{
 		ID:       uint(id),
 		UserID:   uint(claims["user_id"].(float64)),
 		FileName: form.Filename,

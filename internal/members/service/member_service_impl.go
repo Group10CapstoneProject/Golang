@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"time"
 
@@ -26,7 +27,7 @@ type memberServiceImpl struct {
 func (s *memberServiceImpl) CreateMember(request *dto.MemberStoreRequest, ctx context.Context) error {
 	member := request.ToModel()
 	member.ExpiredAt = time.Now().Add(24 * time.Hour)
-	member.Status = model.PENDING
+	member.Status = model.WAITING
 	err := s.memberRepository.CreateMember(member, ctx)
 	return err
 }
@@ -79,12 +80,12 @@ func (s *memberServiceImpl) FindMemberById(id uint, ctx context.Context) (*dto.M
 }
 
 // FindMemberByUser implements MemberService
-func (s *memberServiceImpl) FindMemberByUser(userId uint, ctx context.Context) (*dto.MemberResources, error) {
+func (s *memberServiceImpl) FindMemberByUser(userId uint, ctx context.Context) (*dto.MemberDetailResource, error) {
 	member, err := s.memberRepository.FindMemberByUser(userId, ctx)
 	if err != nil {
 		return nil, err
 	}
-	var result dto.MemberResources
+	var result dto.MemberDetailResource
 	result.FromModel(member)
 	return &result, nil
 }
@@ -147,17 +148,18 @@ func (s *memberServiceImpl) UpdateMember(request *dto.MemberUpdateRequest, ctx c
 // UpdateMemberType implements MemberService
 func (s *memberServiceImpl) UpdateMemberType(request *dto.MemberTypeUpdateRequest, ctx context.Context) error {
 	memberType := request.ToModel()
+	fmt.Println(memberType)
 	err := s.memberRepository.UpdateMemberType(memberType, ctx)
 	return err
 }
 
 // SetStatusMember implements MemberService
 func (s *memberServiceImpl) SetStatusMember(request *dto.SetStatusMember, ctx context.Context) error {
-	member := request.ToModel()
 	check, err := s.memberRepository.FindMemberById(request.ID, ctx)
 	if err != nil {
 		return err
 	}
+	member := request.ToModel()
 
 	if member.Status == model.ACTIVE && check.Status != model.ACTIVE && check.Status != model.INACTIVE {
 		member.ExpiredAt = time.Now().Add(24 * 30 * time.Duration(check.Duration) * time.Hour)
@@ -176,7 +178,7 @@ func (s *memberServiceImpl) SetStatusMember(request *dto.SetStatusMember, ctx co
 }
 
 // MemberPayment implements MemberService
-func (s *memberServiceImpl) MemberPayment(request *dto.PaymMemberStoreRequest, ctx context.Context) error {
+func (s *memberServiceImpl) MemberPayment(request *model.PaymentRequest, ctx context.Context) error {
 	// check member id
 	id := request.ID
 	member, err := s.memberRepository.FindMemberById(id, ctx)
@@ -207,7 +209,7 @@ func (s *memberServiceImpl) MemberPayment(request *dto.PaymMemberStoreRequest, c
 		ID:           id,
 		ProofPayment: url,
 		ExpiredAt:    time.Now().Add(24 * time.Hour),
-		Status:       model.WAITING,
+		Status:       model.PENDING,
 	}
 	err = s.memberRepository.UpdateMember(&body, ctx)
 	if err != nil {

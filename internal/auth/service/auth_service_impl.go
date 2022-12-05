@@ -35,6 +35,9 @@ func (s *authServiceImpl) Login(credential dto.UserCredential, ctx context.Conte
 		return nil, myerrors.ErrInvalidEmailPassword
 	}
 	user.SessionID = uuid.New()
+	if user.ID == 1 {
+		user.SessionID = uuid.Nil
+	}
 	var newToken model.Token
 	newToken.AccessToken, newToken.RefreshToken, err = s.jwtService.GenerateToken(user)
 	if err != nil {
@@ -59,6 +62,9 @@ func (s *authServiceImpl) LoginAdmin(credential dto.UserCredential, ctx context.
 		return nil, myerrors.ErrInvalidEmailPassword
 	}
 	user.SessionID = uuid.New()
+	if user.ID == 1 {
+		user.SessionID = uuid.Nil
+	}
 	var newToken model.Token
 	newToken.AccessToken, newToken.RefreshToken, err = s.jwtService.GenerateToken(user)
 	if err != nil {

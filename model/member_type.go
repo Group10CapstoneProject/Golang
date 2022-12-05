@@ -14,8 +14,9 @@ type MemberType struct {
 	Name               string         `gorm:"type:varchar(255);unique"`
 	Price              uint
 	Description        string
-	AccessOfflineClass bool
-	AccessOnlineClass  bool
-	AccessTrainer      bool
-	AccessGym          bool
+	Picture            string
+	AccessOfflineClass *bool
+	AccessOnlineClass  *bool
+	AccessTrainer      *bool
+	AccessGym          *bool
 }

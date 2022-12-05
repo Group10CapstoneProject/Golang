@@ -12,10 +12,10 @@ type MemberService interface {
 	CreateMember(request *dto.MemberStoreRequest, ctx context.Context) error
 	FindMembers(page *model.Pagination, ctx context.Context) (*dto.MemberResponses, error)
 	FindMemberById(id uint, ctx context.Context) (*dto.MemberDetailResource, error)
-	FindMemberByUser(userId uint, ctx context.Context) (*dto.MemberResources, error)
+	FindMemberByUser(userId uint, ctx context.Context) (*dto.MemberDetailResource, error)
 	UpdateMember(request *dto.MemberUpdateRequest, ctx context.Context) error
 	SetStatusMember(request *dto.SetStatusMember, ctx context.Context) error
-	MemberPayment(request *dto.PaymMemberStoreRequest, ctx context.Context) error
+	MemberPayment(request *model.PaymentRequest, ctx context.Context) error
 	DeleteMember(id uint, ctx context.Context) error
 
 	// member type
