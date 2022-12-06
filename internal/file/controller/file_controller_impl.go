@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Group10CapstoneProject/Golang/constans"
 	authServ "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	"github.com/Group10CapstoneProject/Golang/internal/file/dto"
 	fileServ "github.com/Group10CapstoneProject/Golang/internal/file/service"
@@ -18,7 +19,7 @@ type fileControllerImpl struct {
 
 func (d *fileControllerImpl) Upload(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
+	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
 			return echo.NewHTTPError(http.StatusForbidden, err.Error())
 		}
@@ -27,7 +28,7 @@ func (d *fileControllerImpl) Upload(c echo.Context) error {
 	title := c.FormValue("title")
 	form, err := c.FormFile("file")
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	src, err := form.Open()
 	if err != nil {
