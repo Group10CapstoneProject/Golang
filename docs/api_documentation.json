@@ -157,9 +157,17 @@
                                     }
                                 },
                                 "example": {
-                                    "message": "login success",
-                                    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOjB9.7W8I-3lyZ1X_a27VBNWHSH5yULLrf_GC8vRd2dyMOsg",
-                                    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOjB9.7W8I-3lyZ1X_a27VBNWHSH5yULLrf_GC8vRd2dyMOsg"
+                                    "data": {
+                                        "access": {
+                                            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzMwMTIzMDgsInJvbGUiOiJzdXBlcmFkbWluIiwic2Vzc2lvbl9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDAwMCIsInVzZXJfaWQiOjF9.c0I_CI9tgBB7kMr-ktGVbNqi5i12lbhxUh3JevA0dqk",
+                                            "expired_at": "2023-01-06T20:38:28.881259152+07:00"
+                                        },
+                                        "refresh": {
+                                            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzMwMTIzMDgsInNlc3Npb25faWQiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDAiLCJ1c2VyX2lkIjoxfQ.O04KG6QE7rvuAs9Io2GVttaC7CLzHusJUdoACM0yqIQ",
+                                            "expired_at": "2023-01-06T20:38:28.881260875+07:00"
+                                        }
+                                    },
+                                    "message": "login success"
                                 }
                             }
                         }
@@ -270,6 +278,86 @@
                                     "message": "success refresh token",
                                     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOjB9.7W8I-3lyZ1X_a27VBNWHSH5yULLrf_GC8vRd2dyMOsg",
                                     "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOjB9.7W8I-3lyZ1X_a27VBNWHSH5yULLrf_GC8vRd2dyMOsg"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401" :{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/auth/admin/refresh": {
+            "post": {
+                "tags": ["Auth"],
+                "summary": "Generate new token",
+                "description": "When access_token is expired use refresh_token to generate the new token to admin",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "refresh_token":{
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "format": "jwt token",
+                                        "required": ["true"]
+                                    }
+                                }
+                            },
+                            "example": {
+                                "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInJvbGUiOjB9.7W8I-3lyZ1X_a27VBNWHSH5yULLrf_GC8vRd2dyMOsg"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success generate new token",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        },
+                                        "data":{
+                                            "type": "object",
+                                            "properties": {
+                                                "access_token":{
+                                                    "type": "string",
+                                                    "format": "jwt token"
+                                                },
+                                                "refresh_token":{
+                                                    "type": "string",
+                                                    "format": "jwt token"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "data": {
+                                        "access": {
+                                            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzMwMTIzMDgsInJvbGUiOiJzdXBlcmFkbWluIiwic2Vzc2lvbl9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDAwMCIsInVzZXJfaWQiOjF9.c0I_CI9tgBB7kMr-ktGVbNqi5i12lbhxUh3JevA0dqk",
+                                            "expired_at": "2023-01-06T20:38:28.881259152+07:00"
+                                        },
+                                        "refresh": {
+                                            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzMwMTIzMDgsInNlc3Npb25faWQiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDAiLCJ1c2VyX2lkIjoxfQ.O04KG6QE7rvuAs9Io2GVttaC7CLzHusJUdoACM0yqIQ",
+                                            "expired_at": "2023-01-06T20:38:28.881260875+07:00"
+                                        }
+                                    },
+                                    "message": "login success"
                                 }
                             }
                         }
@@ -1263,695 +1351,6 @@
                 }
             }
         },
-        "/onlineClass":{
-            "get": {
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "tags": ["Online Classes"],
-                "summary": "Get all online classes",
-                "description": "To get all online class availabble",
-                "responses": {
-                    "200": {
-                        "description": "Success get members",
-                        "content": {
-                            "application/json":{
-                                "schema":{
-                                    "$ref":"#/components/schemas/onlineClass"
-                                },
-                                "example": {
-                                    "data": {
-                                        "online_class": [
-                                            {
-                                                "id": 3,
-                                                "title": "Workout Dirumah Aja",
-                                                "price": 25000,
-                                                "link": "https://youtu.be/CPTbVoobeiw",
-                                                "description": "deskripsi apa aja",
-                                                "path": "CPTbVoobeiw"
-                                            },
-                                            {
-                                                "id": 4,
-                                                "title": "Cara Push Up",
-                                                "price": 25000,
-                                                "link": "https://youtu.be/adAdaEqwds",
-                                                "description": "deskripsi apa aja",
-                                                "path": "adAdaEqwds"
-                                            }
-                                        ]
-                                    },
-                                    "message": "success get members"
-                                }
-                            }
-                        }
-                    },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    },
-                    "401":{
-                        "$ref": "#/components/responses/unauthorized"
-                    },
-                    "400":{
-                        "$ref": "#/components/responses/badRequest"
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "tags": ["Online Classes"],
-                "summary": "Create new online class",
-                "description": "To create new online class and only admin have access to this service",
-                "requestBody":{
-                    "required": true,
-                    "content": {
-                        "application/json":{
-                            "schema":{
-                                "$ref": "#/components/schemas/onlineClass"
-                            },
-                            "example": {
-                                "title": "Workout Dirumah Aja",
-                                "price": 25000,
-                                "link": "https://youtu.be/CPTbVoobeiw",
-                                "description": "deskripsi apa aja"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Success create new online class",
-                        "content": {
-                            "application/json":{
-                                "schema":{
-                                    "type":"object",
-                                    "properties": {
-                                        "message":{
-                                            "type": "string"
-                                        }
-                                    }
-                                },
-                                "example": {
-                                    "message": "new online class success created"
-                                }
-                            }
-                        }
-                    },
-                    "400":{
-                        "$ref": "#/components/responses/badRequest"
-                    },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    },
-                    "401":{
-                        "$ref": "#/components/responses/unauthorized"
-                    },
-                    "403":{
-                        "$ref": "#/components/responses/forbidden"
-                    }
-                }
-            }
-        },
-        "/onlineClass/{id}":{
-            "get": {
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "parameters": [
-                    {
-                        "$ref":"#/components/parameters/idUint"
-                    }
-                ],
-                "tags": ["Online Classes"],
-                "summary": "Get single or detail online class",
-                "description": "To spesific online class or detail online class",
-                "responses": {
-                    "200": {
-                        "description": "Success get online class",
-                        "content": {
-                            "application/json":{
-                                "example": {
-                                    "data": {
-                                        "id": 3,
-                                        "title": "Workout Dirumah Aja",
-                                        "price": 25000,
-                                        "link": "https://youtu.be/CPTbVoobeiw",
-                                        "description": "deskripsi apa aja",
-                                        "path": "CPTbVoobeiw",
-                                        "access": true
-                                    },
-                                    "message": "success get online class"
-                                }
-                            }
-                        }
-                    },
-                    "404":{
-                        "$ref": "#/components/responses/notFound"
-                    },
-                    "400":{
-                        "$ref": "#/components/responses/badRequest"
-                    },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    },
-                    "401":{
-                        "$ref": "#/components/responses/unauthorized"
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "parameters": [
-                    {
-                        "$ref":"#/components/parameters/idUint"
-                    }
-                ],
-                "tags": ["Online Classes"],
-                "summary": "Delete member",
-                "description": "Only admin can delete online class",
-                "responses": {
-                    "200": {
-                        "description": "Success delete online class",
-                        "content": {
-                            "application/json":{
-                                "example": {
-                                    "message": "success delete online class"
-                                }
-                            }
-                        }
-                    },
-                    "404":{
-                        "$ref": "#/components/responses/notFound"
-                    },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    },
-                    "401":{
-                        "$ref": "#/components/responses/unauthorized"
-                    },
-                    "400":{
-                        "$ref": "#/components/responses/badRequest"
-                    },
-                    "403":{
-                        "$ref": "#/components/responses/forbidden"
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/components/parameters/idUint"
-                    }
-                ],
-                "tags": ["Online Classes"],
-                "summary": "Update online class",
-                "description": "Update online class only admin can access",
-                "requestBody":{
-                    "required": true,
-                    "content": {
-                        "application/json":{
-                            "schema":{
-                                "$ref":"#/components/schemas/onlineClass"
-                            },
-                            "example": {
-                                "title": "Workout Dirumah Aja",
-                                "price": 25000,
-                                "link": "https://youtu.be/CPTbVoobeiw",
-                                "description": "deskripsi apa aja"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Success update online class",
-                        "content": {
-                            "application/json":{
-                                "schema":{
-                                    "type":"object",
-                                    "properties": {
-                                        "message":{
-                                            "type": "string"
-                                        }
-                                    }
-                                },
-                                "example": {
-                                    "message": "success update online class"
-                                }
-                            }
-                        }
-                    },
-                    "404":{
-                        "$ref": "#/components/responses/notFound"
-                    },
-                    "400":{
-                        "$ref": "#/components/responses/badRequest"
-                    },
-                    "403":{
-                        "$ref": "#/components/responses/forbidden"
-                    },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    },
-                    "401":{
-                        "$ref": "#/components/responses/unauthorized"
-                    }
-                }
-            }
-        },
-        "/onlineClass/booking":{
-            "get": {
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "tags": ["Online Classes"],
-                "summary": "Get all online class booking or transaction",
-                "description": "To get all online class booking or transaction, only admin can access",
-                "responses": {
-                    "200": {
-                        "description": "Success get online class transaction",
-                        "content": {
-                            "application/json":{
-                                "schema":{
-                                    "$ref":"#/components/schemas/onlineClassBooking"
-                                },
-                                "example": {
-                                    "data": {
-                                        "online_classes": [
-                                            {
-                                                "id": 3,
-                                                "user_name": "James Audi",
-                                                "online_class_title": "Workout Dimana Aja",
-                                                "expired_at": "2022-12-01T00:11:45.988+08:00",
-                                                "actived_at": "2022-11-30T00:11:45.988+08:00",
-                                                "duration": 3,
-                                                "status": "WAITING"
-                                            },
-                                            {
-                                                "id": 4,
-                                                "user_name": "James Mudi",
-                                                "online_class_title": "Workout Dimana Aja",
-                                                "expired_at": "2022-12-01T00:11:45.988+08:00",
-                                                "actived_at": "2022-11-30T00:11:45.988+08:00",
-                                                "duration": 3,
-                                                "status": "WAITING"
-                                            }
-                                        ],
-                                        "page": 1,
-                                        "limit": 10,
-                                        "count": 2
-                                    },
-                                    "message": "success get members"
-                                }
-                            }
-                        }
-                    },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    },
-                    "401":{
-                        "$ref": "#/components/responses/unauthorized"
-                    },
-                    "400":{
-                        "$ref": "#/components/responses/badRequest"
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "tags": ["Online Classes"],
-                "summary": "Create new online class booking or transaction",
-                "description": "To create new online class booking or new transaction",
-                "requestBody":{
-                    "required": true,
-                    "content": {
-                        "application/json":{
-                            "schema":{
-                                "$ref": "#/components/schemas/onlineClassBooking"
-                            },
-                            "example": {
-                                "online_class_id": 1,
-                                "duration": 2,
-                                "payment_method_id": 1,
-                                "total": 25000
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Success create new online class",
-                        "content": {
-                            "application/json":{
-                                "schema":{
-                                    "type":"object",
-                                    "properties": {
-                                        "message":{
-                                            "type": "string"
-                                        }
-                                    }
-                                },
-                                "example": {
-                                    "message": "new online class success created"
-                                }
-                            }
-                        }
-                    },
-                    "400":{
-                        "$ref": "#/components/responses/badRequest"
-                    },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    },
-                    "401":{
-                        "$ref": "#/components/responses/unauthorized"
-                    },
-                    "403":{
-                        "$ref": "#/components/responses/forbidden"
-                    }
-                }
-            }
-        },
-        "/onlineClass/booking/{id}":{
-            "get": {
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "parameters": [
-                    {
-                        "$ref":"#/components/parameters/idUint"
-                    }
-                ],
-                "tags": ["Online Classes"],
-                "summary": "Get single or details online class booking",
-                "description": "To spesific online class booking or detail online class booking",
-                "responses": {
-                    "200": {
-                        "description": "Success get online class booking",
-                        "content": {
-                            "application/json":{
-                                "example": {
-                                    "data": {
-                                        "id": 4,
-                                        "user":{
-                                            "id": 1,
-                                            "name": "superadmin",
-                                            "email": "superadmin@gmail.com"
-                                        },
-                                        "online_class": {
-                                            "id": 3,
-                                            "title": "Workout Dirumah Aja",
-                                            "price": 25000,
-                                            "link": "https://youtu.be/CPTbVoobeiw",
-                                            "description": "deskripsi apa aja",
-                                            "path": "CPTbVoobeiw"
-                                        },
-                                        "expired_at": "2022-12-30T00:12:43.638+08:00",
-                                        "actived_at": "2022-11-30T00:12:43.638+08:00",
-                                        "duration": 1,
-                                        "proof_payment": "http://google.com",
-                                        "payment_method": {
-                                            "id": 1,
-                                            "name": "ShoopePay",
-                                            "description": "Bisa bayar dimanapun dan kapanpun",
-                                            "payment_number": "0812342331512"
-                                        },
-                                        "total": 200000,
-                                        "status": "ACTIVE"
-                                    },
-                                    "message": "success get online class booking"
-                                }
-                            }
-                        }
-                    },
-                    "404":{
-                        "$ref": "#/components/responses/notFound"
-                    },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    },
-                    "401":{
-                        "$ref": "#/components/responses/unauthorized"
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "parameters": [
-                    {
-                        "$ref":"#/components/parameters/idUint"
-                    }
-                ],
-                "tags": ["Online Classes"],
-                "summary": "Delete online class booking",
-                "description": "Only admin can delete online class booking",
-                "responses": {
-                    "200": {
-                        "description": "Success delete online class booking",
-                        "content": {
-                            "application/json":{
-                                "example": {
-                                    "message": "success delete online class booking"
-                                }
-                            }
-                        }
-                    },
-                    "404":{
-                        "$ref": "#/components/responses/notFound"
-                    },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    },
-                    "401":{
-                        "$ref": "#/components/responses/unauthorized"
-                    },
-                    "403":{
-                        "$ref": "#/components/responses/forbidden"
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/components/parameters/idUint"
-                    }
-                ],
-                "tags": ["Online Classes"],
-                "summary": "Update online class",
-                "description": "Update online class from user or from admin",
-                "requestBody":{
-                    "required": true,
-                    "content": {
-                        "application/json":{
-                            "schema":{
-                                "$ref":"#/components/schemas/onlineClassBooking"
-                            },
-                            "example": {
-                                "online_class_id": 1,
-                                "duration": 3,
-                                "payment_method_id": 1,
-                                "total": 200000
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Success update online class",
-                        "content": {
-                            "application/json":{
-                                "schema":{
-                                    "type":"object",
-                                    "properties": {
-                                        "message":{
-                                            "type": "string"
-                                        }
-                                    }
-                                },
-                                "example": {
-                                    "message": "success update member"
-                                }
-                            }
-                        }
-                    },
-                    "404":{
-                        "$ref": "#/components/responses/notFound"
-                    },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    },
-                    "401":{
-                        "$ref": "#/components/responses/unauthorized"
-                    }
-                }
-            }
-        },
-        "/onlineClass/booking/setStatus/{id}":{
-            "post": {
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "parameters": [
-                    {
-                        "$ref":"#/components/parameters/idUint"
-                    }
-                ],
-                "tags": ["Online Classes"],
-                "summary": "Set online class booking status",
-                "description": "Only admin can set online class booking status. Status set allowed (ACTIVE, INACTIVE, REJECT)",
-                "requestBody":{
-                    "required": true,
-                    "content": {
-                        "application/json":{
-                            "schema":{
-                                "type": "object",
-                                "properties": {
-                                    "status":{
-                                        "type": "string"
-                                    }
-                                }
-                            },
-                            "example": {
-                                "status":"ACTIVE"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Success set status",
-                        "content": {
-                            "application/json":{
-                                "schema":{
-                                    "type":"object",
-                                    "properties": {
-                                        "message":{
-                                            "type": "string"
-                                        }
-                                    }
-                                },
-                                "example": {
-                                    "message": "success set status"
-                                }
-                            }
-                        }
-                    },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    },
-                    "401":{
-                        "$ref": "#/components/responses/unauthorized"
-                    },
-                    "404":{
-                        "$ref": "#/components/responses/notFound"
-                    },
-                    "403":{
-                        "$ref": "#/components/responses/forbidden"
-                    }
-                }
-            }
-        },
-        "/onlineClass/booking/pay/{id}":{
-            "post": {
-                "tags": ["Online Classes"],
-                "parameters": [
-                    {
-                        "$ref":"#/components/parameters/idUint"
-                    }
-                ],
-                "summary": "Upload proof of online class payment, id is online class booking id",
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "description": "only support image file (validation from extention file)",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data":{
-                            "schema":{
-                                "type": "object",
-                                "properties": {
-                                    "id":{
-                                        "type": "string",
-                                        "description": "online class book id",
-                                        "required": ["true"]
-                                    },
-                                    "file":{
-                                        "type": "string",
-                                        "format": "binary",
-                                        "required": ["true"]
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Payment success",
-                        "content": {
-                            "application/json":{
-                                "example": {
-                                    "message": "payment success"
-                                }
-                            }
-                        }
-                    },
-                    "400":{
-                       "$ref": "#/components/responses/badRequest"
-                    },
-                    "404":{
-                       "$ref": "#/components/responses/notFound"
-                    },
-                    "401":{
-                        "$ref": "#/components/responses/unauthorized"
-                     },
-                     "403":{
-                        "$ref": "#/components/responses/forbidden"
-                     },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    }
-                }
-            }
-        },
         "/members/{id}":{
             "get": {
                 "security": [
@@ -2157,6 +1556,7 @@
                                             "name": "silver",
                                             "price": 200000,
                                             "description": "test member",
+                                            "picture": "https://ik.imagekit.io/rnwxyz/member_type/b7bf1279-ee02-47d8-a3aa-559fb60102a3",
                                             "access_offline_class": true,
                                             "access_online_class": true,
                                             "access_trainer": true,
@@ -2167,6 +1567,7 @@
                                             "name": "gold",
                                             "price": 400000,
                                             "description": "test member",
+                                            "picture": "https://ik.imagekit.io/rnwxyz/member_type/b7bf1279-ee02-47d8-a3aa-559fb60102a3",
                                             "access_offline_class": true,
                                             "access_online_class": true,
                                             "access_trainer": true,
@@ -2206,6 +1607,7 @@
                                 "name": "gold",
                                 "price": 400000,
                                 "description": "test member",
+                                "picture": "https://ik.imagekit.io/rnwxyz/member_type/b7bf1279-ee02-47d8-a3aa-559fb60102a3",
                                 "access_offline_class": true,
                                 "access_online_class": true,
                                 "access_trainer": true,
@@ -2239,6 +1641,9 @@
                     "401":{
                         "$ref": "#/components/responses/unauthorized"
                     },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
                     "403":{
                         "$ref": "#/components/responses/forbidden"
                     }
@@ -2265,6 +1670,7 @@
                                         "name": "silver",
                                         "price": 200000,
                                         "description": "test member",
+                                        "picture": "https://ik.imagekit.io/rnwxyz/member_type/b7bf1279-ee02-47d8-a3aa-559fb60102a3",
                                         "access_offline_class": true,
                                         "access_online_class": true,
                                         "access_trainer": true,
@@ -2277,6 +1683,9 @@
                     },
                     "404":{
                         "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
                     },
                     "500":{
                         "$ref": "#/components/responses/internalServerError"
@@ -2308,15 +1717,14 @@
                                 "$ref": "#/components/schemas/memberType"
                             },
                             "example": {
-                                "title": "Zumba Internasional Class",
-                                "time": "2012-10-31 15:50:13.793654 +0000 UTC",
-                                "duration": 60,
-                                "slot": 50,
-                                "slot_ready": 34,
-                                "price": 500000,
-                                "picture_path": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
-                                "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
-                                "description": "offline class zumba tingkat internasional"
+                                "name": "gold",
+                                "price": 400000,
+                                "description": "test member",
+                                "picture": "https://ik.imagekit.io/rnwxyz/member_type/b7bf1279-ee02-47d8-a3aa-559fb60102a3",
+                                "access_offline_class": true,
+                                "access_online_class": true,
+                                "access_trainer": true,
+                                "access_gym": true
                             }
                         }
                     }
@@ -2342,6 +1750,9 @@
                     },
                     "404":{
                         "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
                     },
                     "500":{
                         "$ref": "#/components/responses/internalServerError"
@@ -2389,6 +1800,9 @@
                     },
                     "404": {
                         "$ref":"#/components/responses/notFound"
+                    },
+                    "400": {
+                        "$ref":"#/components/responses/badRequest"
                     },
                     "500":{
                         "$ref": "#/components/responses/internalServerError"
@@ -2515,6 +1929,1025 @@
                     },
                     "403":{
                         "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/onlineClass":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Online Classes"],
+                "summary": "Get all online classes",
+                "description": "To get all online class availabble",
+                "responses": {
+                    "200": {
+                        "description": "Success get online class",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/onlineClass"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "title": "Zumba Asik",
+                                            "price": 20000,
+                                            "duration": 30,
+                                            "level": "medium",
+                                            "picture": "https://ik.imagekit.io/rnwxyz/online_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc",
+                                            "online_class_category_id": 1
+                                        },
+                                        {
+                                            "id": 2,
+                                            "title": "Zumba Asik 2",
+                                            "price": 20000,
+                                            "duration": 30,
+                                            "level": "medium",
+                                            "picture": "https://ik.imagekit.io/rnwxyz/online_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc",
+                                            "online_class_category_id": 1
+                                        }
+                                    ],
+                                    "message": "success get online classes"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Online Classes"],
+                "summary": "Create new online class",
+                "description": "To create new online class and only admin have access to this service",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/onlineClass"
+                            },
+                            "example": {
+                                "title": "Zumba Asik",
+                                "link": "https://youtu.be/TQQuqLmqYEE",
+                                "price": 20000,
+                                "description": "Contoh online class",
+                                "online_class_category_id": 1,
+                                "tools": "tools example",
+                                "target_area": "all body",
+                                "duration": 30,
+                                "level": "medium",
+                                "picture": "https://ik.imagekit.io/rnwxyz/online_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success create new online class",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "new online class success created"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/onlineClass/{id}":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Online Classes"],
+                "summary": "Get single or detail online class",
+                "description": "To spesific online class or detail online class",
+                "responses": {
+                    "200": {
+                        "description": "Success get online class",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "title": "Zumba Asik Ahh",
+                                        "price": 20000,
+                                        "description": "Contoh online class",
+                                        "link": "https://youtu.be/TQQuqLmqYEE",
+                                        "path": "TQQuqLmqYEE",
+                                        "tools": "tools example",
+                                        "target_area": "all body",
+                                        "duration": 30,
+                                        "level": "medium",
+                                        "picture": "https://ik.imagekit.io/rnwxyz/online_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc",
+                                        "online_class_category": {
+                                            "id": 1,
+                                            "name": "Zumba",
+                                            "description": "Ini merupakan kategori untuk video zumba baru",
+                                            "picture": "https://ik.imagekit.io/rnwxyz/online_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc",
+                                            "online_class_count": 1
+                                        },
+                                        "access_class": true
+                                    },
+                                    "message": "success get online class"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Online Classes"],
+                "summary": "Delete online class",
+                "description": "Only admin can delete online class",
+                "responses": {
+                    "200": {
+                        "description": "Success delete online class",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "success delete online class"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Online Classes"],
+                "summary": "Update online class",
+                "description": "Update online class only admin can access",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref":"#/components/schemas/onlineClass"
+                            },
+                            "example": {
+                                "title": "Zumba Asik Ahh",
+                                "link": "https://youtu.be/TQQuqLmqYEE",
+                                "price": 20000,
+                                "description": "Contoh online class",
+                                "online_class_category_id": 1,
+                                "tools": "tools example",
+                                "target_area": "all body",
+                                "duration": 30,
+                                "level": "medium",
+                                "picture": "https://ik.imagekit.io/rnwxyz/online_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success update online class",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success update online class"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/onlineClass/categories":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Online Class Categories"],
+                "summary": "Get all online class categories",
+                "description": "To get all online class categories availabble",
+                "responses": {
+                    "200": {
+                        "description": "Success get online class categories",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/onlineClassCategory"
+                                },
+                                "example": {
+                                    "data": {
+                                        "data": [
+                                            {
+                                                "id": 1,
+                                                "name": "Zumba",
+                                                "description": "Ini merupakan kategori untuk video zumba baru",
+                                                "picture": "https://ik.imagekit.io/rnwxyz/online_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc",
+                                                "online_class_count": 0
+                                            },
+                                            {
+                                                "id": 2,
+                                                "name": "Zumba 2",
+                                                "description": "Ini merupakan kategori untuk video zumba baru",
+                                                "picture": "https://ik.imagekit.io/rnwxyz/online_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc",
+                                                "online_class_count": 0
+                                            }
+                                        ],
+                                        "message": "success get online class categories"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Online Class Categories"],
+                "summary": "Create new online class category",
+                "description": "To create new online class category and only admin have access to this service",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/onlineClassCategory"
+                            },
+                            "example": {
+                                "name": "Zumba",
+                                "description": "Ini merupakan kategori untuk video zumba",
+                                "picture": "https://ik.imagekit.io/rnwxyz/online_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success create new online class category",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "new online class category success created"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/onlineClass/categories/{id}":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Online Class Categories"],
+                "summary": "Get single or detail online class category",
+                "description": "To spesific online class category or detail online class category",
+                "responses": {
+                    "200": {
+                        "description": "Success get online class category",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "name": "Zumba",
+                                        "description": "Ini merupakan kategori untuk video zumba baru",
+                                        "online_class_count": 1,
+                                        "picture": "https://ik.imagekit.io/rnwxyz/online_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc",
+                                        "online_classes": [
+                                            {
+                                                "id": 1,
+                                                "title": "Zumba Asik Ahh",
+                                                "price": 20000,
+                                                "duration": 30,
+                                                "level": "medium",
+                                                "picture": "https://ik.imagekit.io/rnwxyz/online_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc",
+                                                "online_class_category_id": 1
+                                            },
+                                            {
+                                                "id": 2,
+                                                "title": "Zumba Asik 2 Ahh",
+                                                "price": 20000,
+                                                "duration": 30,
+                                                "level": "medium",
+                                                "picture": "https://ik.imagekit.io/rnwxyz/online_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc",
+                                                "online_class_category_id": 1
+                                            }
+                                        ]
+                                    },
+                                    "message": "success get online calss category"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Online Class Categories"],
+                "summary": "Delete online class category",
+                "description": "Only admin can delete online class category",
+                "responses": {
+                    "200": {
+                        "description": "Success delete online class category",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "success delete online class category"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Online Class Categories"],
+                "summary": "Update online class",
+                "description": "Update online class only admin can access",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref":"#/components/schemas/onlineClassCategory"
+                            },
+                            "example": {
+                                "name": "Zumba",
+                                "description": "Ini merupakan kategori untuk video zumba baru",
+                                "picture": "https://ik.imagekit.io/rnwxyz/online_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success update online class category",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success update online class category"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/onlineClass/booking":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/components/parameters/q"
+                    }
+                ],
+                "tags": ["Online Class Bookings"],
+                "summary": "Get all online class booking or transaction",
+                "description": "To get all online class booking or transaction, only admin can access",
+                "responses": {
+                    "200": {
+                        "description": "Success get online class transaction",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/onlineClassBooking"
+                                },
+                                "example": {
+                                    "data": {
+                                        "data": {
+                                            "online_class_booking": [
+                                                {
+                                                    "id": 1,
+                                                    "user_name": "Rian Wijaya",
+                                                    "user_email": "r@gmail.com",
+                                                    "online_class_title": "Zumba Asik Ahh",
+                                                    "expired_at": "2023-02-04T01:54:05.296+08:00",
+                                                    "actived_at": "2022-12-06T01:54:05.296+08:00",
+                                                    "duration": 2,
+                                                    "status": "ACTIVE"
+                                                },
+                                                {
+                                                    "id": 2,
+                                                    "user_name": "Rian Wijaya",
+                                                    "user_email": "r@gmail.com",
+                                                    "online_class_title": "Zumba Asik Ahh",
+                                                    "expired_at": "2023-02-04T01:54:05.296+08:00",
+                                                    "actived_at": "2022-12-06T01:54:05.296+08:00",
+                                                    "duration": 2,
+                                                    "status": "ACTIVE"
+                                                }
+                                            ],
+                                            "page": 1,
+                                            "limit": 10,
+                                            "count": 2
+                                        },
+                                        "message": "success get online class bookings"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Online Class Bookings"],
+                "summary": "Create new online class booking or transaction",
+                "description": "To create new online class booking or new transaction",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/onlineClassBooking"
+                            },
+                            "example": {
+                                "online_class_id": 1,
+                                "duration": 2,
+                                "payment_method_id": 1,
+                                "total": 40000
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success create new online class booking",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "new online class booking success created"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/onlineClass/booking/{id}":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Online Class Bookings"],
+                "summary": "Get single or details online class booking",
+                "description": "To spesific online class booking or detail online class booking",
+                "responses": {
+                    "200": {
+                        "description": "Success get online class booking",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "user": {
+                                            "id": 3,
+                                            "name": "Rian Wijaya",
+                                            "email": "r@gmail.com"
+                                        },
+                                        "online_class": {
+                                            "id": 1,
+                                            "title": "Zumba Asik Ahh",
+                                            "price": 20000,
+                                            "duration": 30,
+                                            "level": "medium",
+                                            "picture": "https://ik.imagekit.io/rnwxyz/online_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc",
+                                            "online_class_category_id": 1
+                                        },
+                                        "expired_at": "2023-02-04T01:54:05.296+08:00",
+                                        "actived_at": "2022-12-06T01:54:05.296+08:00",
+                                        "duration": 2,
+                                        "proof_payment": "https://ik.imagekit.io/rnwxyz/online_class_booking/64a99302-4a69-4f41-adf4-ef420d5e1036",
+                                        "payment_method": {
+                                            "id": 1,
+                                            "name": "ShoopePay",
+                                            "description": "Bisa bayar dimanapun dan kapanpun",
+                                            "payment_number": "0812342331512"
+                                        },
+                                        "total": 40000,
+                                        "status": "ACTIVE"
+                                    },
+                                    "message": "success get online class booking"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Online Class Bookings"],
+                "summary": "Delete online class booking",
+                "description": "Only admin can delete online class booking",
+                "responses": {
+                    "200": {
+                        "description": "Success delete online class booking",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "success delete online class booking"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Online Class Bookings"],
+                "summary": "Update online class booking",
+                "description": "Update online class booking from user or from admin",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref":"#/components/schemas/onlineClassBooking"
+                            },
+                            "example": {
+                                "online_class_id": 1,
+                                "duration": 2,
+                                "payment_method_id": 1,
+                                "total": 40000
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success update online class booking",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success update online class booking"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/onlineClass/booking/setStatus/{id}":{
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Online Class Bookings"],
+                "summary": "Set online class booking status",
+                "description": "Only admin can set online class booking status. Status set allowed (ACTIVE, INACTIVE, REJECT)",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "status":{
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "example": {
+                                "status":"ACTIVE"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success set status",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success set status"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/onlineClass/booking/pay/{id}":{
+            "post": {
+                "tags": ["Online Class Bookings"],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "summary": "Upload proof of online class booking payment, id is online class booking id",
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "description": "only support image file (validation from extention file)",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "file":{
+                                        "type": "string",
+                                        "format": "binary",
+                                        "required": ["true"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment success",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "payment success"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                       "$ref": "#/components/responses/badRequest"
+                    },
+                    "404":{
+                       "$ref": "#/components/responses/notFound"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                     },
+                     "403":{
+                        "$ref": "#/components/responses/forbidden"
+                     },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
                     }
                 }
             }
@@ -3018,6 +3451,52 @@
                     "path": {
                         "type": "string",
                         "description": "unique id from link video"
+                    },
+                    "tools":{
+                        "type": "string"
+                    },
+                    "target_area":{
+                        "type": "string"
+                    },
+                    "duration":{
+                        "type": "integer"
+                    },
+                    "level":{
+                        "type": "string"
+                    },
+                    "online_class_category":{
+                        "type": "object",
+                        "properties": {
+                            "id":{
+                                "type": "integer"
+                            },
+                            "name":{
+                                "type": "string"
+                            },
+                            "description":{
+                                "type": "string"
+                            },
+                            "picture":{
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "onlineClassCategory":{
+                "type": "object",
+                "properties": {
+                    "id":{
+                        "type": "integer"
+                    },
+                    "name":{
+                        "type": "string"
+                    },
+                    "description":{
+                        "type": "string"
+                    },
+                    "picture":{
+                        "type": "string"
                     }
                 }
             },

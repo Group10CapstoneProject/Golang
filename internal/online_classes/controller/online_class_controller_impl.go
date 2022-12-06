@@ -356,7 +356,7 @@ func (d *onlineClassControllerImpl) GetOnlineClasses(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success get member types",
+		"message": "success get online classes",
 		"data":    onlineClasses,
 	})
 }
@@ -377,7 +377,7 @@ func (d *onlineClassControllerImpl) OnlineClassBookingPayment(c echo.Context) er
 	}
 	form, err := c.FormFile("file")
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	src, err := form.Open()
 	if err != nil {

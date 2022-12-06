@@ -272,7 +272,7 @@ func (s *onlineClassServiceImpl) OnlineClassPayment(request *model.PaymentReques
 	notif := model.Notification{
 		UserID:          onlineClassBooking.UserID,
 		TransactionID:   id,
-		TransactionType: "/onlineClasses/booking/",
+		TransactionType: "/onlineClasses/bookings/",
 		Title:           "Online Class",
 	}
 	if err := s.notificationRepository.CreateNotification(&notif, ctx); err != nil {
