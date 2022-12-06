@@ -10,7 +10,7 @@ import (
 type OfflineClassService interface {
 	// offline class
 	CreateOfflineClass(request *dto.OfflineClassRequest, ctx context.Context) error
-	FindOfflineClasss(page *model.Pagination, ctx context.Context) (*dto.OfflineClassResponses, error)
+	FindOfflineClass(page *model.Pagination, ctx context.Context) (*dto.OfflineClassResponses, error)
 	FindOfflineClassById(id uint, ctx context.Context) (*dto.OfflineClassDetailResource, error)
 	UpdateOfflineClass(request *dto.OfflineClassUpdateRequest, ctx context.Context) error
 	DeleteOfflineClass(id uint, ctx context.Context) error
