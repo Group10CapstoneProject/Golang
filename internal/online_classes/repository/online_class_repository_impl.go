@@ -128,9 +128,9 @@ func (r *onlineClassRepositoryImpl) FindOnlineClassBookings(page *model.Paginati
 	var count int64
 	offset := (page.Limit * page.Page) - page.Limit
 
-	query := r.db.WithContext(ctx).Model(&model.OnlineClassBooking{})
+	query := r.db.WithContext(ctx).Model(&model.OnlineClassBooking{}).Joins("LEFT JOIN users ON users.id = online_class_bookings.user_id").Joins("LEFT JOIN online_classes ON online_classes.id = online_class_bookings.online_class_id")
 	if page.Q != "" {
-		query.Where("users.name LIKE ? OR users.email LIKE ? OR OnlineClass.Title", "%"+page.Q+"%", "%"+page.Q+"%", "%"+page.Q+"%")
+		query.Where("users.name LIKE ? OR users.email LIKE ? OR online_classes.title LIKE ?", "%"+page.Q+"%", "%"+page.Q+"%", "%"+page.Q+"%")
 	}
 	err := query.
 		Preload("User").

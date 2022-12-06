@@ -125,9 +125,9 @@ func (r *memberRepositoryImpl) FindMembers(page *model.Pagination, ctx context.C
 	var count int64
 	offset := (page.Limit * page.Page) - page.Limit
 
-	query := r.db.WithContext(ctx).Model(&model.Member{})
+	query := r.db.WithContext(ctx).Model(&model.Member{}).Joins("LEFT JOIN users ON users.id = members.user_id").Joins("LEFT JOIN member_types ON member_types.id = members.member_type_id")
 	if page.Q != "" {
-		query.Where("users.name LIKE ? OR users.email LIKE ? OR MemberType.name", "%"+page.Q+"%", "%"+page.Q+"%", "%"+page.Q+"%")
+		query.Where("users.name LIKE ? OR users.email LIKE ? OR member_types.name LIKE ?", "%"+page.Q+"%", "%"+page.Q+"%", "%"+page.Q+"%")
 	}
 	err := query.
 		Preload("User").

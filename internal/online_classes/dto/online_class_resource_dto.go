@@ -112,20 +112,20 @@ type OnlineClassBookingResponses struct {
 }
 
 type OnlineClassBookingDetailResource struct {
-	ID            uint                      `json:"id"`
-	User          UserResource              `json:"user"`
-	OnlineClass   OnlineClassDetailResource `json:"online_class"`
-	ExpiredAt     time.Time                 `json:"expired_at"`
-	ActivedAt     time.Time                 `json:"actived_at"`
-	Duration      uint                      `json:"duration"`
-	ProofPayment  string                    `json:"proof_payment"`
-	PaymentMethod PaymentMethodResource     `json:"payment_method"`
-	Total         uint                      `json:"total"`
-	Status        model.StatusType          `json:"status"`
+	ID            uint                  `json:"id"`
+	User          UserResource          `json:"user"`
+	OnlineClass   OnlineClassResource   `json:"online_class"`
+	ExpiredAt     time.Time             `json:"expired_at"`
+	ActivedAt     time.Time             `json:"actived_at"`
+	Duration      uint                  `json:"duration"`
+	ProofPayment  string                `json:"proof_payment"`
+	PaymentMethod PaymentMethodResource `json:"payment_method"`
+	Total         uint                  `json:"total"`
+	Status        model.StatusType      `json:"status"`
 }
 
 func (u *OnlineClassBookingDetailResource) FromModel(m *model.OnlineClassBooking) {
-	onlineClass := OnlineClassDetailResource{}
+	onlineClass := OnlineClassResource{}
 	onlineClass.FromModel(&m.OnlineClass)
 	paymentMethod := PaymentMethodResource{}
 	paymentMethod.FromModel(&m.PaymentMethod)
@@ -175,6 +175,7 @@ type OnlineClassCategoryResource struct {
 	ID               uint   `json:"id"`
 	Name             string `json:"name"`
 	Description      string `json:"description"`
+	Picture          string `json:"picture"`
 	OnlineClassCount uint   `json:"online_class_count"`
 }
 
@@ -183,6 +184,7 @@ func (u *OnlineClassCategoryResource) FromModel(m *model.OnlineClassCategory) {
 
 	u.ID = m.ID
 	u.Name = m.Name
+	u.Picture = m.Picture
 	u.Description = m.Description
 	u.OnlineClassCount = uint(count)
 }
@@ -203,6 +205,7 @@ type OnlineClassByCategoryResource struct {
 	Name             string               `json:"name"`
 	Description      string               `json:"description"`
 	OnlineClassCount uint                 `json:"online_class_count"`
+	Picture          string               `json:"picture"`
 	OnlineClasses    OnlineClassResources `json:"online_classes"`
 }
 
@@ -213,6 +216,7 @@ func (u *OnlineClassByCategoryResource) FromModel(m *model.OnlineClassCategory) 
 
 	u.ID = m.ID
 	u.Name = m.Name
+	u.Picture = m.Picture
 	u.Description = m.Description
 	u.OnlineClassCount = uint(count)
 	u.OnlineClasses = onlineClasses
