@@ -756,421 +756,6 @@
                 }
             }
         },
-        "/offlineClasses": {
-            "get": {
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/components/parameters/page"
-                    },
-                    {
-                        "$ref": "#/components/parameters/limit"
-                    },
-                    {
-                        "$ref": "#/components/parameters/q"
-                    }
-                ],
-                "tags": ["Offline Classes"],
-                "summary": "Get all offline classes",
-                "description": "To get all offline classes",
-                "responses": {
-                    "200": {
-                        "description": "Success get offline classes",
-                        "content": {
-                            "application/json":{
-                                "schema":{
-                                    "type":"object",
-                                    "properties": {
-                                        "message":{
-                                            "type": "string"
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "properties": {
-                                                "offline_classes": {
-                                                    "type": "array",
-                                                    "items":{
-                                                        "type": "object",
-                                                        "properties": {
-                                                            "id":{
-                                                                "type": "string",
-                                                                "format": "UUID"
-                                                            },
-                                                            "title":{
-                                                                "type":"string"
-                                                            },
-                                                            "time":{
-                                                                "type":"string",
-                                                                "description": "use time format"
-                                                            },
-                                                            "duration":{
-                                                                "type": "integer",
-                                                                "description": "format minutes"
-                                                            },
-                                                            "slot":{
-                                                                "type": "integer"
-                                                            },
-                                                            "slot_ready":{
-                                                                "type": "integer",
-                                                                "description": "remaining slots"
-                                                            },
-                                                            "price": {
-                                                                "type": "integer"
-                                                            },
-                                                            "picture_path":{
-                                                                "type": "string",
-                                                                "description": "dispay picture fo the class"
-                                                            },
-                                                            "trainer_id":{
-                                                                "type": "string",
-                                                                "format": "UUID"
-                                                            },
-                                                            "description":{
-                                                                "type": "string",
-                                                                "description": "more information about the class"
-                                                            }
-                                                        }
-                                                    }
-                                                },
-                                                "count": {
-                                                    "type": "integer"
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
-                                "example": {
-                                    "message": "success get offline classes",
-                                    "data": {
-                                        "offline_classes": [
-                                            {
-                                                "id":"123e4567-e89b-12d3-a456-4266141711111",
-                                                "title": "Zumba Internasional Class",
-                                                "time": "2012-10-31 15:50:13.793654 +0000 UTC",
-                                                "duration": 60,
-                                                "slot": 50,
-                                                "slot_ready": 34,
-                                                "price": 500000,
-                                                "picture_path": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
-                                                "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
-                                                "description": "offline class zumba tingkat internasional"
-                                            },
-                                            {
-                                                "id":"123e4567-e89b-12d3-a456-4266141711112",
-                                                "title": "Zumba Internasional Class",
-                                                "time": "2012-10-31 15:50:13.793654 +0000 UTC",
-                                                "duration": 60,
-                                                "slot": 50,
-                                                "slot_ready": 34,
-                                                "price": 500000,
-                                                "picture_path": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
-                                                "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
-                                                "description": "offline class zumba tingkat internasional"
-                                            }
-                                        ],
-                                        "count": 2
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    },
-                    "401":{
-                        "$ref": "#/components/responses/unauthorized"
-                    },
-                    "403":{
-                        "$ref": "#/components/responses/forbidden"
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "tags": ["Offline Classes"],
-                "summary": "New offline class",
-                "description": "To create new offline class",
-                "requestBody":{
-                    "required": true,
-                    "content": {
-                        "application/json":{
-                            "schema":{
-                                "$ref": "#/components/schemas/offlineClass"
-                            },
-                            "example":{
-                                "title": "Zumba Internasional Class",
-                                "time": "2012-10-31 15:50:13.793654 +0000 UTC",
-                                "duration": 60,
-                                "slot": 50,
-                                "slot_ready": 34,
-                                "price": 500000,
-                                "picture_path": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
-                                "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
-                                "description": "offline class zumba tingkat internasional"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Success create offline class",
-                        "content": {
-                            "application/json":{
-                                "schema":{
-                                    "type":"object",
-                                    "properties": {
-                                        "message":{
-                                            "type": "string"
-                                        }
-                                    }
-                                },
-                                "example": {
-                                    "message": "success create offline class"
-                                }
-                            }
-                        }
-                    },
-                    "400":{
-                        "$ref": "#/components/responses/badRequest"
-                    },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    },
-                    "401":{
-                        "$ref": "#/components/responses/unauthorized"
-                    },
-                    "403":{
-                        "$ref": "#/components/responses/forbidden"
-                    }
-                }
-            }
-        },
-        "/offlineClasses/{id}":{
-            "get": {
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/components/parameters/id"
-                    }
-                ],
-                "tags": ["Offline Classes"],
-                "summary": "Get single offline class",
-                "description": "To get spesific offline class",
-                "responses": {
-                    "200": {
-                        "description": "Success get offline class",
-                        "content": {
-                            "application/json":{
-                                "schema":{
-                                    "type":"object",
-                                    "properties": {
-                                        "message":{
-                                            "type": "string"
-                                        },
-                                        "data":{
-                                            "type": "object",
-                                            "properties": {
-                                                "id":{
-                                                    "type":"string",
-                                                    "format": "UUID"
-                                                },
-                                                "title":{
-                                                    "type":"string"
-                                                },
-                                                "time":{
-                                                    "type":"string",
-                                                    "description": "use time format"
-                                                },
-                                                "duration":{
-                                                    "type": "integer",
-                                                    "description": "format minutes"
-                                                },
-                                                "slot":{
-                                                    "type": "integer"
-                                                },
-                                                "slot_ready":{
-                                                    "type": "integer",
-                                                    "description": "remaining slots"
-                                                },
-                                                "price": {
-                                                    "type": "integer"
-                                                },
-                                                "picture_path":{
-                                                    "type": "string",
-                                                    "description": "dispay picture fo the class"
-                                                },
-                                                "trainer_id":{
-                                                    "type": "string",
-                                                    "format": "UUID"
-                                                },
-                                                "description":{
-                                                    "type": "string",
-                                                    "description": "more information about the class"
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
-                                "example": {
-                                    "message": "success get offline class",
-                                    "data": {
-                                        "id": "123e4567-e89b-12d3-a456-4266141711111",
-                                        "title": "Zumba Internasional Class",
-                                        "time": "2012-10-31 15:50:13.793654 +0000 UTC",
-                                        "duration": 60,
-                                        "slot": 50,
-                                        "slot_ready": 34,
-                                        "price": 500000,
-                                        "picture_path": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
-                                        "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
-                                        "description": "offline class zumba tingkat internasional"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "404":{
-                        "$ref": "#/components/responses/notFound"
-                    },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    },
-                    "401":{
-                        "$ref": "#/components/responses/unauthorized"
-                    },
-                    "403":{
-                        "$ref": "#/components/responses/forbidden"
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/components/parameters/id"
-                    }
-                ],
-                "tags": ["Offline Classes"],
-                "summary": "Update offline class",
-                "description": "To update offline classs",
-                "requestBody":{
-                    "required": true,
-                    "content": {
-                        "application/json":{
-                            "schema":{
-                                "$ref": "#/components/schemas/offlineClass"
-                            },
-                            "example": {
-                                "title": "Zumba Internasional Class",
-                                "time": "2012-10-31 15:50:13.793654 +0000 UTC",
-                                "duration": 60,
-                                "slot": 50,
-                                "slot_ready": 34,
-                                "price": 500000,
-                                "picture_path": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
-                                "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
-                                "description": "offline class zumba tingkat internasional"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Success update offline class",
-                        "content": {
-                            "application/json":{
-                                "schema":{
-                                    "type":"object",
-                                    "properties": {
-                                        "message":{
-                                            "type": "string"
-                                        }
-                                    }
-                                },
-                                "example": {
-                                    "message": "success update offline class"
-                                }
-                            }
-                        }
-                    },
-                    "404":{
-                        "$ref": "#/components/responses/notFound"
-                    },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    },
-                    "401":{
-                        "$ref": "#/components/responses/unauthorized"
-                    },
-                    "403":{
-                        "$ref": "#/components/responses/forbidden"
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "parameters": [
-                    {
-                        "$ref": "#/components/parameters/id"
-                    }
-                ],
-                "tags": ["Offline Classes"],
-                "summary": "Delete offline classes",
-                "description": "To delete offline classes use the the id",
-                "responses": {
-                    "200": {
-                        "description": "Success delete offline calss",
-                        "content": {
-                            "application/json":{
-                                "schema":{
-                                    "type":"object",
-                                    "properties": {
-                                        "message":{
-                                            "type": "string"
-                                        }
-                                    }
-                                },
-                                "example": {
-                                    "message": "success delete offline class"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "$ref":"#/components/responses/notFound"
-                    },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    },
-                    "401":{
-                        "$ref": "#/components/responses/unauthorized"
-                    },
-                    "403":{
-                        "$ref": "#/components/responses/forbidden"
-                    }
-                }
-            }
-        },
         "/members":{
             "get": {
                 "security": [
@@ -1933,7 +1518,1258 @@
                 }
             }
         },
-        "/onlineClass":{
+        "/members/pay/{id}":{
+            "post": {
+                "tags": ["Members"],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "summary": "Upload proof of membership payment",
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "description": "only support image file (validation from extention file)",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "file":{
+                                        "type": "string",
+                                        "format": "binary",
+                                        "required": ["true"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment success",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "payment success"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                       "$ref": "#/components/responses/badRequest"
+                    },
+                    "404":{
+                       "$ref": "#/components/responses/notFound"
+                    },
+                    "401":{
+                       "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                       "$ref": "#/components/responses/forbidden"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    }
+                }
+            }
+        },
+        "/offlineClasses": {
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/time"
+                    },
+                    {
+                        "$ref": "#/components/parameters/category"
+                    },
+                    {
+                        "$ref": "#/components/parameters/orderPrice"
+                    }
+                ],
+                "tags": ["Offline Classes"],
+                "summary": "Get all offline classes",
+                "description": "To get all offline classes",
+                "responses": {
+                    "200": {
+                        "description": "Success get offline classes",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "success get offline classes",
+                                    "data": {
+                                        "offline_classes": [
+                                            {
+                                                "id":1,
+                                                "title": "Zumba Internasional Class",
+                                                "time": "2012-10-31 15:50:13.793654 +0000 UTC",
+                                                "duration": 60,
+                                                "slot": 50,
+                                                "slot_booked": 34,
+                                                "price": 500000,
+                                                "offline_class_category_id": 1,
+                                                "pictue": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg"
+                                            },
+                                            {
+                                                "id": 2,
+                                                "title": "Zumba Nasional Class",
+                                                "time": "2012-10-31 15:50:13.793654 +0000 UTC",
+                                                "duration": 60,
+                                                "slot": 50,
+                                                "slot_booked": 34,
+                                                "price": 500000,
+                                                "offline_class_category_id": 1,
+                                                "pictue": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg"
+                                            }
+                                        ],
+                                        "count": 2
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Offline Classes"],
+                "summary": "New offline class",
+                "description": "To create new offline class",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/offlineClass"
+                            },
+                            "example":{
+                                "title": "Zumba Internasional Class",
+                                "time": "2012-10-31 15:50:13.793654 +0000 UTC",
+                                "duration": 60,
+                                "slot": 50,
+                                "price": 500000,
+                                "picture": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
+                                "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
+                                "description": "offline class zumba tingkat internasional",
+                                "offline_class_category_id": 1,
+                                "location": "Alta Gym, Surabaya"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success create offline class",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success create offline class"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/offlineClasses/{id}":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Offline Classes"],
+                "summary": "Get single offline class",
+                "description": "To get spesific offline class",
+                "responses": {
+                    "200": {
+                        "description": "Success get offline class",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "success get offline class",
+                                    "data": {
+                                        "id": 1,
+                                        "title": "Zumba Internasional Class",
+                                        "time": "2012-10-31 15:50:13.793654 +0000 UTC",
+                                        "duration": 60,
+                                        "slot": 50,
+                                        "slot_booked": 34,
+                                        "price": 500000,
+                                        "picture": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
+                                        "trainer_id": 1,
+                                        "online_class_bookings": [
+                                            {
+                                                "id": 1,
+                                                "user_name": "Rian Wijaya",
+                                                "user_email": "r@gmail.com",
+                                                "offline_class_title": "Zumba Internasional Class",
+                                                "expired_at": "2023-02-04T01:54:05.296+08:00",
+                                                "actived_at": "2022-12-06T01:54:05.296+08:00",
+                                                "status": "ACTIVE"
+                                            },
+                                            {
+                                                "id": 2,
+                                                "user_name": "superadmin",
+                                                "user_email": "superadmin@gmail.com",
+                                                "offline_class_title": "Zumba Internasional Class",
+                                                "expired_at": "2023-02-04T18:25:05.744+08:00",
+                                                "actived_at": "",
+                                                "status": "PENDING"
+                                            }
+                                        ],
+                                        "offline_class_category":{
+                                            "id":1,
+                                            "name":"Zumba",
+                                            "description":"category",
+                                            "picture":"https://google.com"
+                                        },
+                                        "description": "offline class zumba tingkat internasional",
+                                        "location": "alta gym, surabaya"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Offline Classes"],
+                "summary": "Update offline class",
+                "description": "To update offline classs",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/offlineClass"
+                            },
+                            "example": {
+                                "title": "Zumba Internasional Class",
+                                "time": "2012-10-31 15:50:13.793654 +0000 UTC",
+                                "duration": 60,
+                                "slot": 50,
+                                "price": 500000,
+                                "picture": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
+                                "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
+                                "description": "offline class zumba tingkat internasional",
+                                "offline_class_category_id": 1,
+                                "location": "Alta Gym, Surabaya"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success update offline class",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success update offline class"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Offline Classes"],
+                "summary": "Delete offline classes",
+                "description": "To delete offline classes use the the id",
+                "responses": {
+                    "200": {
+                        "description": "Success delete offline calss",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success delete offline class"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref":"#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/offlineClasses/categories":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Offline Class Categories"],
+                "summary": "Get all offline class categories",
+                "description": "To get all offline class categories availabble",
+                "responses": {
+                    "200": {
+                        "description": "Success get offline class categories",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/offlineClassCategory"
+                                },
+                                "example": {
+                                    "data": {
+                                        "data": [
+                                            {
+                                                "id": 1,
+                                                "name": "Zumba",
+                                                "description": "Ini merupakan kategori untuk video zumba baru",
+                                                "picture": "https://ik.imagekit.io/rnwxyz/offline_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc",
+                                                "offline_class_count": 0
+                                            },
+                                            {
+                                                "id": 2,
+                                                "name": "Zumba 2",
+                                                "description": "Ini merupakan kategori untuk video zumba baru",
+                                                "picture": "https://ik.imagekit.io/rnwxyz/offline_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc",
+                                                "offline_class_count": 0
+                                            }
+                                        ],
+                                        "message": "success get offline class categories"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Offline Class Categories"],
+                "summary": "Create new offline class category",
+                "description": "To create new offline class category and only admin have access to this service",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/offlineClassCategory"
+                            },
+                            "example": {
+                                "name": "Zumba",
+                                "description": "Ini merupakan kategori untuk video zumba",
+                                "picture": "https://ik.imagekit.io/rnwxyz/offline_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success create new offline class category",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "new offline class category success created"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/offlineClasses/categories/{id}":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Offline Class Categories"],
+                "summary": "Get single or detail offline class category",
+                "description": "To spesific offline class category or detail offline class category",
+                "responses": {
+                    "200": {
+                        "description": "Success get offline class category",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "name": "Zumba",
+                                        "description": "Ini merupakan kategori untuk video zumba baru",
+                                        "offline_class_count": 1,
+                                        "picture": "https://ik.imagekit.io/rnwxyz/offline_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc",
+                                        "offline_class": [
+                                            {
+                                                "id":1,
+                                                "title": "Zumba Internasional Class",
+                                                "time": "2012-10-31 15:50:13.793654 +0000 UTC",
+                                                "duration": 60,
+                                                "slot": 50,
+                                                "slot_booked": 34,
+                                                "price": 500000,
+                                                "offline_class_category_id": 1,
+                                                "pictue": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg"
+                                            },
+                                            {
+                                                "id": 2,
+                                                "title": "Zumba Nasional Class",
+                                                "time": "2012-10-31 15:50:13.793654 +0000 UTC",
+                                                "duration": 60,
+                                                "slot": 50,
+                                                "slot_booked": 34,
+                                                "price": 500000,
+                                                "offline_class_category_id": 1,
+                                                "pictue": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg"
+                                            }
+                                        ]
+                                    },
+                                    "message": "success get offline calss category"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Offline Class Categories"],
+                "summary": "Delete offline class category",
+                "description": "Only admin can delete offline class category",
+                "responses": {
+                    "200": {
+                        "description": "Success delete offline class category",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "success delete offline class category"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Offline Class Categories"],
+                "summary": "Update offline class",
+                "description": "Update offline class only admin can access",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref":"#/components/schemas/offlineClassCategory"
+                            },
+                            "example": {
+                                "name": "Zumba",
+                                "description": "Ini merupakan kategori untuk video zumba baru",
+                                "picture": "https://ik.imagekit.io/rnwxyz/offline_class_category/e77322ba-2ea9-4bac-ad1a-42b74311e5dc"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success update offline class category",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success update offline class category"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/offlineClasses/bookings":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/components/parameters/q"
+                    }
+                ],
+                "tags": ["Offline Class Bookings"],
+                "summary": "Get all offline class booking or transaction",
+                "description": "To get all offline class booking or transaction, only admin can access",
+                "responses": {
+                    "200": {
+                        "description": "Success get offline class transaction",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/offlineClassBooking"
+                                },
+                                "example": {
+                                    "data": {
+                                        "data": {
+                                            "online_class_booking": [
+                                                {
+                                                    "id": 1,
+                                                    "user_name": "Rian Wijaya",
+                                                    "user_email": "r@gmail.com",
+                                                    "offline_class_title": "Zumba Asik Ahh",
+                                                    "expired_at": "2023-02-04T01:54:05.296+08:00",
+                                                    "actived_at": "2022-12-06T01:54:05.296+08:00",
+                                                    "status": "ACTIVE"
+                                                },
+                                                {
+                                                    "id": 2,
+                                                    "user_name": "Rian Wijaya",
+                                                    "user_email": "r@gmail.com",
+                                                    "offline_class_title": "Zumba Asik Ahh",
+                                                    "expired_at": "2023-02-04T01:54:05.296+08:00",
+                                                    "actived_at": "2022-12-06T01:54:05.296+08:00",
+                                                    "status": "ACTIVE"
+                                                }
+                                            ],
+                                            "page": 1,
+                                            "limit": 10,
+                                            "count": 2
+                                        },
+                                        "message": "success get offline class bookings"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Offline Class Bookings"],
+                "summary": "Create new offline class booking or transaction",
+                "description": "To create new offline class booking or new transaction",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/offlineClassBooking"
+                            },
+                            "example": {
+                                "offline_class_id": 1,
+                                "payment_method_id": 1,
+                                "total": 40000
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success create new offline class booking",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "new offline class booking success created"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/offlineClasses/bookings/{id}":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Offline Class Bookings"],
+                "summary": "Get single or details offline class booking",
+                "description": "To spesific offline class booking or detail offline class booking",
+                "responses": {
+                    "200": {
+                        "description": "Success get offline class booking",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "user": {
+                                            "id": 3,
+                                            "name": "Rian Wijaya",
+                                            "email": "r@gmail.com"
+                                        },
+                                        "offline_class": {
+                                            "id":1,
+                                            "title": "Zumba Internasional Class",
+                                            "time": "2012-10-31 15:50:13.793654 +0000 UTC",
+                                            "duration": 60,
+                                            "slot": 50,
+                                            "slot_booked": 34,
+                                            "price": 500000,
+                                            "offline_class_category_id": 1,
+                                            "pictue": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg"
+                                        },
+                                        "expired_at": "2023-02-04T01:54:05.296+08:00",
+                                        "actived_at": "2022-12-06T01:54:05.296+08:00",
+                                        "proof_payment": "https://ik.imagekit.io/rnwxyz/offline_class_booking/64a99302-4a69-4f41-adf4-ef420d5e1036",
+                                        "payment_method": {
+                                            "id": 1,
+                                            "name": "ShoopePay",
+                                            "description": "Bisa bayar dimanapun dan kapanpun",
+                                            "payment_number": "0812342331512"
+                                        },
+                                        "total": 40000,
+                                        "code": "dasdw-awd23123-ea2ea21-dsasd",
+                                        "status": "ACTIVE"
+                                    },
+                                    "message": "success get offline class booking"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Offline Class Bookings"],
+                "summary": "Delete offline class booking",
+                "description": "Only admin can delete offline class booking",
+                "responses": {
+                    "200": {
+                        "description": "Success delete offline class booking",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "success delete offline class booking"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Offline Class Bookings"],
+                "summary": "Update offline class booking",
+                "description": "Update offline class booking from user or from admin",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref":"#/components/schemas/offlineClassBooking"
+                            },
+                            "example": {
+                                "offline_class_id": 1,
+                                "payment_method_id": 1,
+                                "total": 40000
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success update offline class booking",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success update offline class booking"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/offlineClasses/bookings/setStatus/{id}":{
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Offline Class Bookings"],
+                "summary": "Set offline class booking status",
+                "description": "Only admin can set offline class booking status. Status set allowed (ACTIVE, INACTIVE, REJECT)",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "status":{
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "example": {
+                                "status":"ACTIVE"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success set status",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success set status"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/offlineClasses/bookings/pay/{id}":{
+            "post": {
+                "tags": ["Offline Class Bookings"],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "summary": "Upload proof of offline class booking payment, id is offline class booking id",
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "description": "only support image file (validation from extention file)",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "file":{
+                                        "type": "string",
+                                        "format": "binary",
+                                        "required": ["true"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment success",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "payment success"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                       "$ref": "#/components/responses/badRequest"
+                    },
+                    "404":{
+                       "$ref": "#/components/responses/notFound"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                     },
+                     "403":{
+                        "$ref": "#/components/responses/forbidden"
+                     },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    }
+                }
+            }
+        },
+        "/offlineClasses/bookings/take":{
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/email"
+                    },
+                    {
+                        "$ref":"#/components/parameters/code"
+                    }
+                ],
+                "tags": ["Offline Class Bookings"],
+                "summary": "User take the booking (user comes to offline class)",
+                "description": "Only admin can take user offline class booking. Status booking will set to DONE",
+                "responses": {
+                    "200": {
+                        "description": "Success take booking",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success take booking"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/email"
+                    },
+                    {
+                        "$ref":"#/components/parameters/code"
+                    }
+                ],
+                "tags": ["Offline Class Bookings"],
+                "summary": "User take the booking (user comes to offline class)",
+                "description": "Only admin can take user offline class booking. Will check booking user from email and code",
+                "responses": {
+                    "200": {
+                        "description": "Success take booking",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "user": {
+                                            "id": 3,
+                                            "name": "Rian Wijaya",
+                                            "email": "r@gmail.com"
+                                        },
+                                        "offline_class": {
+                                            "id":1,
+                                            "title": "Zumba Internasional Class",
+                                            "time": "2012-10-31 15:50:13.793654 +0000 UTC",
+                                            "duration": 60,
+                                            "slot": 50,
+                                            "slot_booked": 34,
+                                            "price": 500000,
+                                            "offline_class_category_id": 1,
+                                            "pictue": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg"
+                                        },
+                                        "expired_at": "2023-02-04T01:54:05.296+08:00",
+                                        "actived_at": "2022-12-06T01:54:05.296+08:00",
+                                        "proof_payment": "https://ik.imagekit.io/rnwxyz/offline_class_booking/64a99302-4a69-4f41-adf4-ef420d5e1036",
+                                        "payment_method": {
+                                            "id": 1,
+                                            "name": "ShoopePay",
+                                            "description": "Bisa bayar dimanapun dan kapanpun",
+                                            "payment_number": "0812342331512"
+                                        },
+                                        "total": 40000,
+                                        "code": "dasdw-awd23123-ea2ea21-dsasd",
+                                        "status": "ACTIVE"
+                                    },
+                                    "message": "success get offline class booking"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/onlineClasses":{
             "get": {
                 "security": [
                     {
@@ -2053,7 +2889,7 @@
                 }
             }
         },
-        "/onlineClass/{id}":{
+        "/onlineClasses/{id}":{
             "get": {
                 "security": [
                     {
@@ -2229,7 +3065,7 @@
                 }
             }
         },
-        "/onlineClass/categories":{
+        "/onlineClasses/categories":{
             "get": {
                 "security": [
                     {
@@ -2340,7 +3176,7 @@
                 }
             }
         },
-        "/onlineClass/categories/{id}":{
+        "/onlineClasses/categories/{id}":{
             "get": {
                 "security": [
                     {
@@ -2515,7 +3351,7 @@
                 }
             }
         },
-        "/onlineClass/booking":{
+        "/onlineClasses/bookings":{
             "get": {
                 "security": [
                     {
@@ -2646,7 +3482,7 @@
                 }
             }
         },
-        "/onlineClass/booking/{id}":{
+        "/onlineClasses/bookings/{id}":{
             "get": {
                 "security": [
                     {
@@ -2821,7 +3657,7 @@
                 }
             }
         },
-        "/onlineClass/booking/setStatus/{id}":{
+        "/onlineClasses/bookings/setStatus/{id}":{
             "post": {
                 "security": [
                     {
@@ -2891,7 +3727,7 @@
                 }
             }
         },
-        "/onlineClass/booking/pay/{id}":{
+        "/onlineClasses/bookings/pay/{id}":{
             "post": {
                 "tags": ["Online Class Bookings"],
                 "parameters": [
@@ -3201,67 +4037,6 @@
                 }
             }
         },
-        "/members/pay/{id}":{
-            "post": {
-                "tags": ["Members"],
-                "parameters": [
-                    {
-                        "$ref":"#/components/parameters/idUint"
-                    }
-                ],
-                "summary": "Upload proof of membership payment",
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "description": "only support image file (validation from extention file)",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data":{
-                            "schema":{
-                                "type": "object",
-                                "properties": {
-                                    "file":{
-                                        "type": "string",
-                                        "format": "binary",
-                                        "required": ["true"]
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Payment success",
-                        "content": {
-                            "application/json":{
-                                "example": {
-                                    "message": "payment success"
-                                }
-                            }
-                        }
-                    },
-                    "400":{
-                       "$ref": "#/components/responses/badRequest"
-                    },
-                    "404":{
-                       "$ref": "#/components/responses/notFound"
-                    },
-                    "401":{
-                       "$ref": "#/components/responses/unauthorized"
-                    },
-                    "403":{
-                       "$ref": "#/components/responses/forbidden"
-                    },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    }
-                }
-            }
-        },
         "/files/upload":{
             "post": {
                 "tags": ["File"],
@@ -3373,6 +4148,283 @@
                     },
                     "500":{
                         "$ref": "#/components/responses/internalServerError"
+                    }
+                }
+            }
+        },
+        "/articles":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Articles"],
+                "summary": "Get all articles",
+                "description": "To get all articles",
+                "responses": {
+                    "200": {
+                        "description": "Success get articles",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/article"
+                                },
+                                "example": {
+                                    "data": {
+                                        "data": {
+                                            "articles": [
+                                                {
+                                                    "id": 1,
+                                                    "title": "Artikel aja",
+                                                    "description": "Ini artikel",
+                                                    "picture":"https://google.com",
+                                                    "pinned": false,
+                                                    "updated_at": "2022-10-21 13:23:12"
+                                                },
+                                                {
+                                                    "id": 2,
+                                                    "title": "Artikel aja 2",
+                                                    "description": "Ini artikel",
+                                                    "picture":"https://google.com",
+                                                    "pinned": false,
+                                                    "updated_at": "2022-10-21 13:23:12"
+                                                }
+                                            ],
+                                            "count": 2
+                                        },
+                                        "message": "success get articles"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Articles"],
+                "summary": "Create new articles",
+                "description": "To create new online article and only admin have access to this service",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/article"
+                            },
+                            "example": {
+                                "title": "Artikel aja 2",
+                                "description": "Ini artikel",
+                                "picture":"https://google.com",
+                                "content":"contoh artikel bla blaa",
+                                "pinned": false
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success create new article",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "new article success created"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/articles/{id}":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Articles"],
+                "summary": "Get single or detail article",
+                "description": "To spesific online article or detail article",
+                "responses": {
+                    "200": {
+                        "description": "Success get article",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": {
+                                        "id": 2,
+                                        "title": "Artikel aja 2",
+                                        "description": "Ini artikel",
+                                        "picture":"https://google.com",
+                                        "content":"contoh artikel bla blaa",
+                                        "pinned": false,
+                                        "updated_at": "2022-10-21 13:23:12"
+                                    },
+                                    "message": "success get online calss category"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Articles"],
+                "summary": "Delete article",
+                "description": "Only admin can delete article",
+                "responses": {
+                    "200": {
+                        "description": "Success delete article",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "success delete article"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Articles"],
+                "summary": "Update article",
+                "description": "Update article only admin can access",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref":"#/components/schemas/article"
+                            },
+                            "example": {
+                                "title": "Artikel aja 2",
+                                "description": "Ini artikel",
+                                "picture":"https://google.com",
+                                "content":"contoh artikel bla blaa",
+                                "pinned": false
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success update article",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success update article"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
                     }
                 }
             }
@@ -3500,6 +4552,49 @@
                     }
                 }
             },
+            "article":{
+                "type": "object",
+                "properties": {
+                    "id":{
+                        "type": "integer"
+                    },
+                    "title":{
+                        "type": "string"
+                    },
+                    "description":{
+                        "type": "string"
+                    },
+                    "picture":{
+                        "type": "string"
+                    },
+                    "content":{
+                        "type": "string"
+                    },
+                    "pinned":{
+                        "type": "boolean"
+                    },
+                    "updated_at":{
+                        "type": "boolean"
+                    }
+                }
+            },
+            "offlineClassCategory":{
+                "type": "object",
+                "properties": {
+                    "id":{
+                        "type": "integer"
+                    },
+                    "name":{
+                        "type": "string"
+                    },
+                    "description":{
+                        "type": "string"
+                    },
+                    "picture":{
+                        "type": "string"
+                    }
+                }
+            },
             "onlineClassBooking":{
                 "type":"object",
                 "properties": {
@@ -3530,6 +4625,43 @@
                     },
                     "total": {
                         "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "description": "same as status in member"
+                    }
+                }
+            },
+            "offlineClassBooking":{
+                "type":"object",
+                "properties": {
+                    "id":{
+                        "type": "integer"
+                    },
+                    "user_id":{
+                        "type": "integer"
+                    },
+                    "offline_class_id": {
+                        "type": "integer"
+                    },
+                    "expired_at": {
+                        "type": "string"
+                    },
+                    "actived_at": {
+                        "type": "string"
+                    },
+                    "payment_method_id": {
+                        "type": "integer"
+                    },
+                    "proof_payment": {
+                        "type": "string"
+                    },
+                    "total": {
+                        "type": "string"
+                    },
+                    "code":{
+                        "type": "string",
+                        "description": "when status active booking will generate unique code"
                     },
                     "status": {
                         "type": "string",
@@ -3594,14 +4726,14 @@
                     "slot":{
                         "type": "integer"
                     },
-                    "slot_ready":{
+                    "slot_booked":{
                         "type": "integer",
-                        "description": "remaining slots"
+                        "description": "slots used"
                     },
                     "price": {
                         "type": "integer"
                     },
-                    "picture_path":{
+                    "picture":{
                         "type": "string",
                         "description": "dispay picture fo the class"
                     },
@@ -3612,6 +4744,13 @@
                     "description":{
                         "type": "string",
                         "description": "more information about the class"
+                    },
+                    "location":{
+                        "type": "string"
+                    },
+                    "offline_class_category_id":{
+                        "type": "integer",
+                        "description": "the category id"
                     }
                 }
             }
@@ -3717,6 +4856,51 @@
                     "description": "The number of page (page)"
                 },
                 "example": 1
+            },
+            "category": {
+                "in": "query",
+                "name": "category_id",
+                "schema":{
+                    "type": "integer",
+                    "description": "category id"
+                },
+                "example": 1
+            },
+            "email": {
+                "in": "query",
+                "name": "email",
+                "schema":{
+                    "type": "string",
+                    "description": "user email"
+                },
+                "example": "james@gmail.com"
+            },
+            "code": {
+                "in": "query",
+                "name": "code",
+                "schema":{
+                    "type": "string",
+                    "description": "booking code"
+                },
+                "example": "dsnd7wb2-we2heh-22wq2-wdw1"
+            },
+            "orderPrice": {
+                "in": "query",
+                "name": "order_by_price",
+                "schema":{
+                    "type": "string",
+                    "description": "price order DESC or ASC"
+                },
+                "example": "DESC"
+            },
+            "time": {
+                "in": "query",
+                "name": "time",
+                "schema":{
+                    "type": "string",
+                    "description": "filter date"
+                },
+                "example": "2022-12-02"
             },
             "limit": {
                 "in": "query",
