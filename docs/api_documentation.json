@@ -1518,6 +1518,67 @@
                 }
             }
         },
+        "/members/pay/{id}":{
+            "post": {
+                "tags": ["Members"],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "summary": "Upload proof of membership payment",
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "description": "only support image file (validation from extention file)",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "file":{
+                                        "type": "string",
+                                        "format": "binary",
+                                        "required": ["true"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment success",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "payment success"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                       "$ref": "#/components/responses/badRequest"
+                    },
+                    "404":{
+                       "$ref": "#/components/responses/notFound"
+                    },
+                    "401":{
+                       "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                       "$ref": "#/components/responses/forbidden"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    }
+                }
+            }
+        },
         "/offlineClasses": {
             "get": {
                 "security": [
@@ -1852,7 +1913,7 @@
                 }
             }
         },
-        "/offlineClass/categories":{
+        "/offlineClasses/categories":{
             "get": {
                 "security": [
                     {
@@ -1963,7 +2024,7 @@
                 }
             }
         },
-        "/offlineClass/categories/{id}":{
+        "/offlineClasses/categories/{id}":{
             "get": {
                 "security": [
                     {
@@ -2142,7 +2203,7 @@
                 }
             }
         },
-        "/offlineClass/booking":{
+        "/offlineClasses/bookings":{
             "get": {
                 "security": [
                     {
@@ -2270,7 +2331,7 @@
                 }
             }
         },
-        "/offlineClass/booking/{id}":{
+        "/offlineClasses/bookings/{id}":{
             "get": {
                 "security": [
                     {
@@ -2446,7 +2507,7 @@
                 }
             }
         },
-        "/offlineClass/booking/setStatus/{id}":{
+        "/offlineClasses/bookings/setStatus/{id}":{
             "post": {
                 "security": [
                     {
@@ -2516,7 +2577,7 @@
                 }
             }
         },
-        "/offlineClass/booking/pay/{id}":{
+        "/offlineClasses/bookings/pay/{id}":{
             "post": {
                 "tags": ["Offline Class Bookings"],
                 "parameters": [
@@ -2577,7 +2638,7 @@
                 }
             }
         },
-        "/offlineClass/booking/take":{
+        "/offlineClasses/bookings/take":{
             "post": {
                 "security": [
                     {
@@ -2708,7 +2769,7 @@
                 }
             }
         },
-        "/onlineClass":{
+        "/onlineClasses":{
             "get": {
                 "security": [
                     {
@@ -2828,7 +2889,7 @@
                 }
             }
         },
-        "/onlineClass/{id}":{
+        "/onlineClasses/{id}":{
             "get": {
                 "security": [
                     {
@@ -3004,7 +3065,7 @@
                 }
             }
         },
-        "/onlineClass/categories":{
+        "/onlineClasses/categories":{
             "get": {
                 "security": [
                     {
@@ -3115,7 +3176,7 @@
                 }
             }
         },
-        "/onlineClass/categories/{id}":{
+        "/onlineClasses/categories/{id}":{
             "get": {
                 "security": [
                     {
@@ -3290,7 +3351,7 @@
                 }
             }
         },
-        "/onlineClass/booking":{
+        "/onlineClasses/bookings":{
             "get": {
                 "security": [
                     {
@@ -3421,7 +3482,7 @@
                 }
             }
         },
-        "/onlineClass/booking/{id}":{
+        "/onlineClasses/bookings/{id}":{
             "get": {
                 "security": [
                     {
@@ -3596,7 +3657,7 @@
                 }
             }
         },
-        "/onlineClass/booking/setStatus/{id}":{
+        "/onlineClasses/bookings/setStatus/{id}":{
             "post": {
                 "security": [
                     {
@@ -3666,7 +3727,7 @@
                 }
             }
         },
-        "/onlineClass/booking/pay/{id}":{
+        "/onlineClasses/bookings/pay/{id}":{
             "post": {
                 "tags": ["Online Class Bookings"],
                 "parameters": [
@@ -3976,67 +4037,6 @@
                 }
             }
         },
-        "/members/pay/{id}":{
-            "post": {
-                "tags": ["Members"],
-                "parameters": [
-                    {
-                        "$ref":"#/components/parameters/idUint"
-                    }
-                ],
-                "summary": "Upload proof of membership payment",
-                "security": [
-                    {
-                        "AccessToken":[]
-                    }
-                ],
-                "description": "only support image file (validation from extention file)",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data":{
-                            "schema":{
-                                "type": "object",
-                                "properties": {
-                                    "file":{
-                                        "type": "string",
-                                        "format": "binary",
-                                        "required": ["true"]
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Payment success",
-                        "content": {
-                            "application/json":{
-                                "example": {
-                                    "message": "payment success"
-                                }
-                            }
-                        }
-                    },
-                    "400":{
-                       "$ref": "#/components/responses/badRequest"
-                    },
-                    "404":{
-                       "$ref": "#/components/responses/notFound"
-                    },
-                    "401":{
-                       "$ref": "#/components/responses/unauthorized"
-                    },
-                    "403":{
-                       "$ref": "#/components/responses/forbidden"
-                    },
-                    "500":{
-                        "$ref": "#/components/responses/internalServerError"
-                    }
-                }
-            }
-        },
         "/files/upload":{
             "post": {
                 "tags": ["File"],
@@ -4148,6 +4148,283 @@
                     },
                     "500":{
                         "$ref": "#/components/responses/internalServerError"
+                    }
+                }
+            }
+        },
+        "/articles":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Articles"],
+                "summary": "Get all articles",
+                "description": "To get all articles",
+                "responses": {
+                    "200": {
+                        "description": "Success get articles",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/article"
+                                },
+                                "example": {
+                                    "data": {
+                                        "data": {
+                                            "articles": [
+                                                {
+                                                    "id": 1,
+                                                    "title": "Artikel aja",
+                                                    "description": "Ini artikel",
+                                                    "picture":"https://google.com",
+                                                    "pinned": false,
+                                                    "updated_at": "2022-10-21 13:23:12"
+                                                },
+                                                {
+                                                    "id": 2,
+                                                    "title": "Artikel aja 2",
+                                                    "description": "Ini artikel",
+                                                    "picture":"https://google.com",
+                                                    "pinned": false,
+                                                    "updated_at": "2022-10-21 13:23:12"
+                                                }
+                                            ],
+                                            "count": 2
+                                        },
+                                        "message": "success get articles"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Articles"],
+                "summary": "Create new articles",
+                "description": "To create new online article and only admin have access to this service",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/article"
+                            },
+                            "example": {
+                                "title": "Artikel aja 2",
+                                "description": "Ini artikel",
+                                "picture":"https://google.com",
+                                "content":"contoh artikel bla blaa",
+                                "pinned": false
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success create new article",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "new article success created"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/articles/{id}":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Articles"],
+                "summary": "Get single or detail article",
+                "description": "To spesific online article or detail article",
+                "responses": {
+                    "200": {
+                        "description": "Success get article",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": {
+                                        "id": 2,
+                                        "title": "Artikel aja 2",
+                                        "description": "Ini artikel",
+                                        "picture":"https://google.com",
+                                        "content":"contoh artikel bla blaa",
+                                        "pinned": false,
+                                        "updated_at": "2022-10-21 13:23:12"
+                                    },
+                                    "message": "success get online calss category"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Articles"],
+                "summary": "Delete article",
+                "description": "Only admin can delete article",
+                "responses": {
+                    "200": {
+                        "description": "Success delete article",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "success delete article"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Articles"],
+                "summary": "Update article",
+                "description": "Update article only admin can access",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref":"#/components/schemas/article"
+                            },
+                            "example": {
+                                "title": "Artikel aja 2",
+                                "description": "Ini artikel",
+                                "picture":"https://google.com",
+                                "content":"contoh artikel bla blaa",
+                                "pinned": false
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success update article",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success update article"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
                     }
                 }
             }
@@ -4272,6 +4549,32 @@
                     },
                     "picture":{
                         "type": "string"
+                    }
+                }
+            },
+            "article":{
+                "type": "object",
+                "properties": {
+                    "id":{
+                        "type": "integer"
+                    },
+                    "title":{
+                        "type": "string"
+                    },
+                    "description":{
+                        "type": "string"
+                    },
+                    "picture":{
+                        "type": "string"
+                    },
+                    "content":{
+                        "type": "string"
+                    },
+                    "pinned":{
+                        "type": "boolean"
+                    },
+                    "updated_at":{
+                        "type": "boolean"
                     }
                 }
             },
