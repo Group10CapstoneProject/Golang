@@ -15,4 +15,6 @@ var (
 	ErrDuplicateRecord      = errors.New("duplicate record")
 	ErrRecordNotFound       = errors.New("record not found")
 	ErrFailedUpload         = errors.New("upload file failed")
+	ErrAlredyPaid           = errors.New("alredy paid")
+	ErrAlredyTake           = errors.New("booking alredy take")
 )

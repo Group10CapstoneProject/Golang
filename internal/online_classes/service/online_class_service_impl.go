@@ -3,7 +3,6 @@ package service
 import (
 	"bytes"
 	"context"
-	"errors"
 	"io"
 	"strings"
 	"time"
@@ -242,7 +241,7 @@ func (s *onlineClassServiceImpl) OnlineClassPayment(request *model.PaymentReques
 		return myerrors.ErrPermission
 	}
 	if onlineClassBooking.ProofPayment != "" {
-		return errors.New("member already paid")
+		return myerrors.ErrAlredyPaid
 	}
 	// create file buffer
 	buf := bytes.NewBuffer(nil)
