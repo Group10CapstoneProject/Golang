@@ -17,20 +17,19 @@ type OfflineClassResource struct {
 	Slot                   uint      `json:"slot"`
 	SlotBooked             uint      `json:"slot_booked"`
 	Picture                string    `json:"picture"`
-	TrainerID              uint      `json:"trainer_id"`
 	OfflineClassCategoryID uint      `json:"offline_class_category_id"`
 }
 
 func (u *OfflineClassResource) FromModel(m *model.OfflineClass) {
 	u.ID = m.ID
 	u.Title = m.Title
+	u.Time = m.Time
 	u.Price = m.Price
 	u.Duration = m.Duration
 	u.Slot = m.Slot
 	u.SlotBooked = m.SlotBooked
 	u.Picture = m.Picture
-	u.TrainerID = m.TrainerID
-	u.OfflineClassCategoryID = m.OfflineClassCategory.ID
+	u.OfflineClassCategoryID = m.OfflineClassCategoryID
 }
 
 type OfflineClassResources []OfflineClassResource
@@ -57,7 +56,6 @@ type OfflineClassDetailResource struct {
 	Description          string                       `json:"description"`
 	AccessClass          bool                         `json:"access_class"`
 	OfflineClassCategory OfflineClassCategoryResource `json:"offline_class_category"`
-	OfflineClassBookings OfflineClassBookingResources `json:"offline_class_bookings"`
 }
 
 func (u *OfflineClassDetailResource) FromModel(m *model.OfflineClass) {
@@ -78,7 +76,11 @@ func (u *OfflineClassDetailResource) FromModel(m *model.OfflineClass) {
 	u.Location = m.Location
 	u.Description = m.Description
 	u.OfflineClassCategory = category
-	u.OfflineClassBookings = offlineClassBookings
+}
+
+type OfflineClassResponses struct {
+	OfflineClasses OfflineClassResources `json:"offline_classes"`
+	Count          uint                  `json:"count"`
 }
 
 // offline class booking
@@ -113,7 +115,7 @@ func (u *OfflineClassBookingResources) FromModel(m []model.OfflineClassBooking) 
 }
 
 type OfflineClassBookingResponses struct {
-	Members OfflineClassBookingResources `json:"offline_class_booking"`
+	Members OfflineClassBookingResources `json:"offline_class_bookings"`
 	Page    uint                         `json:"page"`
 	Limit   uint                         `json:"limit"`
 	Count   uint                         `json:"count"`

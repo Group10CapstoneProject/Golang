@@ -148,6 +148,7 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassById(id uint, ctx context.C
 	offlineClass := model.OfflineClass{}
 	err := r.db.WithContext(ctx).Where("id = ?", id).
 		Preload("OfflineClassCategory").
+		Preload("OfflineClassCategory.OfflineClass").
 		First(&offlineClass).Error
 	return &offlineClass, err
 }
@@ -156,7 +157,7 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassById(id uint, ctx context.C
 func (r *offlineClassRepositoryImpl) FindOfflineClassCategoryById(id uint, ctx context.Context) (*model.OfflineClassCategory, error) {
 	offlineClassCategory := model.OfflineClassCategory{}
 	err := r.db.WithContext(ctx).Where("id = ?", id).
-		Preload("OfflineCLass").
+		Preload("OfflineClass").
 		First(&offlineClassCategory).Error
 	return &offlineClassCategory, err
 }
@@ -165,6 +166,7 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassCategoryById(id uint, ctx c
 func (r *offlineClassRepositoryImpl) FindOfflineClassCategories(cond *model.OfflineClassCategory, ctx context.Context) ([]model.OfflineClassCategory, error) {
 	offlineClassCategorys := []model.OfflineClassCategory{}
 	err := r.db.WithContext(ctx).Model(&model.OfflineClassCategory{}).
+		Preload("OfflineClass").
 		Find(&offlineClassCategorys).
 		Error
 
@@ -184,7 +186,7 @@ func (r *offlineClassRepositoryImpl) FindOfflineClasses(cond *model.OfflineClass
 // ReadOfflineClassBookings implements OfflineClassRepository
 func (r *offlineClassRepositoryImpl) ReadOfflineClassBookings(cond *model.OfflineClassBooking, ctx context.Context) ([]model.OfflineClassBooking, error) {
 	offlineClassBooking := []model.OfflineClassBooking{}
-	err := r.db.WithContext(ctx).Find(&offlineClassBooking, cond).Error
+	err := r.db.WithContext(ctx).Model(&model.OfflineClassBooking{}).Preload("User").Preload("OfflineClass").Find(&offlineClassBooking, cond).Error
 	return offlineClassBooking, err
 }
 
@@ -235,11 +237,11 @@ func (r *offlineClassRepositoryImpl) UpdateOfflineClassCategory(body *model.Offl
 
 // OperationOfflineClassSlot implements OfflineClassRepository
 func (r *offlineClassRepositoryImpl) OperationOfflineClassSlot(body *model.OfflineClass, operation string, ctx context.Context) error {
-	res := r.db.WithContext(ctx).Model(body)
+	res := r.db.WithContext(ctx).Model(body).First(body)
 	if operation == "increment" {
-		res.Update("slot_booked", "slot_booked + 1")
+		res.Update("slot_booked", body.SlotBooked+1)
 	} else if operation == "decrement" {
-		res.Update("slot_booked", "slot_booked - 1")
+		res.Update("slot_booked", body.SlotBooked-1)
 	}
 	if res.Error != nil {
 		if strings.Contains(res.Error.Error(), "Duplicate entry") {

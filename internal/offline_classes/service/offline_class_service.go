@@ -11,7 +11,7 @@ type OfflineClassService interface {
 	// offline class booking
 	CreateOfflineClassBooking(request *dto.OfflineClassBookingStoreRequest, ctx context.Context) error
 	FindOfflineClassBookings(page *model.Pagination, ctx context.Context) (*dto.OfflineClassBookingResponses, error)
-	CheckOfflineClassBookings(request *dto.TakeOfflineClassBooking, ctx context.Context) (*dto.OfflineClassBookingResources, error)
+	CheckOfflineClassBookings(request *dto.TakeOfflineClassBooking, ctx context.Context) (*dto.OfflineClassBookingResource, error)
 	FindOfflineClassBookingById(id uint, ctx context.Context) (*dto.OfflineClassBookingDetailResource, error)
 	FindOfflineClassBookingByUser(userId uint, ctx context.Context) (*dto.OfflineClassBookingResources, error)
 	UpdateOfflineClassBooking(request *dto.OfflineClassBookingUpdateRequest, ctx context.Context) error

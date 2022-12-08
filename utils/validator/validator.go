@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"time"
 
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
@@ -61,6 +62,9 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 			case "title":
 				msg := fmt.Sprintf("%s not allowed", each.Field())
 				return echo.NewHTTPError(http.StatusBadRequest, msg)
+			case "mytime":
+				msg := fmt.Sprintf("%s invalid format time, use (YYYY-MM-DD hh:mm:ss), example 2006-01-02 15:04:05", each.Field())
+				return echo.NewHTTPError(http.StatusBadRequest, msg)
 			default:
 				msg := fmt.Sprintf("Invalid field %s", each.Field())
 				return echo.NewHTTPError(http.StatusBadRequest, msg)
@@ -90,6 +94,9 @@ func NewCustomValidator(e *echo.Echo) {
 	if err := validator.RegisterValidation("title", titleValidator); err != nil {
 		panic(err)
 	}
+	if err := validator.RegisterValidation("mytime", mytimeValidator); err != nil {
+		panic(err)
+	}
 
 	e.Validator = &CustomValidator{validator}
 }
@@ -107,7 +114,7 @@ func nameValidator(fl validator.FieldLevel) bool {
 }
 
 func statusValidator(fl validator.FieldLevel) bool {
-	nameRegex := regexp.MustCompile("^(ACTIVE|active|REJECT|reject|INACTIVE|inactive)*$")
+	nameRegex := regexp.MustCompile("^(ACTIVE|REJECT|INACTIVE)*$")
 	return nameRegex.MatchString(fl.Field().String())
 }
 
@@ -119,4 +126,10 @@ func titleValidator(fl validator.FieldLevel) bool {
 func imageValidator(fl validator.FieldLevel) bool {
 	nameRegex := regexp.MustCompile(`^.*\.(jpg|JPG|png|PNG|jpeg|JPEG)$`)
 	return nameRegex.MatchString(fl.Field().String())
+}
+
+func mytimeValidator(fl validator.FieldLevel) bool {
+	layoutFormat := "2006-01-02 15:04:05"
+	_, err := time.Parse(layoutFormat, fl.Field().String())
+	return err == nil
 }

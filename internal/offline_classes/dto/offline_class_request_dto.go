@@ -46,21 +46,27 @@ func (u *OfflineClassBookingUpdateRequest) ToModel() *model.OfflineClassBooking 
 
 // offline class store and update request
 type OfflineClassStoreRequest struct {
-	Title                  string    `json:"title" validate:"required,name"`
-	Time                   time.Time `json:"time" validate:"required,url"`
-	Duration               uint      `json:"duration" validate:"required,gte=1"`
-	Slot                   uint      `json:"slot" validate:"required,gte=1"`
-	Price                  uint      `json:"price" validate:"required,gte=1"`
-	Picture                string    `json:"picture" validate:"required,url"`
-	Description            string    `json:"description,omitempty"`
-	Location               string    `json:"location" validate:"required"`
-	OfflineClassCategoryID uint      `json:"offline_class_category_id" validate:"required,gte=1"`
+	Title                  string `json:"title" validate:"required,name"`
+	Time                   string `json:"time" validate:"required,mytime"`
+	Duration               uint   `json:"duration" validate:"required,gte=1"`
+	Slot                   uint   `json:"slot" validate:"required,gte=1"`
+	Price                  uint   `json:"price" validate:"required,gte=1"`
+	Picture                string `json:"picture" validate:"required,url"`
+	Description            string `json:"description,omitempty"`
+	Location               string `json:"location" validate:"required"`
+	OfflineClassCategoryID uint   `json:"offline_class_category_id" validate:"required,gte=1"`
 }
 
 func (u *OfflineClassStoreRequest) ToModel() *model.OfflineClass {
+	layoutFormat := "2006-01-02 15:04:05"
+	time, err := time.Parse(layoutFormat, u.Time)
+	if err != nil {
+		return nil
+	}
+
 	return &model.OfflineClass{
 		Title:                  u.Title,
-		Time:                   u.Time,
+		Time:                   time,
 		Duration:               u.Duration,
 		Slot:                   u.Slot,
 		Price:                  u.Price,
@@ -73,22 +79,28 @@ func (u *OfflineClassStoreRequest) ToModel() *model.OfflineClass {
 
 type OfflineClassUpdateRequest struct {
 	ID                     uint
-	Title                  string    `json:"title" validate:"required,name"`
-	Time                   time.Time `json:"time" validate:"required,url"`
-	Duration               uint      `json:"duration" validate:"required,gte=1"`
-	Slot                   uint      `json:"slot" validate:"required,gte=1"`
-	Price                  uint      `json:"price" validate:"required,gte=1"`
-	Picture                string    `json:"picture" validate:"required,url"`
-	Description            string    `json:"description,omitempty"`
-	Location               string    `json:"location" validate:"required"`
-	OfflineClassCategoryID uint      `json:"offline_class_category_id" validate:"required,gte=1"`
+	Title                  string `json:"title" validate:"required,name"`
+	Time                   string `json:"time" validate:"required,mytime"`
+	Duration               uint   `json:"duration" validate:"required,gte=1"`
+	Slot                   uint   `json:"slot" validate:"required,gte=1"`
+	Price                  uint   `json:"price" validate:"required,gte=1"`
+	Picture                string `json:"picture" validate:"required,url"`
+	Description            string `json:"description,omitempty"`
+	Location               string `json:"location" validate:"required"`
+	OfflineClassCategoryID uint   `json:"offline_class_category_id" validate:"required,gte=1"`
 }
 
 func (u *OfflineClassUpdateRequest) ToModel() *model.OfflineClass {
+	layoutFormat := "2006-01-02 15:04:05"
+	time, err := time.Parse(layoutFormat, u.Time)
+	if err != nil {
+		return nil
+	}
+
 	return &model.OfflineClass{
 		ID:                     u.ID,
 		Title:                  u.Title,
-		Time:                   u.Time,
+		Time:                   time,
 		Duration:               u.Duration,
 		Slot:                   u.Slot,
 		Price:                  u.Price,

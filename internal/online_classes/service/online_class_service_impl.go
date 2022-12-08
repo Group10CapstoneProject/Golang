@@ -34,6 +34,7 @@ func (s *onlineClassServiceImpl) CreateOnlineClass(request *dto.OnlineClassStore
 func (s *onlineClassServiceImpl) CreateOnlineClassBooking(request *dto.OnlineClassBookingStoreRequest, ctx context.Context) error {
 	onlineClassBooking := request.ToModel()
 	onlineClassBooking.ExpiredAt = time.Now().Add(24 * time.Hour)
+	onlineClassBooking.ActivedAt = time.Date(0001, 1, 1, 0, 0, 0, 0, time.UTC)
 	onlineClassBooking.Status = model.WAITING
 	err := s.onlineClassRepository.CreateOnlineClassBooking(onlineClassBooking, ctx)
 	return err
@@ -271,7 +272,7 @@ func (s *onlineClassServiceImpl) OnlineClassPayment(request *model.PaymentReques
 	notif := model.Notification{
 		UserID:          onlineClassBooking.UserID,
 		TransactionID:   id,
-		TransactionType: "/onlineClasses/bookings/",
+		TransactionType: "/online-classes/bookings/details",
 		Title:           "Online Class",
 	}
 	if err := s.notificationRepository.CreateNotification(&notif, ctx); err != nil {

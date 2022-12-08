@@ -37,6 +37,7 @@ func (s *offlineClassServiceImpl) CreateOfflineClass(request *dto.OfflineClassSt
 func (s *offlineClassServiceImpl) CreateOfflineClassBooking(request *dto.OfflineClassBookingStoreRequest, ctx context.Context) error {
 	offlineClassBooking := request.ToModel()
 	offlineClassBooking.ExpiredAt = time.Now().Add(24 * time.Hour)
+	offlineClassBooking.ActivedAt = time.Date(0001, 1, 1, 0, 0, 0, 0, time.UTC)
 	offlineClassBooking.Status = model.WAITING
 	err := s.offlineClassRepository.CreateOfflineClassBooking(offlineClassBooking, ctx)
 	if err != nil {
@@ -227,7 +228,7 @@ func (s *offlineClassServiceImpl) OfflineClassPayment(request *model.PaymentRequ
 	notif := model.Notification{
 		UserID:          offlineClassBooking.UserID,
 		TransactionID:   id,
-		TransactionType: "/offlineClasses/bookings/",
+		TransactionType: "/offline-classes/bookings/details",
 		Title:           "Offline Class",
 	}
 	if err := s.notificationRepository.CreateNotification(&notif, ctx); err != nil {
@@ -292,12 +293,16 @@ func (s *offlineClassServiceImpl) TakeOfflineClassBooking(request *dto.TakeOffli
 	if err != nil {
 		return err
 	}
-	if offlineClassBooking == nil {
+	if len(offlineClassBooking) == 0 {
 		return myerrors.ErrRecordNotFound
 	}
-	if offlineClassBooking[0].Status != model.ACTIVE {
+
+	if offlineClassBooking[0].Status == model.DONE {
 		return myerrors.ErrAlredyTake
+	} else if offlineClassBooking[0].Status != model.ACTIVE {
+		return myerrors.ErrRecordNotFound
 	}
+
 	offlineClassBookingUpdate := model.OfflineClassBooking{
 		ID:     offlineClassBooking[0].ID,
 		Status: model.DONE,
@@ -310,18 +315,24 @@ func (s *offlineClassServiceImpl) TakeOfflineClassBooking(request *dto.TakeOffli
 }
 
 // ReadOfflineClassBookings implements OfflineClassService
-func (s *offlineClassServiceImpl) CheckOfflineClassBookings(request *dto.TakeOfflineClassBooking, ctx context.Context) (*dto.OfflineClassBookingResources, error) {
+func (s *offlineClassServiceImpl) CheckOfflineClassBookings(request *dto.TakeOfflineClassBooking, ctx context.Context) (*dto.OfflineClassBookingResource, error) {
 	cond := request.ToModel()
-	offlineClassBookings, err := s.offlineClassRepository.ReadOfflineClassBookings(cond, ctx)
+	offlineClassBooking, err := s.offlineClassRepository.ReadOfflineClassBookings(cond, ctx)
 	if err != nil {
 		return nil, err
 	}
-	if offlineClassBookings == nil {
+	if len(offlineClassBooking) == 0 {
 		return nil, myerrors.ErrRecordNotFound
 	}
 
-	var result dto.OfflineClassBookingResources
-	result.FromModel(offlineClassBookings)
+	if offlineClassBooking[0].Status == model.DONE {
+		return nil, myerrors.ErrAlredyTake
+	} else if offlineClassBooking[0].Status != model.ACTIVE {
+		return nil, myerrors.ErrRecordNotFound
+	}
+
+	var result dto.OfflineClassBookingResource
+	result.FromModel(&offlineClassBooking[0])
 
 	return &result, nil
 }

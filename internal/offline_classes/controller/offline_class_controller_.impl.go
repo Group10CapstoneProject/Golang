@@ -360,12 +360,6 @@ func (d *offlineclassControllerImpl) GetOfflineClassDetail(c echo.Context) error
 		} else {
 			offlineClass.AccessClass = memberUser.MemberType.AccessOfflineClass
 		}
-		if !offlineClass.AccessClass {
-			offlineClass.AccessClass, err = d.offlineClassService.CheckAccessOfflineClass(uint(claims["user_id"].(float64)), uint(id), c.Request().Context())
-			if err != nil {
-				return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-			}
-		}
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{
@@ -387,9 +381,13 @@ func (d *offlineclassControllerImpl) GetOfflineClasses(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
+	result := dto.OfflineClassResponses{
+		OfflineClasses: *offlineClasses,
+		Count:          uint(len(*offlineClasses)),
+	}
 	return c.JSON(http.StatusOK, echo.Map{
 		"message": "success get offline classes",
-		"data":    offlineClasses,
+		"data":    result,
 	})
 }
 

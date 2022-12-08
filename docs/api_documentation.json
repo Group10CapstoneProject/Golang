@@ -939,7 +939,7 @@
                 }
             }
         },
-        "/members/{id}":{
+        "/members/details/{id}":{
             "get": {
                 "security": [
                     {
@@ -1454,7 +1454,7 @@
                 }
             }
         },
-        "/members/setStatus/{id}":{
+        "/members/set-status/{id}":{
             "post": {
                 "security": [
                     {
@@ -1582,7 +1582,7 @@
                 }
             }
         },
-        "/offlineClasses": {
+        "/offline-classes": {
             "get": {
                 "security": [
                     {
@@ -1675,7 +1675,7 @@
                                 "slot": 50,
                                 "price": 500000,
                                 "picture": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
-                                "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
+                                "trainer_id": 1,
                                 "description": "offline class zumba tingkat internasional",
                                 "offline_class_category_id": 1,
                                 "location": "Alta Gym, Surabaya"
@@ -1717,7 +1717,7 @@
                 }
             }
         },
-        "/offlineClasses/{id}":{
+        "/offline-classes/details/{id}":{
             "get": {
                 "security": [
                     {
@@ -1738,46 +1738,28 @@
                         "content": {
                             "application/json":{
                                 "example": {
-                                    "message": "success get offline class",
                                     "data": {
                                         "id": 1,
-                                        "title": "Zumba Internasional Class",
-                                        "time": "2012-10-31 15:50:13.793654 +0000 UTC",
+                                        "title": "Yoga Test",
+                                        "time": "2022-12-12T18:30:00+08:00",
+                                        "price": 50000,
                                         "duration": 60,
                                         "slot": 50,
-                                        "slot_booked": 34,
-                                        "price": 500000,
-                                        "picture": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
-                                        "trainer_id": 1,
-                                        "online_class_bookings": [
-                                            {
-                                                "id": 1,
-                                                "user_name": "Rian Wijaya",
-                                                "user_email": "r@gmail.com",
-                                                "offline_class_title": "Zumba Internasional Class",
-                                                "expired_at": "2023-02-04T01:54:05.296+08:00",
-                                                "actived_at": "2022-12-06T01:54:05.296+08:00",
-                                                "status": "ACTIVE"
-                                            },
-                                            {
-                                                "id": 2,
-                                                "user_name": "superadmin",
-                                                "user_email": "superadmin@gmail.com",
-                                                "offline_class_title": "Zumba Internasional Class",
-                                                "expired_at": "2023-02-04T18:25:05.744+08:00",
-                                                "actived_at": "",
-                                                "status": "PENDING"
-                                            }
-                                        ],
-                                        "offline_class_category":{
-                                            "id":1,
-                                            "name":"Zumba",
-                                            "description":"category",
-                                            "picture":"https://google.com"
-                                        },
-                                        "description": "offline class zumba tingkat internasional",
-                                        "location": "alta gym, surabaya"
-                                    }
+                                        "slot_booked": 3,
+                                        "picture": "https://ik.imagekit.io/rnwxyz/offline_class/339fb454-8d0b-4721-9cb7-a78e781de701",
+                                        "trainer_id": 0,
+                                        "location": "Alta Gym, Surabaya",
+                                        "description": "testing",
+                                        "access_class": true,
+                                        "offline_class_category": {
+                                            "id": 1,
+                                            "name": "Yoga",
+                                            "description": "Ini merupakan kategori update",
+                                            "picture": "https://ik.imagekit.io/rnwxyz/offline_class/339fb454-8d0b-4721-9cb7-a78e781de701",
+                                            "offline_class_count": 1
+                                        }
+                                    },
+                                    "message": "success get offline class"
                                 }
                             }
                         }
@@ -1824,7 +1806,7 @@
                                 "slot": 50,
                                 "price": 500000,
                                 "picture": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg",
-                                "trainer_id": "123e4567-e89b-12d3-a456-426614174000",
+                                "trainer_id": 1,
                                 "description": "offline class zumba tingkat internasional",
                                 "offline_class_category_id": 1,
                                 "location": "Alta Gym, Surabaya"
@@ -1916,7 +1898,7 @@
                 }
             }
         },
-        "/offlineClasses/categories":{
+        "/offline-classes/categories":{
             "get": {
                 "security": [
                     {
@@ -2027,7 +2009,7 @@
                 }
             }
         },
-        "/offlineClasses/categories/{id}":{
+        "/offline-classes/categories/details/{id}":{
             "get": {
                 "security": [
                     {
@@ -2206,7 +2188,7 @@
                 }
             }
         },
-        "/offlineClasses/bookings":{
+        "/offline-classes/bookings":{
             "get": {
                 "security": [
                     {
@@ -2334,7 +2316,7 @@
                 }
             }
         },
-        "/offlineClasses/bookings/{id}":{
+        "/offline-classes/bookings/details/{id}":{
             "get": {
                 "security": [
                     {
@@ -2510,7 +2492,7 @@
                 }
             }
         },
-        "/offlineClasses/bookings/setStatus/{id}":{
+        "/offline-classes/bookings/set-status/{id}":{
             "post": {
                 "security": [
                     {
@@ -2580,7 +2562,7 @@
                 }
             }
         },
-        "/offlineClasses/bookings/pay/{id}":{
+        "/offline-classes/bookings/pay/{id}":{
             "post": {
                 "tags": ["Offline Class Bookings"],
                 "parameters": [
@@ -2641,7 +2623,7 @@
                 }
             }
         },
-        "/offlineClasses/bookings/take":{
+        "/offline-classes/bookings/take":{
             "post": {
                 "security": [
                     {
@@ -2718,37 +2700,17 @@
                         "content": {
                             "application/json":{
                                 "example": {
-                                    "data": {
-                                        "id": 1,
-                                        "user": {
-                                            "id": 3,
-                                            "name": "Rian Wijaya",
-                                            "email": "r@gmail.com"
-                                        },
-                                        "offline_class": {
-                                            "id":1,
-                                            "title": "Zumba Internasional Class",
-                                            "time": "2012-10-31 15:50:13.793654 +0000 UTC",
-                                            "duration": 60,
-                                            "slot": 50,
-                                            "slot_booked": 34,
-                                            "price": 500000,
-                                            "offline_class_category_id": 1,
-                                            "pictue": "http://gambar.com/offlineClass/123e4567-e89b-12d3-a456-426614174111.jpg"
-                                        },
-                                        "expired_at": "2023-02-04T01:54:05.296+08:00",
-                                        "actived_at": "2022-12-06T01:54:05.296+08:00",
-                                        "proof_payment": "https://ik.imagekit.io/rnwxyz/offline_class_booking/64a99302-4a69-4f41-adf4-ef420d5e1036",
-                                        "payment_method": {
-                                            "id": 1,
-                                            "name": "ShoopePay",
-                                            "description": "Bisa bayar dimanapun dan kapanpun",
-                                            "payment_number": "0812342331512"
-                                        },
-                                        "total": 40000,
-                                        "code": "dasdw-awd23123-ea2ea21-dsasd",
-                                        "status": "ACTIVE"
-                                    },
+                                    "data": [
+                                        {
+                                            "id": 4,
+                                            "user_name": "superadmin",
+                                            "user_email": "superadmin@gmail.com",
+                                            "offline_class_title": "Yoga Test",
+                                            "expired_at": "2022-12-12T19:30:00+08:00",
+                                            "actived_at": "2022-12-08T15:31:56.657+08:00",
+                                            "status": "ACTIVE"
+                                        }
+                                    ],
                                     "message": "success get offline class booking"
                                 }
                             }
@@ -2772,7 +2734,7 @@
                 }
             }
         },
-        "/onlineClasses":{
+        "/online-classes":{
             "get": {
                 "security": [
                     {
@@ -2892,7 +2854,7 @@
                 }
             }
         },
-        "/onlineClasses/{id}":{
+        "/online-classes/details/{id}":{
             "get": {
                 "security": [
                     {
@@ -3068,7 +3030,7 @@
                 }
             }
         },
-        "/onlineClasses/categories":{
+        "/online-classes/categories":{
             "get": {
                 "security": [
                     {
@@ -3179,7 +3141,7 @@
                 }
             }
         },
-        "/onlineClasses/categories/{id}":{
+        "/online-classes/categories/details/{id}":{
             "get": {
                 "security": [
                     {
@@ -3354,7 +3316,7 @@
                 }
             }
         },
-        "/onlineClasses/bookings":{
+        "/online-classes/bookings":{
             "get": {
                 "security": [
                     {
@@ -3485,7 +3447,7 @@
                 }
             }
         },
-        "/onlineClasses/bookings/{id}":{
+        "/online-classes/bookings/details/{id}":{
             "get": {
                 "security": [
                     {
@@ -3660,7 +3622,7 @@
                 }
             }
         },
-        "/onlineClasses/bookings/setStatus/{id}":{
+        "/online-classes/bookings/set-status/{id}":{
             "post": {
                 "security": [
                     {
@@ -3730,7 +3692,7 @@
                 }
             }
         },
-        "/onlineClasses/bookings/pay/{id}":{
+        "/online-classes/bookings/pay/{id}":{
             "post": {
                 "tags": ["Online Class Bookings"],
                 "parameters": [
@@ -3791,7 +3753,7 @@
                 }
             }
         },
-        "/paymentMethods":{
+        "/payment-methods":{
             "get": {
                 "security": [
                     {
@@ -3888,7 +3850,7 @@
                 }
             }
         },
-        "/paymentMethods/{id}":{
+        "/payment-methods/details/{id}":{
             "get": {
                 "parameters": [
                     {
@@ -4273,7 +4235,7 @@
                 }
             }
         },
-        "/articles/{id}":{
+        "/articles/details/{id}":{
             "get": {
                 "security": [
                     {
