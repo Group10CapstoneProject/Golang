@@ -8,23 +8,24 @@ import (
 	authServ "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	memberServ "github.com/Group10CapstoneProject/Golang/internal/members/service"
 	dtoNotif "github.com/Group10CapstoneProject/Golang/internal/notifications/dto"
-	notifServ "github.com/Group10CapstoneProject/Golang/internal/notifications/service"
-	"github.com/Group10CapstoneProject/Golang/internal/online_classes/dto"
-	onlineClassServ "github.com/Group10CapstoneProject/Golang/internal/online_classes/service"
+	notificationServ "github.com/Group10CapstoneProject/Golang/internal/notifications/service"
+	"github.com/Group10CapstoneProject/Golang/internal/offline_classes/dto"
+	offlineClassServ "github.com/Group10CapstoneProject/Golang/internal/offline_classes/service"
 	"github.com/Group10CapstoneProject/Golang/model"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
-type onlineClassControllerImpl struct {
+type offlineclassControllerImpl struct {
+	offlineClassService offlineClassServ.OfflineClassService
 	memberService       memberServ.MemberService
-	onlineClassService  onlineClassServ.OnlineClassService
 	authService         authServ.AuthService
-	notificationService notifServ.NotificationService
+	notificationService notificationServ.NotificationService
 }
 
-// CreateOnlineClass implements OnlineClassController
-func (d *onlineClassControllerImpl) CreateOnlineClass(c echo.Context) error {
+// CheckOfflineClassBooking implements OfflineClassController
+func (d *offlineclassControllerImpl) CheckOfflineClassBooking(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
 	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
@@ -32,23 +33,55 @@ func (d *onlineClassControllerImpl) CreateOnlineClass(c echo.Context) error {
 		}
 		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
-	var onlineClass dto.OnlineClassStoreRequest
-	if err := c.Bind(&onlineClass); err != nil {
+	emailParam := c.QueryParam("email")
+	codeParam := c.QueryParam("code")
+	code, err := uuid.Parse(codeParam)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	condition := dto.TakeOfflineClassBooking{
+		Email: emailParam,
+		Code:  code,
+	}
+	if err := c.Validate(condition); err != nil {
 		return err
 	}
-	if err := c.Validate(onlineClass); err != nil {
-		return err
-	}
-	if err := d.onlineClassService.CreateOnlineClass(&onlineClass, c.Request().Context()); err != nil {
+	offlineClassBooking, err := d.offlineClassService.CheckOfflineClassBookings(&condition, c.Request().Context())
+	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "new online class success created",
+		"message": "success get offline class booking",
+		"data":    offlineClassBooking,
 	})
 }
 
-// CreateOnlineClassBooking implements OnlineClassController
-func (d *onlineClassControllerImpl) CreateOnlineClassBooking(c echo.Context) error {
+// CreateOfflineClass implements OfflineClassController
+func (d *offlineclassControllerImpl) CreateOfflineClass(c echo.Context) error {
+	claims := d.authService.GetClaims(&c)
+	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
+		if err == myerrors.ErrPermission {
+			return echo.NewHTTPError(http.StatusForbidden, err.Error())
+		}
+		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+	}
+	var offlineClass dto.OfflineClassStoreRequest
+	if err := c.Bind(&offlineClass); err != nil {
+		return err
+	}
+	if err := c.Validate(offlineClass); err != nil {
+		return err
+	}
+	if err := d.offlineClassService.CreateOfflineClass(&offlineClass, c.Request().Context()); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "new offline class success created",
+	})
+}
+
+// CreateOfflineClassBooking implements OfflineClassController
+func (d *offlineclassControllerImpl) CreateOfflineClassBooking(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
 	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
@@ -56,24 +89,24 @@ func (d *onlineClassControllerImpl) CreateOnlineClassBooking(c echo.Context) err
 		}
 		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
-	var onlineClassBooking dto.OnlineClassBookingStoreRequest
-	if err := c.Bind(&onlineClassBooking); err != nil {
+	var offlineClassBooking dto.OfflineClassBookingStoreRequest
+	if err := c.Bind(&offlineClassBooking); err != nil {
 		return err
 	}
-	if err := c.Validate(onlineClassBooking); err != nil {
+	if err := c.Validate(offlineClassBooking); err != nil {
 		return err
 	}
-	onlineClassBooking.UserID = uint(claims["user_id"].(float64))
-	if err := d.onlineClassService.CreateOnlineClassBooking(&onlineClassBooking, c.Request().Context()); err != nil {
+	offlineClassBooking.UserID = uint(claims["user_id"].(float64))
+	if err := d.offlineClassService.CreateOfflineClassBooking(&offlineClassBooking, c.Request().Context()); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "new online class booking success created",
+		"message": "new offline class booking success created",
 	})
 }
 
-// CreateOnlineClassCategory implements OnlineClassController
-func (d *onlineClassControllerImpl) CreateOnlineClassCategory(c echo.Context) error {
+// CreateOfflineClassCategory implements OfflineClassController
+func (d *offlineclassControllerImpl) CreateOfflineClassCategory(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
 	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
@@ -81,48 +114,23 @@ func (d *onlineClassControllerImpl) CreateOnlineClassCategory(c echo.Context) er
 		}
 		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
-	var onlineClassCategory dto.OnlineClassCategoryStoreRequest
-	if err := c.Bind(&onlineClassCategory); err != nil {
+	var offlineClassCategory dto.OfflineClassCategoryStoreRequest
+	if err := c.Bind(&offlineClassCategory); err != nil {
 		return err
 	}
-	if err := c.Validate(onlineClassCategory); err != nil {
+	if err := c.Validate(offlineClassCategory); err != nil {
 		return err
 	}
-	if err := d.onlineClassService.CreateOnlineClassCategory(&onlineClassCategory, c.Request().Context()); err != nil {
+	if err := d.offlineClassService.CreateOfflineClassCategory(&offlineClassCategory, c.Request().Context()); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "new online class category success created",
+		"message": "new offline class category success created",
 	})
 }
 
-// DeleteOnlineClass implements OnlineClassController
-func (d *onlineClassControllerImpl) DeleteOnlineClass(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
-	param := c.Param("id")
-	id, err := strconv.Atoi(param)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "not found")
-	}
-	if err := d.onlineClassService.DeleteOnlineClass(uint(id), c.Request().Context()); err != nil {
-		if err == myerrors.ErrRecordNotFound {
-			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
-	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success delete online class",
-	})
-}
-
-// DeleteOnlineClassBooking implements OnlineClassController
-func (d *onlineClassControllerImpl) DeleteOnlineClassBooking(c echo.Context) error {
+// DeleteOfflineClass implements OfflineClassController
+func (d *offlineclassControllerImpl) DeleteOfflineClass(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
 	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
@@ -135,19 +143,19 @@ func (d *onlineClassControllerImpl) DeleteOnlineClassBooking(c echo.Context) err
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
-	if err := d.onlineClassService.DeleteOnlineClassBooking(uint(id), c.Request().Context()); err != nil {
+	if err := d.offlineClassService.DeleteOfflineClass(uint(id), c.Request().Context()); err != nil {
 		if err == myerrors.ErrRecordNotFound {
-			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+			return echo.NewHTTPError(http.StatusNotFound, err.Error())
 		}
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success delete online class booking",
+		"message": "success delete offline class",
 	})
 }
 
-// DeleteOnlineClassCategory implements OnlineClassController
-func (d *onlineClassControllerImpl) DeleteOnlineClassCategory(c echo.Context) error {
+// DeleteOfflineClassBooking implements OfflineClassController
+func (d *offlineclassControllerImpl) DeleteOfflineClassBooking(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
 	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
@@ -160,19 +168,44 @@ func (d *onlineClassControllerImpl) DeleteOnlineClassCategory(c echo.Context) er
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
-	if err := d.onlineClassService.DeleteOnlineClassCategory(uint(id), c.Request().Context()); err != nil {
+	if err := d.offlineClassService.DeleteOfflineClassBooking(uint(id), c.Request().Context()); err != nil {
 		if err == myerrors.ErrRecordNotFound {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success delete online class category",
+		"message": "success delete offline class booking",
 	})
 }
 
-// GetOnlineClassBookingDetail implements OnlineClassController
-func (d *onlineClassControllerImpl) GetOnlineClassBookingDetail(c echo.Context) error {
+// DeleteOfflineClassCategory implements OfflineClassController
+func (d *offlineclassControllerImpl) DeleteOfflineClassCategory(c echo.Context) error {
+	claims := d.authService.GetClaims(&c)
+	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
+		if err == myerrors.ErrPermission {
+			return echo.NewHTTPError(http.StatusForbidden, err.Error())
+		}
+		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+	}
+	param := c.Param("id")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "not found")
+	}
+	if err := d.offlineClassService.DeleteOfflineClassCategory(uint(id), c.Request().Context()); err != nil {
+		if err == myerrors.ErrRecordNotFound {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "success delete offline class category",
+	})
+}
+
+// GetOfflineClassBookingDetail implements OfflineClassController
+func (d *offlineclassControllerImpl) GetOfflineClassBookingDetail(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
 	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
@@ -185,7 +218,7 @@ func (d *onlineClassControllerImpl) GetOnlineClassBookingDetail(c echo.Context) 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
-	onlineClassBooking, err := d.onlineClassService.FindOnlineClassBookingById(uint(id), c.Request().Context())
+	offlineClassBooking, err := d.offlineClassService.FindOfflineClassBookingById(uint(id), c.Request().Context())
 	if err != nil {
 		if err == myerrors.ErrRecordNotFound {
 			return echo.NewHTTPError(http.StatusNotFound, err.Error())
@@ -195,20 +228,20 @@ func (d *onlineClassControllerImpl) GetOnlineClassBookingDetail(c echo.Context) 
 	if claims["role"].(string) == constans.Role_superadmin || claims["role"].(string) == constans.Role_admin {
 		notif := dtoNotif.NotificationReadRequest{
 			TransactionID: uint(id),
-			Title:         "Online Class",
+			Title:         "Offline Class",
 		}
 		if err := d.notificationService.ReadNotification(&notif, c.Request().Context()); err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success get online class booking",
-		"data":    onlineClassBooking,
+		"message": "success get offline class booking",
+		"data":    offlineClassBooking,
 	})
 }
 
-// GetOnlineClassBookingUser implements OnlineClassController
-func (d *onlineClassControllerImpl) GetOnlineClassBookingUser(c echo.Context) error {
+// GetOfflineClassBookingUser implements OfflineClassController
+func (d *offlineclassControllerImpl) GetOfflineClassBookingUser(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
 	if err := d.authService.ValidationRole(claims, constans.Role_user, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
@@ -216,18 +249,18 @@ func (d *onlineClassControllerImpl) GetOnlineClassBookingUser(c echo.Context) er
 		}
 		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
-	onlineClassBooking, err := d.onlineClassService.FindOnlineClassBookingByUser(uint(claims["user_id"].(float64)), c.Request().Context())
+	offlineClassBooking, err := d.offlineClassService.FindOfflineClassBookingByUser(uint(claims["user_id"].(float64)), c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success get online class booking",
-		"data":    onlineClassBooking,
+		"message": "success get offline class booking",
+		"data":    offlineClassBooking,
 	})
 }
 
-// GetOnlineClassBookings implements OnlineClassController
-func (d *onlineClassControllerImpl) GetOnlineClassBookings(c echo.Context) error {
+// GetOfflineClassBookings implements OfflineClassController
+func (d *offlineclassControllerImpl) GetOfflineClassBookings(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
 	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
@@ -238,18 +271,18 @@ func (d *onlineClassControllerImpl) GetOnlineClassBookings(c echo.Context) error
 	var query model.Pagination
 	query.NewPageQuery(c)
 
-	onlineClassBookings, err := d.onlineClassService.FindOnlineClassBookings(&query, c.Request().Context())
+	offlineClassBookings, err := d.offlineClassService.FindOfflineClassBookings(&query, c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success get online class bookings",
-		"data":    onlineClassBookings,
+		"message": "success get offline class bookings",
+		"data":    offlineClassBookings,
 	})
 }
 
-// GetOnlineClassCategories implements OnlineClassController
-func (d *onlineClassControllerImpl) GetOnlineClassCategories(c echo.Context) error {
+// GetOfflineClassCategories implements OfflineClassController
+func (d *offlineclassControllerImpl) GetOfflineClassCategories(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
 	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
@@ -257,45 +290,18 @@ func (d *onlineClassControllerImpl) GetOnlineClassCategories(c echo.Context) err
 		}
 		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
-	onlineClassCategories, err := d.onlineClassService.FindOnlineClassCategories(c.Request().Context())
+	offlineClassCategories, err := d.offlineClassService.FindOfflineClassCategories(c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success get online class categories",
-		"data":    onlineClassCategories,
+		"message": "success get offline class categories",
+		"data":    offlineClassCategories,
 	})
 }
 
-// GetOnlineClassCategoryDetail implements OnlineClassController
-func (d *onlineClassControllerImpl) GetOnlineClassCategoryDetail(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
-	param := c.Param("id")
-	id, err := strconv.Atoi(param)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "not found")
-	}
-	onlineClassCategory, err := d.onlineClassService.FindOnlineClassCategoryById(uint(id), c.Request().Context())
-	if err != nil {
-		if err == myerrors.ErrRecordNotFound {
-			return echo.NewHTTPError(http.StatusNotFound, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
-	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success get online calss category",
-		"data":    onlineClassCategory,
-	})
-}
-
-// GetOnlineClassDetail implements OnlineClassController
-func (d *onlineClassControllerImpl) GetOnlineClassDetail(c echo.Context) error {
+// GetOfflineClassCategoryDetail implements OfflineClassController
+func (d *offlineclassControllerImpl) GetOfflineClassCategoryDetail(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
 	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
@@ -308,14 +314,41 @@ func (d *onlineClassControllerImpl) GetOnlineClassDetail(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
-	onlineClass, err := d.onlineClassService.FindOnlineClassById(uint(id), c.Request().Context())
+	offlineClassCategory, err := d.offlineClassService.FindOfflineClassCategoryById(uint(id), c.Request().Context())
 	if err != nil {
 		if err == myerrors.ErrRecordNotFound {
 			return echo.NewHTTPError(http.StatusNotFound, err.Error())
 		}
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	onlineClass.AccessClass = true
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "success get offline class category",
+		"data":    offlineClassCategory,
+	})
+}
+
+// GetOfflineClassDetail implements OfflineClassController
+func (d *offlineclassControllerImpl) GetOfflineClassDetail(c echo.Context) error {
+	claims := d.authService.GetClaims(&c)
+	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
+		if err == myerrors.ErrPermission {
+			return echo.NewHTTPError(http.StatusForbidden, err.Error())
+		}
+		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+	}
+	param := c.Param("id")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "not found")
+	}
+	offlineClass, err := d.offlineClassService.FindOfflineClassById(uint(id), c.Request().Context())
+	if err != nil {
+		if err == myerrors.ErrRecordNotFound {
+			return echo.NewHTTPError(http.StatusNotFound, err.Error())
+		}
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	offlineClass.AccessClass = true
 
 	if claims["role"].(string) == constans.Role_user {
 		memberUser, err := d.memberService.FindMemberByUser(uint(claims["user_id"].(float64)), c.Request().Context())
@@ -323,26 +356,20 @@ func (d *onlineClassControllerImpl) GetOnlineClassDetail(c echo.Context) error {
 			if err != myerrors.ErrRecordNotFound {
 				return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 			}
-			onlineClass.AccessClass = false
+			offlineClass.AccessClass = false
 		} else {
-			onlineClass.AccessClass = memberUser.MemberType.AccessOnlineClass
-		}
-		if !onlineClass.AccessClass {
-			onlineClass.AccessClass, err = d.onlineClassService.CheckAccessOnlineClass(uint(claims["user_id"].(float64)), uint(id), c.Request().Context())
-			if err != nil {
-				return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-			}
+			offlineClass.AccessClass = memberUser.MemberType.AccessOfflineClass
 		}
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success get online class",
-		"data":    onlineClass,
+		"message": "success get offline class",
+		"data":    offlineClass,
 	})
 }
 
-// GetOnlineClasses implements OnlineClassController
-func (d *onlineClassControllerImpl) GetOnlineClasses(c echo.Context) error {
+// GetOfflineClasses implements OfflineClassController
+func (d *offlineclassControllerImpl) GetOfflineClasses(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
 	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
@@ -350,18 +377,22 @@ func (d *onlineClassControllerImpl) GetOnlineClasses(c echo.Context) error {
 		}
 		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
-	onlineClasses, err := d.onlineClassService.FindOnlineClasses(c.Request().Context())
+	offlineClasses, err := d.offlineClassService.FindOfflineClasses(c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
+	result := dto.OfflineClassResponses{
+		OfflineClasses: *offlineClasses,
+		Count:          uint(len(*offlineClasses)),
+	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success get online classes",
-		"data":    onlineClasses,
+		"message": "success get offline classes",
+		"data":    result,
 	})
 }
 
-// OnlineClassBookingPayment implements OnlineClassController
-func (d *onlineClassControllerImpl) OnlineClassBookingPayment(c echo.Context) error {
+// OfflineClassBookingPayment implements OfflineClassController
+func (d *offlineclassControllerImpl) OfflineClassBookingPayment(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
 	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
@@ -392,7 +423,7 @@ func (d *onlineClassControllerImpl) OnlineClassBookingPayment(c echo.Context) er
 	if err := c.Validate(body); err != nil {
 		return err
 	}
-	err = d.onlineClassService.OnlineClassPayment(&body, c.Request().Context())
+	err = d.offlineClassService.OfflineClassPayment(&body, c.Request().Context())
 	if err != nil {
 		if err == myerrors.ErrPermission {
 			return echo.NewHTTPError(http.StatusForbidden, err.Error())
@@ -404,8 +435,8 @@ func (d *onlineClassControllerImpl) OnlineClassBookingPayment(c echo.Context) er
 	})
 }
 
-// SetStatusOnlineClassBooking implements OnlineClassController
-func (d *onlineClassControllerImpl) SetStatusOnlineClassBooking(c echo.Context) error {
+// SetStatusOfflineClassBooking implements OfflineClassController
+func (d *offlineclassControllerImpl) SetStatusOfflineClassBooking(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
 	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
@@ -418,7 +449,7 @@ func (d *onlineClassControllerImpl) SetStatusOnlineClassBooking(c echo.Context) 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
-	var status dto.SetStatusOnlineClassBooking
+	var status dto.SetStatusOfflineClassBooking
 	if err := c.Bind(&status); err != nil {
 		return err
 	}
@@ -426,7 +457,7 @@ func (d *onlineClassControllerImpl) SetStatusOnlineClassBooking(c echo.Context) 
 		return err
 	}
 	status.ID = uint(id)
-	if err := d.onlineClassService.SetStatusOnlineClassBooking(&status, c.Request().Context()); err != nil {
+	if err := d.offlineClassService.SetStatusOfflineClassBooking(&status, c.Request().Context()); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
@@ -434,8 +465,32 @@ func (d *onlineClassControllerImpl) SetStatusOnlineClassBooking(c echo.Context) 
 	})
 }
 
-// UpdateOnlineClass implements OnlineClassController
-func (d *onlineClassControllerImpl) UpdateOnlineClass(c echo.Context) error {
+// TakeOfflineClassBooking implements OfflineClassController
+func (d *offlineclassControllerImpl) TakeOfflineClassBooking(c echo.Context) error {
+	emailParam := c.QueryParam("email")
+	codeParam := c.QueryParam("code")
+	code, err := uuid.Parse(codeParam)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	condition := dto.TakeOfflineClassBooking{
+		Email: emailParam,
+		Code:  code,
+	}
+	if err := c.Validate(condition); err != nil {
+		return err
+	}
+	err = d.offlineClassService.TakeOfflineClassBooking(&condition, c.Request().Context())
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "success take offline class booking",
+	})
+}
+
+// UpdateOfflineClass implements OfflineClassController
+func (d *offlineclassControllerImpl) UpdateOfflineClass(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
 	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
@@ -448,24 +503,24 @@ func (d *onlineClassControllerImpl) UpdateOnlineClass(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
-	var onlineClass dto.OnlineClassUpdateRequest
-	if err := c.Bind(&onlineClass); err != nil {
+	var offlineClass dto.OfflineClassUpdateRequest
+	if err := c.Bind(&offlineClass); err != nil {
 		return err
 	}
-	if err := c.Validate(onlineClass); err != nil {
+	if err := c.Validate(offlineClass); err != nil {
 		return err
 	}
-	onlineClass.ID = uint(id)
-	if err := d.onlineClassService.UpdateOnlineClass(&onlineClass, c.Request().Context()); err != nil {
+	offlineClass.ID = uint(id)
+	if err := d.offlineClassService.UpdateOfflineClass(&offlineClass, c.Request().Context()); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success update online class",
+		"message": "success update offline class",
 	})
 }
 
-// UpdateOnlineClassBooking implements OnlineClassController
-func (d *onlineClassControllerImpl) UpdateOnlineClassBooking(c echo.Context) error {
+// UpdateOfflineClassBooking implements OfflineClassController
+func (d *offlineclassControllerImpl) UpdateOfflineClassBooking(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
 	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
@@ -478,24 +533,24 @@ func (d *onlineClassControllerImpl) UpdateOnlineClassBooking(c echo.Context) err
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
-	var onlineClassBooking dto.OnlineClassBookingUpdateRequest
-	if err := c.Bind(&onlineClassBooking); err != nil {
+	var offlineClassBooking dto.OfflineClassBookingUpdateRequest
+	if err := c.Bind(&offlineClassBooking); err != nil {
 		return err
 	}
-	if err := c.Validate(onlineClassBooking); err != nil {
+	if err := c.Validate(offlineClassBooking); err != nil {
 		return err
 	}
-	onlineClassBooking.ID = uint(id)
-	if err := d.onlineClassService.UpdateOnlineClassBooking(&onlineClassBooking, c.Request().Context()); err != nil {
+	offlineClassBooking.ID = uint(id)
+	if err := d.offlineClassService.UpdateOfflineClassBooking(&offlineClassBooking, c.Request().Context()); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success update online class booking",
+		"message": "success update offline class booking",
 	})
 }
 
-// UpdateOnlineClassCategory implements OnlineClassController
-func (d *onlineClassControllerImpl) UpdateOnlineClassCategory(c echo.Context) error {
+// UpdateOfflineClassCategory implements OfflineClassController
+func (d *offlineclassControllerImpl) UpdateOfflineClassCategory(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
 	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
 		if err == myerrors.ErrPermission {
@@ -508,27 +563,27 @@ func (d *onlineClassControllerImpl) UpdateOnlineClassCategory(c echo.Context) er
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
-	var onlineClassCategory dto.OnlineClassCategoryUpdateRequest
-	if err := c.Bind(&onlineClassCategory); err != nil {
+	var offlineClassCategory dto.OfflineClassCategoryUpdateRequest
+	if err := c.Bind(&offlineClassCategory); err != nil {
 		return err
 	}
-	if err := c.Validate(onlineClassCategory); err != nil {
+	if err := c.Validate(offlineClassCategory); err != nil {
 		return err
 	}
-	onlineClassCategory.ID = uint(id)
-	if err := d.onlineClassService.UpdateOnlineClassCategory(&onlineClassCategory, c.Request().Context()); err != nil {
+	offlineClassCategory.ID = uint(id)
+	if err := d.offlineClassService.UpdateOfflineClassCategory(&offlineClassCategory, c.Request().Context()); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success update online class category",
+		"message": "success update offline class category",
 	})
 }
 
-func NewOnlineClassController(memberService memberServ.MemberService, authService authServ.AuthService, notificationService notifServ.NotificationService, onlineClassService onlineClassServ.OnlineClassService) OnlineClassController {
-	return &onlineClassControllerImpl{
-		memberService:       memberService,
-		onlineClassService:  onlineClassService,
+func NewOfflineClassController(offlineClassService offlineClassServ.OfflineClassService, authService authServ.AuthService, membersService memberServ.MemberService, notificationServ notificationServ.NotificationService) OfflineClassController {
+	return &offlineclassControllerImpl{
+		offlineClassService: offlineClassService,
+		memberService:       membersService,
 		authService:         authService,
-		notificationService: notificationService,
+		notificationService: notificationServ,
 	}
 }

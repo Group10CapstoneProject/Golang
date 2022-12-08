@@ -350,7 +350,7 @@ func (d *memberControllerImpl) MemberPayment(c echo.Context) error {
 	}
 	form, err := c.FormFile("file")
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	src, err := form.Open()
 	if err != nil {

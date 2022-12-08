@@ -27,6 +27,7 @@ type memberServiceImpl struct {
 func (s *memberServiceImpl) CreateMember(request *dto.MemberStoreRequest, ctx context.Context) error {
 	member := request.ToModel()
 	member.ExpiredAt = time.Now().Add(24 * time.Hour)
+	member.ActivedAt = time.Date(0001, 1, 1, 0, 0, 0, 0, time.UTC)
 	member.Status = model.WAITING
 	err := s.memberRepository.CreateMember(member, ctx)
 	return err
@@ -219,7 +220,7 @@ func (s *memberServiceImpl) MemberPayment(request *model.PaymentRequest, ctx con
 	notif := model.Notification{
 		UserID:          member.UserID,
 		TransactionID:   id,
-		TransactionType: "/members/",
+		TransactionType: "/members/details",
 		Title:           "Member",
 	}
 	if err := s.notificationRepository.CreateNotification(&notif, ctx); err != nil {
