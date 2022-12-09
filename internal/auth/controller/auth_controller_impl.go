@@ -38,9 +38,6 @@ func (d *authControllerImpl) Login(c echo.Context) error {
 // Logout implements AuthController
 func (d *authControllerImpl) Logout(c echo.Context) error {
 	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	userId := claims["user_id"].(float64)
 	if err := d.authService.Logout(uint(userId), c.Request().Context()); err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())

@@ -121,29 +121,6 @@ func (s *authServiceImpl) Refresh(token model.Token, ctx context.Context) (*mode
 	return &newToken, err
 }
 
-// ValidatationAdmin implements AuthService
-func (s *authServiceImpl) ValidationRole(token jwt.MapClaims, role string, ctx context.Context) error {
-	userRole := token["role"].(string)
-	if userRole == role || userRole == constans.Role_superadmin {
-		return s.ValidationToken(token, ctx)
-	}
-	return myerrors.ErrPermission
-}
-
-// ValidationToken implements AuthService
-func (s *authServiceImpl) ValidationToken(token jwt.MapClaims, ctx context.Context) error {
-	userId := uint(token["user_id"].(float64))
-	user, err := s.usersRepository.FindUserByID(&userId, ctx)
-	if err != nil {
-		return err
-	}
-	sessionId := token["session_id"].(string)
-	if user.SessionID.String() != sessionId {
-		return myerrors.ErrInvalidSession
-	}
-	return nil
-}
-
 func (s *authServiceImpl) GetClaims(c *echo.Context) jwt.MapClaims {
 	user := (*c).Get("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)

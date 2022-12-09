@@ -4,17 +4,16 @@ import (
 	"net/http"
 
 	"github.com/Group10CapstoneProject/Golang/constans"
-	authService "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	"github.com/Group10CapstoneProject/Golang/internal/users/dto"
 	userService "github.com/Group10CapstoneProject/Golang/internal/users/service"
 	"github.com/Group10CapstoneProject/Golang/model"
-	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
+	jwtServ "github.com/Group10CapstoneProject/Golang/utils/jwt"
 	"github.com/labstack/echo/v4"
 )
 
 type userControllerImpl struct {
 	userService userService.UserService
-	authService authService.AuthService
+	jwtService  jwtServ.JWTService
 }
 
 // Signup implements UserController
@@ -36,13 +35,6 @@ func (d *userControllerImpl) Signup(c echo.Context) error {
 
 // NewAadmin implements UserController
 func (d *userControllerImpl) NewAadmin(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_superadmin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	var user dto.NewUser
 	if err := c.Bind(&user); err != nil {
 		return err
@@ -60,10 +52,7 @@ func (d *userControllerImpl) NewAadmin(c echo.Context) error {
 
 // GetUser implements UserController
 func (d *userControllerImpl) GetUser(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
+	claims := d.jwtService.GetClaims(&c)
 	userId := uint(claims["user_id"].(float64))
 	user, err := d.userService.FindUser(&userId, c.Request().Context())
 	if err != nil {
@@ -77,13 +66,6 @@ func (d *userControllerImpl) GetUser(c echo.Context) error {
 
 // GetUsers implements UserController
 func (d *userControllerImpl) GetUsers(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	var query model.Pagination
 	query.NewPageQuery(c)
 
@@ -99,13 +81,6 @@ func (d *userControllerImpl) GetUsers(c echo.Context) error {
 
 // GetAdmins implements UserController
 func (d *userControllerImpl) GetAdmins(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	var query model.Pagination
 	query.NewPageQuery(c)
 
@@ -119,9 +94,9 @@ func (d *userControllerImpl) GetAdmins(c echo.Context) error {
 	})
 }
 
-func NewUserController(userService userService.UserService, authService authService.AuthService) UserController {
+func NewUserController(userService userService.UserService, jwtService jwtServ.JWTService) UserController {
 	return &userControllerImpl{
 		userService: userService,
-		authService: authService,
+		jwtService:  jwtService,
 	}
 }

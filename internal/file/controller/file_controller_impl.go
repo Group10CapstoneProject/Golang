@@ -4,27 +4,16 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Group10CapstoneProject/Golang/constans"
-	authServ "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	"github.com/Group10CapstoneProject/Golang/internal/file/dto"
 	fileServ "github.com/Group10CapstoneProject/Golang/internal/file/service"
-	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"github.com/labstack/echo/v4"
 )
 
 type fileControllerImpl struct {
 	fileService fileServ.FileService
-	authService authServ.AuthService
 }
 
 func (d *fileControllerImpl) Upload(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	title := c.FormValue("title")
 	form, err := c.FormFile("file")
 	if err != nil {
@@ -54,9 +43,8 @@ func (d *fileControllerImpl) Upload(c echo.Context) error {
 	})
 }
 
-func NewFileController(fileService fileServ.FileService, authService authServ.AuthService) FileController {
+func NewFileController(fileService fileServ.FileService) FileController {
 	return &fileControllerImpl{
 		fileService: fileService,
-		authService: authService,
 	}
 }

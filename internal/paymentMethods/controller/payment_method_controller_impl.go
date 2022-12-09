@@ -4,28 +4,20 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Group10CapstoneProject/Golang/constans"
-	authServ "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	"github.com/Group10CapstoneProject/Golang/internal/paymentMethods/dto"
 	paymentMethodServ "github.com/Group10CapstoneProject/Golang/internal/paymentMethods/service"
+	jwtServ "github.com/Group10CapstoneProject/Golang/utils/jwt"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"github.com/labstack/echo/v4"
 )
 
 type paymentMehtodControllerImpl struct {
 	paymentMethodService paymentMethodServ.PaymentMethodService
-	authService          authServ.AuthService
+	jwtService           jwtServ.JWTService
 }
 
 // CreatePaymentMethod implements PaymentMethodController
 func (d *paymentMehtodControllerImpl) CreatePaymentMethod(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	var paymentMethod dto.PaymentMethodStoreRequest
 	if err := c.Bind(&paymentMethod); err != nil {
 		return err
@@ -43,13 +35,6 @@ func (d *paymentMehtodControllerImpl) CreatePaymentMethod(c echo.Context) error 
 
 // DeletePaymentMethod implements PaymentMethodController
 func (d *paymentMehtodControllerImpl) DeletePaymentMethod(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -68,13 +53,6 @@ func (d *paymentMehtodControllerImpl) DeletePaymentMethod(c echo.Context) error 
 
 // GetPaymentMethodDetail implements PaymentMethodController
 func (d *paymentMehtodControllerImpl) GetPaymentMethodDetail(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -95,13 +73,6 @@ func (d *paymentMehtodControllerImpl) GetPaymentMethodDetail(c echo.Context) err
 
 // GetPaymentMethods implements PaymentMethodController
 func (d *paymentMehtodControllerImpl) GetPaymentMethods(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	paymentMethods, err := d.paymentMethodService.FindPaymentMethods(c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -114,13 +85,6 @@ func (d *paymentMehtodControllerImpl) GetPaymentMethods(c echo.Context) error {
 
 // UpdatePaymentMethod implements PaymentMethodController
 func (d *paymentMehtodControllerImpl) UpdatePaymentMethod(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -142,9 +106,9 @@ func (d *paymentMehtodControllerImpl) UpdatePaymentMethod(c echo.Context) error 
 	})
 }
 
-func NewPaymentMethodController(paymentMethodService paymentMethodServ.PaymentMethodService, authService authServ.AuthService) PaymentMethodController {
+func NewPaymentMethodController(paymentMethodService paymentMethodServ.PaymentMethodService, jwtService jwtServ.JWTService) PaymentMethodController {
 	return &paymentMehtodControllerImpl{
 		paymentMethodService: paymentMethodService,
-		authService:          authService,
+		jwtService:           jwtService,
 	}
 }

@@ -5,13 +5,13 @@ import (
 	"strconv"
 
 	"github.com/Group10CapstoneProject/Golang/constans"
-	authServ "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	memberServ "github.com/Group10CapstoneProject/Golang/internal/members/service"
 	dtoNotif "github.com/Group10CapstoneProject/Golang/internal/notifications/dto"
 	notificationServ "github.com/Group10CapstoneProject/Golang/internal/notifications/service"
 	"github.com/Group10CapstoneProject/Golang/internal/offline_classes/dto"
 	offlineClassServ "github.com/Group10CapstoneProject/Golang/internal/offline_classes/service"
 	"github.com/Group10CapstoneProject/Golang/model"
+	jwtServ "github.com/Group10CapstoneProject/Golang/utils/jwt"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -20,19 +20,12 @@ import (
 type offlineclassControllerImpl struct {
 	offlineClassService offlineClassServ.OfflineClassService
 	memberService       memberServ.MemberService
-	authService         authServ.AuthService
+	jwtService          jwtServ.JWTService
 	notificationService notificationServ.NotificationService
 }
 
 // CheckOfflineClassBooking implements OfflineClassController
 func (d *offlineclassControllerImpl) CheckOfflineClassBooking(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	emailParam := c.QueryParam("email")
 	codeParam := c.QueryParam("code")
 	code, err := uuid.Parse(codeParam)
@@ -58,13 +51,6 @@ func (d *offlineclassControllerImpl) CheckOfflineClassBooking(c echo.Context) er
 
 // CreateOfflineClass implements OfflineClassController
 func (d *offlineclassControllerImpl) CreateOfflineClass(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	var offlineClass dto.OfflineClassStoreRequest
 	if err := c.Bind(&offlineClass); err != nil {
 		return err
@@ -82,13 +68,6 @@ func (d *offlineclassControllerImpl) CreateOfflineClass(c echo.Context) error {
 
 // CreateOfflineClassBooking implements OfflineClassController
 func (d *offlineclassControllerImpl) CreateOfflineClassBooking(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	var offlineClassBooking dto.OfflineClassBookingStoreRequest
 	if err := c.Bind(&offlineClassBooking); err != nil {
 		return err
@@ -96,6 +75,7 @@ func (d *offlineclassControllerImpl) CreateOfflineClassBooking(c echo.Context) e
 	if err := c.Validate(offlineClassBooking); err != nil {
 		return err
 	}
+	claims := d.jwtService.GetClaims(&c)
 	offlineClassBooking.UserID = uint(claims["user_id"].(float64))
 	if err := d.offlineClassService.CreateOfflineClassBooking(&offlineClassBooking, c.Request().Context()); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -107,13 +87,6 @@ func (d *offlineclassControllerImpl) CreateOfflineClassBooking(c echo.Context) e
 
 // CreateOfflineClassCategory implements OfflineClassController
 func (d *offlineclassControllerImpl) CreateOfflineClassCategory(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	var offlineClassCategory dto.OfflineClassCategoryStoreRequest
 	if err := c.Bind(&offlineClassCategory); err != nil {
 		return err
@@ -131,13 +104,6 @@ func (d *offlineclassControllerImpl) CreateOfflineClassCategory(c echo.Context) 
 
 // DeleteOfflineClass implements OfflineClassController
 func (d *offlineclassControllerImpl) DeleteOfflineClass(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -156,13 +122,6 @@ func (d *offlineclassControllerImpl) DeleteOfflineClass(c echo.Context) error {
 
 // DeleteOfflineClassBooking implements OfflineClassController
 func (d *offlineclassControllerImpl) DeleteOfflineClassBooking(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -181,13 +140,6 @@ func (d *offlineclassControllerImpl) DeleteOfflineClassBooking(c echo.Context) e
 
 // DeleteOfflineClassCategory implements OfflineClassController
 func (d *offlineclassControllerImpl) DeleteOfflineClassCategory(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -206,13 +158,6 @@ func (d *offlineclassControllerImpl) DeleteOfflineClassCategory(c echo.Context) 
 
 // GetOfflineClassBookingDetail implements OfflineClassController
 func (d *offlineclassControllerImpl) GetOfflineClassBookingDetail(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -225,6 +170,7 @@ func (d *offlineclassControllerImpl) GetOfflineClassBookingDetail(c echo.Context
 		}
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
+	claims := d.jwtService.GetClaims(&c)
 	if claims["role"].(string) == constans.Role_superadmin || claims["role"].(string) == constans.Role_admin {
 		notif := dtoNotif.NotificationReadRequest{
 			TransactionID: uint(id),
@@ -242,13 +188,7 @@ func (d *offlineclassControllerImpl) GetOfflineClassBookingDetail(c echo.Context
 
 // GetOfflineClassBookingUser implements OfflineClassController
 func (d *offlineclassControllerImpl) GetOfflineClassBookingUser(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_user, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
+	claims := d.jwtService.GetClaims(&c)
 	offlineClassBooking, err := d.offlineClassService.FindOfflineClassBookingByUser(uint(claims["user_id"].(float64)), c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -261,13 +201,6 @@ func (d *offlineclassControllerImpl) GetOfflineClassBookingUser(c echo.Context) 
 
 // GetOfflineClassBookings implements OfflineClassController
 func (d *offlineclassControllerImpl) GetOfflineClassBookings(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	var query model.Pagination
 	query.NewPageQuery(c)
 
@@ -283,13 +216,6 @@ func (d *offlineclassControllerImpl) GetOfflineClassBookings(c echo.Context) err
 
 // GetOfflineClassCategories implements OfflineClassController
 func (d *offlineclassControllerImpl) GetOfflineClassCategories(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	offlineClassCategories, err := d.offlineClassService.FindOfflineClassCategories(c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -302,13 +228,6 @@ func (d *offlineclassControllerImpl) GetOfflineClassCategories(c echo.Context) e
 
 // GetOfflineClassCategoryDetail implements OfflineClassController
 func (d *offlineclassControllerImpl) GetOfflineClassCategoryDetail(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -329,13 +248,6 @@ func (d *offlineclassControllerImpl) GetOfflineClassCategoryDetail(c echo.Contex
 
 // GetOfflineClassDetail implements OfflineClassController
 func (d *offlineclassControllerImpl) GetOfflineClassDetail(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -349,6 +261,7 @@ func (d *offlineclassControllerImpl) GetOfflineClassDetail(c echo.Context) error
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	offlineClass.AccessClass = true
+	claims := d.jwtService.GetClaims(&c)
 
 	if claims["role"].(string) == constans.Role_user {
 		memberUser, err := d.memberService.FindMemberByUser(uint(claims["user_id"].(float64)), c.Request().Context())
@@ -370,13 +283,6 @@ func (d *offlineclassControllerImpl) GetOfflineClassDetail(c echo.Context) error
 
 // GetOfflineClasses implements OfflineClassController
 func (d *offlineclassControllerImpl) GetOfflineClasses(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	offlineClasses, err := d.offlineClassService.FindOfflineClasses(c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -393,13 +299,6 @@ func (d *offlineclassControllerImpl) GetOfflineClasses(c echo.Context) error {
 
 // OfflineClassBookingPayment implements OfflineClassController
 func (d *offlineclassControllerImpl) OfflineClassBookingPayment(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -414,6 +313,7 @@ func (d *offlineclassControllerImpl) OfflineClassBookingPayment(c echo.Context) 
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	defer src.Close()
+	claims := d.jwtService.GetClaims(&c)
 	body := model.PaymentRequest{
 		ID:       uint(id),
 		UserID:   uint(claims["user_id"].(float64)),
@@ -437,13 +337,6 @@ func (d *offlineclassControllerImpl) OfflineClassBookingPayment(c echo.Context) 
 
 // SetStatusOfflineClassBooking implements OfflineClassController
 func (d *offlineclassControllerImpl) SetStatusOfflineClassBooking(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -491,13 +384,6 @@ func (d *offlineclassControllerImpl) TakeOfflineClassBooking(c echo.Context) err
 
 // UpdateOfflineClass implements OfflineClassController
 func (d *offlineclassControllerImpl) UpdateOfflineClass(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -521,13 +407,6 @@ func (d *offlineclassControllerImpl) UpdateOfflineClass(c echo.Context) error {
 
 // UpdateOfflineClassBooking implements OfflineClassController
 func (d *offlineclassControllerImpl) UpdateOfflineClassBooking(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -551,13 +430,6 @@ func (d *offlineclassControllerImpl) UpdateOfflineClassBooking(c echo.Context) e
 
 // UpdateOfflineClassCategory implements OfflineClassController
 func (d *offlineclassControllerImpl) UpdateOfflineClassCategory(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -579,11 +451,11 @@ func (d *offlineclassControllerImpl) UpdateOfflineClassCategory(c echo.Context) 
 	})
 }
 
-func NewOfflineClassController(offlineClassService offlineClassServ.OfflineClassService, authService authServ.AuthService, membersService memberServ.MemberService, notificationServ notificationServ.NotificationService) OfflineClassController {
+func NewOfflineClassController(offlineClassService offlineClassServ.OfflineClassService, jwtService jwtServ.JWTService, membersService memberServ.MemberService, notificationServ notificationServ.NotificationService) OfflineClassController {
 	return &offlineclassControllerImpl{
 		offlineClassService: offlineClassService,
 		memberService:       membersService,
-		authService:         authService,
+		jwtService:          jwtService,
 		notificationService: notificationServ,
 	}
 }

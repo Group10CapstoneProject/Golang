@@ -6,31 +6,24 @@ import (
 	"strconv"
 
 	"github.com/Group10CapstoneProject/Golang/constans"
-	authServ "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	"github.com/Group10CapstoneProject/Golang/internal/members/dto"
 	memberServ "github.com/Group10CapstoneProject/Golang/internal/members/service"
 	dtoNotif "github.com/Group10CapstoneProject/Golang/internal/notifications/dto"
 	notifServ "github.com/Group10CapstoneProject/Golang/internal/notifications/service"
 	"github.com/Group10CapstoneProject/Golang/model"
+	jwtServ "github.com/Group10CapstoneProject/Golang/utils/jwt"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"github.com/labstack/echo/v4"
 )
 
 type memberControllerImpl struct {
 	memberService       memberServ.MemberService
-	authService         authServ.AuthService
+	jwtService          jwtServ.JWTService
 	notificationService notifServ.NotificationService
 }
 
 // CreateMember implements MemberController
 func (d *memberControllerImpl) CreateMember(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	var member dto.MemberStoreRequest
 	if err := c.Bind(&member); err != nil {
 		return err
@@ -38,6 +31,7 @@ func (d *memberControllerImpl) CreateMember(c echo.Context) error {
 	if err := c.Validate(member); err != nil {
 		return err
 	}
+	claims := d.jwtService.GetClaims(&c)
 	member.UserID = uint(claims["user_id"].(float64))
 	if err := d.memberService.CreateMember(&member, c.Request().Context()); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -49,13 +43,6 @@ func (d *memberControllerImpl) CreateMember(c echo.Context) error {
 
 // CreateMemberType implements MemberController
 func (d *memberControllerImpl) CreateMemberType(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	var memberType dto.MemberTypeStoreRequest
 	if err := c.Bind(&memberType); err != nil {
 		return err
@@ -73,13 +60,6 @@ func (d *memberControllerImpl) CreateMemberType(c echo.Context) error {
 
 // DeleteMember implements MemberController
 func (d *memberControllerImpl) DeleteMember(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -98,13 +78,6 @@ func (d *memberControllerImpl) DeleteMember(c echo.Context) error {
 
 // DeleteMemberType implements MemberController
 func (d *memberControllerImpl) DeleteMemberType(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -123,18 +96,12 @@ func (d *memberControllerImpl) DeleteMemberType(c echo.Context) error {
 
 // GetMemberDetail implements MemberController
 func (d *memberControllerImpl) GetMemberDetail(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
+	claims := d.jwtService.GetClaims(&c)
 	member, err := d.memberService.FindMemberById(uint(id), c.Request().Context())
 	if err != nil {
 		if err == myerrors.ErrRecordNotFound {
@@ -159,13 +126,6 @@ func (d *memberControllerImpl) GetMemberDetail(c echo.Context) error {
 
 // GetMemberTypeDetail implements MemberController
 func (d *memberControllerImpl) GetMemberTypeDetail(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -186,13 +146,6 @@ func (d *memberControllerImpl) GetMemberTypeDetail(c echo.Context) error {
 
 // GetMemberTypes implements MemberController
 func (d *memberControllerImpl) GetMemberTypes(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	memberTypes, err := d.memberService.FindMemberTypes(c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -205,14 +158,9 @@ func (d *memberControllerImpl) GetMemberTypes(c echo.Context) error {
 
 // GetMemberUser implements MemberController
 func (d *memberControllerImpl) GetMemberUser(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_user, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
-	members, err := d.memberService.FindMemberByUser(uint(claims["user_id"].(float64)), c.Request().Context())
+	claims := d.jwtService.GetClaims(&c)
+	userId := claims["user_id"].(float64)
+	members, err := d.memberService.FindMemberByUser(uint(userId), c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -224,13 +172,6 @@ func (d *memberControllerImpl) GetMemberUser(c echo.Context) error {
 
 // GetMembers implements MemberController
 func (d *memberControllerImpl) GetMembers(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	var query model.Pagination
 	query.NewPageQuery(c)
 
@@ -246,13 +187,6 @@ func (d *memberControllerImpl) GetMembers(c echo.Context) error {
 
 // UpdateMember implements MemberController
 func (d *memberControllerImpl) UpdateMember(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -276,13 +210,6 @@ func (d *memberControllerImpl) UpdateMember(c echo.Context) error {
 
 // UpdateMemberType implements MemberController
 func (d *memberControllerImpl) UpdateMemberType(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -306,13 +233,6 @@ func (d *memberControllerImpl) UpdateMemberType(c echo.Context) error {
 
 // SetStatusMember implements MemberController
 func (d *memberControllerImpl) SetStatusMember(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -336,13 +256,6 @@ func (d *memberControllerImpl) SetStatusMember(c echo.Context) error {
 
 // MemberPayment implements MemberController
 func (d *memberControllerImpl) MemberPayment(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -357,6 +270,7 @@ func (d *memberControllerImpl) MemberPayment(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	defer src.Close()
+	claims := d.jwtService.GetClaims(&c)
 	body := model.PaymentRequest{
 		ID:       uint(id),
 		UserID:   uint(claims["user_id"].(float64)),
@@ -379,10 +293,10 @@ func (d *memberControllerImpl) MemberPayment(c echo.Context) error {
 	})
 }
 
-func NewMemberController(memberService memberServ.MemberService, authService authServ.AuthService, notificationService notifServ.NotificationService) MemberController {
+func NewMemberController(memberService memberServ.MemberService, notificationService notifServ.NotificationService, jwtService jwtServ.JWTService) MemberController {
 	return &memberControllerImpl{
 		memberService:       memberService,
-		authService:         authService,
 		notificationService: notificationService,
+		jwtService:          jwtService,
 	}
 }

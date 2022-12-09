@@ -7,12 +7,14 @@ import (
 	"github.com/Group10CapstoneProject/Golang/model"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"github.com/golang-jwt/jwt"
+	"github.com/labstack/echo/v4"
 )
 
 type JWTService interface {
-	generateAccessToken(user *model.User) (string, error)
-	generateRefreshToken(user *model.User) (string, error)
+	GenerateAccessToken(user *model.User) (string, error)
+	GenerateRefreshToken(user *model.User) (string, error)
 	GenerateToken(user *model.User) (at string, rt string, err error)
+	GetClaims(c *echo.Context) jwt.MapClaims
 	TokenClaims(token string, secret string) (jwt.MapClaims, error)
 }
 
@@ -28,7 +30,7 @@ func NewJWTService(accessSecretKey string, refreshSecretKey string) JWTService {
 	}
 }
 
-func (j *jwtServiceImpl) generateAccessToken(user *model.User) (string, error) {
+func (j *jwtServiceImpl) GenerateAccessToken(user *model.User) (string, error) {
 	claims := &jwt.MapClaims{
 		"user_id":    user.ID,
 		"role":       user.Role,
@@ -39,7 +41,7 @@ func (j *jwtServiceImpl) generateAccessToken(user *model.User) (string, error) {
 	return token.SignedString([]byte(j.accessSecretKey))
 }
 
-func (j *jwtServiceImpl) generateRefreshToken(user *model.User) (string, error) {
+func (j *jwtServiceImpl) GenerateRefreshToken(user *model.User) (string, error) {
 	claims := &jwt.MapClaims{
 		"user_id":    user.ID,
 		"session_id": user.SessionID,
@@ -50,11 +52,11 @@ func (j *jwtServiceImpl) generateRefreshToken(user *model.User) (string, error) 
 }
 
 func (j *jwtServiceImpl) GenerateToken(user *model.User) (at string, rt string, err error) {
-	accessToken, err := j.generateAccessToken(user)
+	accessToken, err := j.GenerateAccessToken(user)
 	if err != nil {
 		return "", "", myerrors.ErrGenerateAccessToken
 	}
-	refreshToken, err := j.generateRefreshToken(user)
+	refreshToken, err := j.GenerateRefreshToken(user)
 	if err != nil {
 		return "", "", myerrors.ErrGenerateRefreshToken
 	}
@@ -71,4 +73,10 @@ func (j *jwtServiceImpl) TokenClaims(token string, secret string) (jwt.MapClaims
 	}
 
 	return claims, nil
+}
+
+func (j *jwtServiceImpl) GetClaims(c *echo.Context) jwt.MapClaims {
+	user := (*c).Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	return claims
 }

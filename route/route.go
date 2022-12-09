@@ -82,14 +82,14 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	offlineClassService := pkgOfflineClassService.NewOfflineClassService(offlineClassRepository, notificationRepository, imagekitService)
 
 	// init controller
-	userController := pkgUserController.NewUserController(userService, authService)
+	userController := pkgUserController.NewUserController(userService, jwtService)
 	authController := pkgAuthController.NewAuthController(authService)
-	paymentMethodController := pkgPaymentMethodController.NewPaymentMethodController(paymentMethodService, authService)
-	memberController := pkgMemberController.NewMemberController(memberService, authService, noticationService)
-	fileController := pkgFileController.NewFileController(fileService, authService)
-	noticationController := pkgNotificationController.NewNotificationController(noticationService, authService)
-	onlineClassController := pkgOnlineClassController.NewOnlineClassController(memberService, authService, noticationService, onlineClassService)
-	offlineClassController := pkgOfflineClassController.NewOfflineClassController(offlineClassService, authService, memberService, noticationService)
+	paymentMethodController := pkgPaymentMethodController.NewPaymentMethodController(paymentMethodService, jwtService)
+	memberController := pkgMemberController.NewMemberController(memberService, noticationService, jwtService)
+	fileController := pkgFileController.NewFileController(fileService)
+	noticationController := pkgNotificationController.NewNotificationController(noticationService)
+	onlineClassController := pkgOnlineClassController.NewOnlineClassController(memberService, jwtService, noticationService, onlineClassService)
+	offlineClassController := pkgOfflineClassController.NewOfflineClassController(offlineClassService, jwtService, memberService, noticationService)
 
 	// int route
 	// auth
