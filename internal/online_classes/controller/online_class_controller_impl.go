@@ -5,13 +5,13 @@ import (
 	"strconv"
 
 	"github.com/Group10CapstoneProject/Golang/constans"
-	authServ "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	memberServ "github.com/Group10CapstoneProject/Golang/internal/members/service"
 	dtoNotif "github.com/Group10CapstoneProject/Golang/internal/notifications/dto"
 	notifServ "github.com/Group10CapstoneProject/Golang/internal/notifications/service"
 	"github.com/Group10CapstoneProject/Golang/internal/online_classes/dto"
 	onlineClassServ "github.com/Group10CapstoneProject/Golang/internal/online_classes/service"
 	"github.com/Group10CapstoneProject/Golang/model"
+	jwtServ "github.com/Group10CapstoneProject/Golang/utils/jwt"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"github.com/labstack/echo/v4"
 )
@@ -19,19 +19,12 @@ import (
 type onlineClassControllerImpl struct {
 	memberService       memberServ.MemberService
 	onlineClassService  onlineClassServ.OnlineClassService
-	authService         authServ.AuthService
+	jwtService          jwtServ.JWTService
 	notificationService notifServ.NotificationService
 }
 
 // CreateOnlineClass implements OnlineClassController
 func (d *onlineClassControllerImpl) CreateOnlineClass(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	var onlineClass dto.OnlineClassStoreRequest
 	if err := c.Bind(&onlineClass); err != nil {
 		return err
@@ -49,13 +42,6 @@ func (d *onlineClassControllerImpl) CreateOnlineClass(c echo.Context) error {
 
 // CreateOnlineClassBooking implements OnlineClassController
 func (d *onlineClassControllerImpl) CreateOnlineClassBooking(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	var onlineClassBooking dto.OnlineClassBookingStoreRequest
 	if err := c.Bind(&onlineClassBooking); err != nil {
 		return err
@@ -63,6 +49,7 @@ func (d *onlineClassControllerImpl) CreateOnlineClassBooking(c echo.Context) err
 	if err := c.Validate(onlineClassBooking); err != nil {
 		return err
 	}
+	claims := d.jwtService.GetClaims(&c)
 	onlineClassBooking.UserID = uint(claims["user_id"].(float64))
 	if err := d.onlineClassService.CreateOnlineClassBooking(&onlineClassBooking, c.Request().Context()); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -74,13 +61,6 @@ func (d *onlineClassControllerImpl) CreateOnlineClassBooking(c echo.Context) err
 
 // CreateOnlineClassCategory implements OnlineClassController
 func (d *onlineClassControllerImpl) CreateOnlineClassCategory(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	var onlineClassCategory dto.OnlineClassCategoryStoreRequest
 	if err := c.Bind(&onlineClassCategory); err != nil {
 		return err
@@ -98,13 +78,6 @@ func (d *onlineClassControllerImpl) CreateOnlineClassCategory(c echo.Context) er
 
 // DeleteOnlineClass implements OnlineClassController
 func (d *onlineClassControllerImpl) DeleteOnlineClass(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -123,13 +96,6 @@ func (d *onlineClassControllerImpl) DeleteOnlineClass(c echo.Context) error {
 
 // DeleteOnlineClassBooking implements OnlineClassController
 func (d *onlineClassControllerImpl) DeleteOnlineClassBooking(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -148,13 +114,6 @@ func (d *onlineClassControllerImpl) DeleteOnlineClassBooking(c echo.Context) err
 
 // DeleteOnlineClassCategory implements OnlineClassController
 func (d *onlineClassControllerImpl) DeleteOnlineClassCategory(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -173,13 +132,6 @@ func (d *onlineClassControllerImpl) DeleteOnlineClassCategory(c echo.Context) er
 
 // GetOnlineClassBookingDetail implements OnlineClassController
 func (d *onlineClassControllerImpl) GetOnlineClassBookingDetail(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -192,6 +144,7 @@ func (d *onlineClassControllerImpl) GetOnlineClassBookingDetail(c echo.Context) 
 		}
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
+	claims := d.jwtService.GetClaims(&c)
 	if claims["role"].(string) == constans.Role_superadmin || claims["role"].(string) == constans.Role_admin {
 		notif := dtoNotif.NotificationReadRequest{
 			TransactionID: uint(id),
@@ -209,13 +162,7 @@ func (d *onlineClassControllerImpl) GetOnlineClassBookingDetail(c echo.Context) 
 
 // GetOnlineClassBookingUser implements OnlineClassController
 func (d *onlineClassControllerImpl) GetOnlineClassBookingUser(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_user, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
+	claims := d.jwtService.GetClaims(&c)
 	onlineClassBooking, err := d.onlineClassService.FindOnlineClassBookingByUser(uint(claims["user_id"].(float64)), c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -228,13 +175,6 @@ func (d *onlineClassControllerImpl) GetOnlineClassBookingUser(c echo.Context) er
 
 // GetOnlineClassBookings implements OnlineClassController
 func (d *onlineClassControllerImpl) GetOnlineClassBookings(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	var query model.Pagination
 	query.NewPageQuery(c)
 
@@ -250,13 +190,6 @@ func (d *onlineClassControllerImpl) GetOnlineClassBookings(c echo.Context) error
 
 // GetOnlineClassCategories implements OnlineClassController
 func (d *onlineClassControllerImpl) GetOnlineClassCategories(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	onlineClassCategories, err := d.onlineClassService.FindOnlineClassCategories(c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -269,13 +202,6 @@ func (d *onlineClassControllerImpl) GetOnlineClassCategories(c echo.Context) err
 
 // GetOnlineClassCategoryDetail implements OnlineClassController
 func (d *onlineClassControllerImpl) GetOnlineClassCategoryDetail(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -296,13 +222,6 @@ func (d *onlineClassControllerImpl) GetOnlineClassCategoryDetail(c echo.Context)
 
 // GetOnlineClassDetail implements OnlineClassController
 func (d *onlineClassControllerImpl) GetOnlineClassDetail(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -316,6 +235,7 @@ func (d *onlineClassControllerImpl) GetOnlineClassDetail(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	onlineClass.AccessClass = true
+	claims := d.jwtService.GetClaims(&c)
 
 	if claims["role"].(string) == constans.Role_user {
 		memberUser, err := d.memberService.FindMemberByUser(uint(claims["user_id"].(float64)), c.Request().Context())
@@ -343,13 +263,6 @@ func (d *onlineClassControllerImpl) GetOnlineClassDetail(c echo.Context) error {
 
 // GetOnlineClasses implements OnlineClassController
 func (d *onlineClassControllerImpl) GetOnlineClasses(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	onlineClasses, err := d.onlineClassService.FindOnlineClasses(c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -362,13 +275,6 @@ func (d *onlineClassControllerImpl) GetOnlineClasses(c echo.Context) error {
 
 // OnlineClassBookingPayment implements OnlineClassController
 func (d *onlineClassControllerImpl) OnlineClassBookingPayment(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationToken(claims, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -382,6 +288,7 @@ func (d *onlineClassControllerImpl) OnlineClassBookingPayment(c echo.Context) er
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
+	claims := d.jwtService.GetClaims(&c)
 	defer src.Close()
 	body := model.PaymentRequest{
 		ID:       uint(id),
@@ -406,13 +313,6 @@ func (d *onlineClassControllerImpl) OnlineClassBookingPayment(c echo.Context) er
 
 // SetStatusOnlineClassBooking implements OnlineClassController
 func (d *onlineClassControllerImpl) SetStatusOnlineClassBooking(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -436,13 +336,6 @@ func (d *onlineClassControllerImpl) SetStatusOnlineClassBooking(c echo.Context) 
 
 // UpdateOnlineClass implements OnlineClassController
 func (d *onlineClassControllerImpl) UpdateOnlineClass(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -466,13 +359,6 @@ func (d *onlineClassControllerImpl) UpdateOnlineClass(c echo.Context) error {
 
 // UpdateOnlineClassBooking implements OnlineClassController
 func (d *onlineClassControllerImpl) UpdateOnlineClassBooking(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -496,13 +382,6 @@ func (d *onlineClassControllerImpl) UpdateOnlineClassBooking(c echo.Context) err
 
 // UpdateOnlineClassCategory implements OnlineClassController
 func (d *onlineClassControllerImpl) UpdateOnlineClassCategory(c echo.Context) error {
-	claims := d.authService.GetClaims(&c)
-	if err := d.authService.ValidationRole(claims, constans.Role_admin, c.Request().Context()); err != nil {
-		if err == myerrors.ErrPermission {
-			return echo.NewHTTPError(http.StatusForbidden, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -524,11 +403,11 @@ func (d *onlineClassControllerImpl) UpdateOnlineClassCategory(c echo.Context) er
 	})
 }
 
-func NewOnlineClassController(memberService memberServ.MemberService, authService authServ.AuthService, notificationService notifServ.NotificationService, onlineClassService onlineClassServ.OnlineClassService) OnlineClassController {
+func NewOnlineClassController(memberService memberServ.MemberService, jwtService jwtServ.JWTService, notificationService notifServ.NotificationService, onlineClassService onlineClassServ.OnlineClassService) OnlineClassController {
 	return &onlineClassControllerImpl{
 		memberService:       memberService,
 		onlineClassService:  onlineClassService,
-		authService:         authService,
+		jwtService:          jwtService,
 		notificationService: notificationService,
 	}
 }

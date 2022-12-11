@@ -2,6 +2,7 @@ package route
 
 import (
 	"github.com/Group10CapstoneProject/Golang/config"
+	"github.com/Group10CapstoneProject/Golang/constans"
 	pkgAuthController "github.com/Group10CapstoneProject/Golang/internal/auth/controller"
 	pkgAuthRepostiory "github.com/Group10CapstoneProject/Golang/internal/auth/repository"
 	pkgAuthService "github.com/Group10CapstoneProject/Golang/internal/auth/service"
@@ -25,6 +26,7 @@ import (
 	pkgUserController "github.com/Group10CapstoneProject/Golang/internal/users/controller"
 	pkgUserRepostiory "github.com/Group10CapstoneProject/Golang/internal/users/repository"
 	pkgUserService "github.com/Group10CapstoneProject/Golang/internal/users/service"
+	customMiddleware "github.com/Group10CapstoneProject/Golang/middleware"
 	"github.com/Group10CapstoneProject/Golang/utils/imgkit"
 	jwtService "github.com/Group10CapstoneProject/Golang/utils/jwt"
 	"github.com/Group10CapstoneProject/Golang/utils/password"
@@ -44,6 +46,11 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 		},
 	))
 	customValidator.NewCustomValidator(e)
+	md := customMiddleware.NewCustomMiddleware(db, config.Env.JWT_SECRET_ACCESS)
+	allAccess := ""
+	roleSuperadmin := constans.Role_superadmin
+	roleAdmin := constans.Role_admin
+	roleUser := constans.Role_user
 
 	api := e.Group("/api")
 
@@ -75,129 +82,129 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	offlineClassService := pkgOfflineClassService.NewOfflineClassService(offlineClassRepository, notificationRepository, imagekitService)
 
 	// init controller
-	userController := pkgUserController.NewUserController(userService, authService)
+	userController := pkgUserController.NewUserController(userService, jwtService)
 	authController := pkgAuthController.NewAuthController(authService)
-	paymentMethodController := pkgPaymentMethodController.NewPaymentMethodController(paymentMethodService, authService)
-	memberController := pkgMemberController.NewMemberController(memberService, authService, noticationService)
-	fileController := pkgFileController.NewFileController(fileService, authService)
-	noticationController := pkgNotificationController.NewNotificationController(noticationService, authService)
-	onlineClassController := pkgOnlineClassController.NewOnlineClassController(memberService, authService, noticationService, onlineClassService)
-	offlineClassController := pkgOfflineClassController.NewOfflineClassController(offlineClassService, authService, memberService, noticationService)
+	paymentMethodController := pkgPaymentMethodController.NewPaymentMethodController(paymentMethodService, jwtService)
+	memberController := pkgMemberController.NewMemberController(memberService, noticationService, jwtService)
+	fileController := pkgFileController.NewFileController(fileService)
+	noticationController := pkgNotificationController.NewNotificationController(noticationService)
+	onlineClassController := pkgOnlineClassController.NewOnlineClassController(memberService, jwtService, noticationService, onlineClassService)
+	offlineClassController := pkgOfflineClassController.NewOfflineClassController(offlineClassService, jwtService, memberService, noticationService)
 
 	// int route
 	// auth
 	auth := v1.Group("/auth")
 	auth.POST("/login", authController.Login)
 	auth.POST("/refresh", authController.RefreshToken)
-	auth.POST("/logout", authController.Logout, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	auth.POST("/logout", authController.Logout, md.CustomJWTWithConfig(allAccess))
 	admin := auth.Group("/admin")
 	admin.POST("/login", authController.LoginAdmin)
 	admin.POST("/refresh", authController.RefreshAdminToken)
 
 	// users
 	users := v1.Group("/users")
-	users.GET("", userController.GetUsers, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	users.GET("", userController.GetUsers, md.CustomJWTWithConfig(roleAdmin))
 	users.POST("/signup", userController.Signup)
-	users.GET("/profile", userController.GetUser, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	users.GET("/profile", userController.GetUser, md.CustomJWTWithConfig(allAccess))
 	userAdmin := users.Group("/admin")
-	userAdmin.POST("", userController.NewAadmin, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	userAdmin.GET("", userController.GetAdmins, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	userAdmin.POST("", userController.NewAadmin, md.CustomJWTWithConfig(roleSuperadmin))
+	userAdmin.GET("", userController.GetAdmins, md.CustomJWTWithConfig(roleSuperadmin))
 
 	// payment methods
 	paymentMethods := v1.Group("/payment-methods")
-	paymentMethods.POST("", paymentMethodController.CreatePaymentMethod, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	paymentMethods.GET("", paymentMethodController.GetPaymentMethods, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	paymentMethods.POST("", paymentMethodController.CreatePaymentMethod, md.CustomJWTWithConfig(roleAdmin))
+	paymentMethods.GET("", paymentMethodController.GetPaymentMethods, md.CustomJWTWithConfig(allAccess))
 	paymentMethodDetails := paymentMethods.Group("/details")
-	paymentMethodDetails.GET("/:id", paymentMethodController.GetPaymentMethodDetail, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	paymentMethodDetails.PUT("/:id", paymentMethodController.UpdatePaymentMethod, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	paymentMethodDetails.DELETE("/:id", paymentMethodController.DeletePaymentMethod, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	paymentMethodDetails.GET("/:id", paymentMethodController.GetPaymentMethodDetail, md.CustomJWTWithConfig(allAccess))
+	paymentMethodDetails.PUT("/:id", paymentMethodController.UpdatePaymentMethod, md.CustomJWTWithConfig(roleAdmin))
+	paymentMethodDetails.DELETE("/:id", paymentMethodController.DeletePaymentMethod, md.CustomJWTWithConfig(roleAdmin))
 
 	// members
 	members := v1.Group("/members")
-	members.POST("", memberController.CreateMember, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	members.GET("", memberController.GetMembers, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	members.POST("/set-status/:id", memberController.SetStatusMember, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	members.POST("/pay/:id", memberController.MemberPayment, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	members.GET("/user", memberController.GetMemberUser, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	members.POST("", memberController.CreateMember, md.CustomJWTWithConfig(roleUser))
+	members.GET("", memberController.GetMembers, md.CustomJWTWithConfig(allAccess))
+	members.POST("/set-status/:id", memberController.SetStatusMember, md.CustomJWTWithConfig(roleAdmin))
+	members.POST("/pay/:id", memberController.MemberPayment, md.CustomJWTWithConfig(roleUser))
+	members.GET("/user", memberController.GetMemberUser, md.CustomJWTWithConfig(roleUser))
 	memberDetails := members.Group("/details")
-	memberDetails.GET("/:id", memberController.GetMemberDetail, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	memberDetails.PUT("/:id", memberController.UpdateMember, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	memberDetails.DELETE("/:id", memberController.DeleteMember, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	memberDetails.GET("/:id", memberController.GetMemberDetail, md.CustomJWTWithConfig(allAccess))
+	memberDetails.PUT("/:id", memberController.UpdateMember, md.CustomJWTWithConfig(roleAdmin))
+	memberDetails.DELETE("/:id", memberController.DeleteMember, md.CustomJWTWithConfig(roleAdmin))
 	// member types
 	memberTypes := members.Group("/types")
-	memberTypes.POST("", memberController.CreateMemberType, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	memberTypes.GET("", memberController.GetMemberTypes, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	memberTypes.POST("", memberController.CreateMemberType, md.CustomJWTWithConfig(roleAdmin))
+	memberTypes.GET("", memberController.GetMemberTypes, md.CustomJWTWithConfig(allAccess))
 	memberTypeDetails := memberTypes.Group("/details")
-	memberTypeDetails.GET("/:id", memberController.GetMemberTypeDetail, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	memberTypeDetails.PUT("/:id", memberController.UpdateMemberType, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	memberTypeDetails.DELETE("/:id", memberController.DeleteMemberType, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	memberTypeDetails.GET("/:id", memberController.GetMemberTypeDetail, md.CustomJWTWithConfig(allAccess))
+	memberTypeDetails.PUT("/:id", memberController.UpdateMemberType, md.CustomJWTWithConfig(roleAdmin))
+	memberTypeDetails.DELETE("/:id", memberController.DeleteMemberType, md.CustomJWTWithConfig(roleAdmin))
 
 	// files
 	files := v1.Group("/files")
-	files.POST("/upload", fileController.Upload, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	files.POST("/upload", fileController.Upload, md.CustomJWTWithConfig(roleAdmin))
 
 	// notifications
 	notifications := v1.Group("/notifications")
-	notifications.GET("", noticationController.GetNotifications, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	notifications.GET("", noticationController.GetNotifications, md.CustomJWTWithConfig(roleAdmin))
 
 	// online classes
 	onlineClasses := v1.Group("/online-classes")
-	onlineClasses.POST("", onlineClassController.CreateOnlineClass, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	onlineClasses.GET("", onlineClassController.GetOnlineClasses, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	onlineClasses.POST("", onlineClassController.CreateOnlineClass, md.CustomJWTWithConfig(roleAdmin))
+	onlineClasses.GET("", onlineClassController.GetOnlineClasses, md.CustomJWTWithConfig(allAccess))
 	onlineClassDetails := onlineClasses.Group("/details")
-	onlineClassDetails.GET("/:id", onlineClassController.GetOnlineClassDetail, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	onlineClassDetails.PUT("/:id", onlineClassController.UpdateOnlineClass, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	onlineClassDetails.DELETE("/:id", onlineClassController.DeleteOnlineClass, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	onlineClassDetails.GET("/:id", onlineClassController.GetOnlineClassDetail, md.CustomJWTWithConfig(allAccess))
+	onlineClassDetails.PUT("/:id", onlineClassController.UpdateOnlineClass, md.CustomJWTWithConfig(roleAdmin))
+	onlineClassDetails.DELETE("/:id", onlineClassController.DeleteOnlineClass, md.CustomJWTWithConfig(roleAdmin))
 	// online class booking
 	onlineClassBooking := onlineClasses.Group("/bookings")
-	onlineClassBooking.POST("", onlineClassController.CreateOnlineClassBooking, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	onlineClassBooking.GET("", onlineClassController.GetOnlineClassBookings, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	onlineClassBooking.GET("/user", onlineClassController.GetOnlineClassBookingUser, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	onlineClassBooking.POST("/set-status/:id", onlineClassController.SetStatusOnlineClassBooking, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	onlineClassBooking.POST("/pay/:id", onlineClassController.OnlineClassBookingPayment, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	onlineClassBooking.POST("", onlineClassController.CreateOnlineClassBooking, md.CustomJWTWithConfig(roleUser))
+	onlineClassBooking.GET("", onlineClassController.GetOnlineClassBookings, md.CustomJWTWithConfig(allAccess))
+	onlineClassBooking.GET("/user", onlineClassController.GetOnlineClassBookingUser, md.CustomJWTWithConfig(roleUser))
+	onlineClassBooking.POST("/set-status/:id", onlineClassController.SetStatusOnlineClassBooking, md.CustomJWTWithConfig(roleAdmin))
+	onlineClassBooking.POST("/pay/:id", onlineClassController.OnlineClassBookingPayment, md.CustomJWTWithConfig(roleUser))
 	onlineClassBookingDetails := onlineClassBooking.Group("/details")
-	onlineClassBookingDetails.GET("/:id", onlineClassController.GetOnlineClassBookingDetail, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	onlineClassBookingDetails.PUT("/:id", onlineClassController.UpdateOnlineClassBooking, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	onlineClassBookingDetails.DELETE("/:id", onlineClassController.DeleteOnlineClassBooking, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	onlineClassBookingDetails.GET("/:id", onlineClassController.GetOnlineClassBookingDetail, md.CustomJWTWithConfig(roleUser))
+	onlineClassBookingDetails.PUT("/:id", onlineClassController.UpdateOnlineClassBooking, md.CustomJWTWithConfig(roleAdmin))
+	onlineClassBookingDetails.DELETE("/:id", onlineClassController.DeleteOnlineClassBooking, md.CustomJWTWithConfig(roleAdmin))
 	// online class category
 	onlineClassCategory := onlineClasses.Group("/categories")
-	onlineClassCategory.POST("", onlineClassController.CreateOnlineClassCategory, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	onlineClassCategory.GET("", onlineClassController.GetOnlineClassCategories, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	onlineClassCategory.POST("", onlineClassController.CreateOnlineClassCategory, md.CustomJWTWithConfig(roleAdmin))
+	onlineClassCategory.GET("", onlineClassController.GetOnlineClassCategories, md.CustomJWTWithConfig(roleUser))
 	onlineClassCategoryDetails := onlineClassCategory.Group("/details")
-	onlineClassCategoryDetails.GET("/:id", onlineClassController.GetOnlineClassCategoryDetail, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	onlineClassCategoryDetails.PUT("/:id", onlineClassController.UpdateOnlineClassCategory, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	onlineClassCategoryDetails.DELETE("/:id", onlineClassController.DeleteOnlineClassCategory, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	onlineClassCategoryDetails.GET("/:id", onlineClassController.GetOnlineClassCategoryDetail, md.CustomJWTWithConfig(allAccess))
+	onlineClassCategoryDetails.PUT("/:id", onlineClassController.UpdateOnlineClassCategory, md.CustomJWTWithConfig(roleAdmin))
+	onlineClassCategoryDetails.DELETE("/:id", onlineClassController.DeleteOnlineClassCategory, md.CustomJWTWithConfig(roleAdmin))
 
 	// offline classes
 	offlineClasses := v1.Group("/offline-classes")
-	offlineClasses.POST("", offlineClassController.CreateOfflineClass, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	offlineClasses.GET("", offlineClassController.GetOfflineClasses, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	offlineClasses.POST("", offlineClassController.CreateOfflineClass, md.CustomJWTWithConfig(roleAdmin))
+	offlineClasses.GET("", offlineClassController.GetOfflineClasses, md.CustomJWTWithConfig(allAccess))
 	offlineClassDetails := offlineClasses.Group("/details")
-	offlineClassDetails.GET("/:id", offlineClassController.GetOfflineClassDetail, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	offlineClassDetails.PUT("/:id", offlineClassController.UpdateOfflineClass, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	offlineClassDetails.DELETE("/:id", offlineClassController.DeleteOfflineClass, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	offlineClassDetails.GET("/:id", offlineClassController.GetOfflineClassDetail, md.CustomJWTWithConfig(allAccess))
+	offlineClassDetails.PUT("/:id", offlineClassController.UpdateOfflineClass, md.CustomJWTWithConfig(roleAdmin))
+	offlineClassDetails.DELETE("/:id", offlineClassController.DeleteOfflineClass, md.CustomJWTWithConfig(roleAdmin))
 	// offline class booking
 	offlineClassBooking := offlineClasses.Group("/bookings")
-	offlineClassBooking.POST("", offlineClassController.CreateOfflineClassBooking, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	offlineClassBooking.GET("", offlineClassController.GetOfflineClassBookings, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	offlineClassBooking.GET("/user", offlineClassController.GetOfflineClassBookingUser, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	offlineClassBooking.POST("/set-status/:id", offlineClassController.SetStatusOfflineClassBooking, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	offlineClassBooking.POST("/pay/:id", offlineClassController.OfflineClassBookingPayment, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	offlineClassBooking.POST("", offlineClassController.CreateOfflineClassBooking, md.CustomJWTWithConfig(roleUser))
+	offlineClassBooking.GET("", offlineClassController.GetOfflineClassBookings, md.CustomJWTWithConfig(allAccess))
+	offlineClassBooking.GET("/user", offlineClassController.GetOfflineClassBookingUser, md.CustomJWTWithConfig(roleUser))
+	offlineClassBooking.POST("/set-status/:id", offlineClassController.SetStatusOfflineClassBooking, md.CustomJWTWithConfig(roleAdmin))
+	offlineClassBooking.POST("/pay/:id", offlineClassController.OfflineClassBookingPayment, md.CustomJWTWithConfig(roleUser))
 	offlineClassBookingTake := offlineClassBooking.Group("/take")
-	offlineClassBookingTake.GET("", offlineClassController.CheckOfflineClassBooking, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	offlineClassBookingTake.POST("", offlineClassController.TakeOfflineClassBooking, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	offlineClassBookingTake.GET("", offlineClassController.CheckOfflineClassBooking, md.CustomJWTWithConfig(roleAdmin))
+	offlineClassBookingTake.POST("", offlineClassController.TakeOfflineClassBooking, md.CustomJWTWithConfig(roleAdmin))
 	offlineClassBookingDetails := offlineClassBooking.Group("/details")
-	offlineClassBookingDetails.GET("/:id", offlineClassController.GetOfflineClassBookingDetail, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	offlineClassBookingDetails.PUT("/:id", offlineClassController.UpdateOfflineClassBooking, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	offlineClassBookingDetails.DELETE("/:id", offlineClassController.DeleteOfflineClassBooking, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	offlineClassBookingDetails.GET("/:id", offlineClassController.GetOfflineClassBookingDetail, md.CustomJWTWithConfig(allAccess))
+	offlineClassBookingDetails.PUT("/:id", offlineClassController.UpdateOfflineClassBooking, md.CustomJWTWithConfig(roleAdmin))
+	offlineClassBookingDetails.DELETE("/:id", offlineClassController.DeleteOfflineClassBooking, md.CustomJWTWithConfig(roleAdmin))
 	// offline class category
 	offlineClassCategory := offlineClasses.Group("/categories")
-	offlineClassCategory.POST("", offlineClassController.CreateOfflineClassCategory, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	offlineClassCategory.GET("", offlineClassController.GetOfflineClassCategories, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	offlineClassCategory.POST("", offlineClassController.CreateOfflineClassCategory, md.CustomJWTWithConfig(roleAdmin))
+	offlineClassCategory.GET("", offlineClassController.GetOfflineClassCategories, md.CustomJWTWithConfig(allAccess))
 	offlineClassCategoryDetails := offlineClassCategory.Group("/details")
-	offlineClassCategoryDetails.GET("/:id", offlineClassController.GetOfflineClassCategoryDetail, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	offlineClassCategoryDetails.PUT("/:id", offlineClassController.UpdateOfflineClassCategory, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
-	offlineClassCategoryDetails.DELETE("/:id", offlineClassController.DeleteOfflineClassCategory, middleware.JWT([]byte(config.Env.JWT_SECRET_ACCESS)))
+	offlineClassCategoryDetails.GET("/:id", offlineClassController.GetOfflineClassCategoryDetail, md.CustomJWTWithConfig(allAccess))
+	offlineClassCategoryDetails.PUT("/:id", offlineClassController.UpdateOfflineClassCategory, md.CustomJWTWithConfig(roleAdmin))
+	offlineClassCategoryDetails.DELETE("/:id", offlineClassController.DeleteOfflineClassCategory, md.CustomJWTWithConfig(roleAdmin))
 
 	// create default user (superadmin)
 	if err := userService.CreateSuperadmin(); err != nil {
