@@ -8,6 +8,8 @@ import (
 	pkgAuthService "github.com/Group10CapstoneProject/Golang/internal/auth/service"
 	pkgFileController "github.com/Group10CapstoneProject/Golang/internal/file/controller"
 	pkgFileService "github.com/Group10CapstoneProject/Golang/internal/file/service"
+	pkgHistoryController "github.com/Group10CapstoneProject/Golang/internal/history/controller"
+	pkgHistoryService "github.com/Group10CapstoneProject/Golang/internal/history/service"
 	pkgMemberController "github.com/Group10CapstoneProject/Golang/internal/members/controller"
 	pkgMemberRepostiory "github.com/Group10CapstoneProject/Golang/internal/members/repository"
 	pkgMemberService "github.com/Group10CapstoneProject/Golang/internal/members/service"
@@ -80,6 +82,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	fileService := pkgFileService.NewFileService(imagekitService)
 	onlineClassService := pkgOnlineClassService.NewOnlineClassService(onlineClassRepository, notificationRepository, imagekitService)
 	offlineClassService := pkgOfflineClassService.NewOfflineClassService(offlineClassRepository, notificationRepository, imagekitService)
+	historyService := pkgHistoryService.NewHistoryService(memberRepository, onlineClassRepository, offlineClassRepository)
 
 	// init controller
 	userController := pkgUserController.NewUserController(userService, jwtService)
@@ -90,6 +93,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	noticationController := pkgNotificationController.NewNotificationController(noticationService)
 	onlineClassController := pkgOnlineClassController.NewOnlineClassController(memberService, jwtService, noticationService, onlineClassService)
 	offlineClassController := pkgOfflineClassController.NewOfflineClassController(offlineClassService, jwtService, memberService, noticationService)
+	historyController := pkgHistoryController.NewHistoryController(historyService, jwtService)
 
 	// int route
 	// auth
@@ -205,6 +209,11 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	offlineClassCategoryDetails.GET("/:id", offlineClassController.GetOfflineClassCategoryDetail, md.CustomJWTWithConfig(allAccess))
 	offlineClassCategoryDetails.PUT("/:id", offlineClassController.UpdateOfflineClassCategory, md.CustomJWTWithConfig(roleAdmin))
 	offlineClassCategoryDetails.DELETE("/:id", offlineClassController.DeleteOfflineClassCategory, md.CustomJWTWithConfig(roleAdmin))
+
+	// history
+	history := v1.Group("/histories")
+	history.GET("/activities", historyController.FindHistoryActivity, md.CustomJWTWithConfig(roleUser))
+	history.GET("/orders", historyController.FindHistoryOrder, md.CustomJWTWithConfig(roleUser))
 
 	// create default user (superadmin)
 	if err := userService.CreateSuperadmin(); err != nil {

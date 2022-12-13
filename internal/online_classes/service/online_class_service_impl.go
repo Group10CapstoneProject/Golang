@@ -31,13 +31,16 @@ func (s *onlineClassServiceImpl) CreateOnlineClass(request *dto.OnlineClassStore
 }
 
 // CreateOnlineClassBooking implements OnlineClassService
-func (s *onlineClassServiceImpl) CreateOnlineClassBooking(request *dto.OnlineClassBookingStoreRequest, ctx context.Context) error {
+func (s *onlineClassServiceImpl) CreateOnlineClassBooking(request *dto.OnlineClassBookingStoreRequest, ctx context.Context) (uint, error) {
 	onlineClassBooking := request.ToModel()
 	onlineClassBooking.ExpiredAt = time.Now().Add(24 * time.Hour)
 	onlineClassBooking.ActivedAt = time.Date(0001, 1, 1, 0, 0, 0, 0, time.UTC)
 	onlineClassBooking.Status = model.WAITING
-	err := s.onlineClassRepository.CreateOnlineClassBooking(onlineClassBooking, ctx)
-	return err
+	result, err := s.onlineClassRepository.CreateOnlineClassBooking(onlineClassBooking, ctx)
+	if err != nil {
+		return 0, err
+	}
+	return result.ID, nil
 }
 
 // CreateOnlineClassCategory implements OnlineClassService

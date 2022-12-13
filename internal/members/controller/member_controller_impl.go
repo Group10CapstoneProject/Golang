@@ -33,11 +33,17 @@ func (d *memberControllerImpl) CreateMember(c echo.Context) error {
 	}
 	claims := d.jwtService.GetClaims(&c)
 	member.UserID = uint(claims["user_id"].(float64))
-	if err := d.memberService.CreateMember(&member, c.Request().Context()); err != nil {
+	id, err := d.memberService.CreateMember(&member, c.Request().Context())
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	result, err := d.memberService.FindMemberById(id, c.Request().Context())
+	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
 		"message": "new member success created",
+		"data":    result,
 	})
 }
 
