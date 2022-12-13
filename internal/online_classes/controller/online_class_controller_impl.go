@@ -51,17 +51,11 @@ func (d *onlineClassControllerImpl) CreateOnlineClassBooking(c echo.Context) err
 	}
 	claims := d.jwtService.GetClaims(&c)
 	onlineClassBooking.UserID = uint(claims["user_id"].(float64))
-	id, err := d.onlineClassService.CreateOnlineClassBooking(&onlineClassBooking, c.Request().Context())
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
-	result, err := d.onlineClassService.FindOnlineClassBookingById(id, c.Request().Context())
-	if err != nil {
+	if err := d.onlineClassService.CreateOnlineClassBooking(&onlineClassBooking, c.Request().Context()); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
 		"message": "new online class booking success created",
-		"data":    result,
 	})
 }
 

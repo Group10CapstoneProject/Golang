@@ -17,7 +17,7 @@ type Member struct {
 	MemberTypeID    uint
 	MemberType      MemberType
 	ExpiredAt       time.Time
-	ActivedAt       time.Time `gorm:"default:null"`
+	ActivedAt       time.Time
 	Duration        uint
 	Status          StatusType `gorm:"type:enum('PENDING', 'WAITING', 'ACTIVE', 'INACTIVE', 'REJECT', 'DONE', 'CENCEL');column:status"`
 	ProofPayment    string

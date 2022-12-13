@@ -34,20 +34,20 @@ func (s *offlineClassServiceImpl) CreateOfflineClass(request *dto.OfflineClassSt
 }
 
 // CreateOfflineClassBooking implements OfflineClassService
-func (s *offlineClassServiceImpl) CreateOfflineClassBooking(request *dto.OfflineClassBookingStoreRequest, ctx context.Context) (uint, error) {
+func (s *offlineClassServiceImpl) CreateOfflineClassBooking(request *dto.OfflineClassBookingStoreRequest, ctx context.Context) error {
 	offlineClassBooking := request.ToModel()
 	offlineClassBooking.ExpiredAt = time.Now().Add(24 * time.Hour)
 	offlineClassBooking.ActivedAt = time.Date(0001, 1, 1, 0, 0, 0, 0, time.UTC)
 	offlineClassBooking.Status = model.WAITING
-	result, err := s.offlineClassRepository.CreateOfflineClassBooking(offlineClassBooking, ctx)
+	err := s.offlineClassRepository.CreateOfflineClassBooking(offlineClassBooking, ctx)
 	if err != nil {
-		return 0, err
+		return err
 	}
 	err = s.offlineClassRepository.OperationOfflineClassSlot(&model.OfflineClass{ID: offlineClassBooking.OfflineClassID}, "increment", ctx)
 	if err != nil {
-		return 0, err
+		return err
 	}
-	return result.ID, nil
+	return nil
 }
 
 // CreateOfflineClassCategory implements OfflineClassService

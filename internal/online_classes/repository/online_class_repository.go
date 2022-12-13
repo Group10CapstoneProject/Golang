@@ -8,7 +8,7 @@ import (
 
 type OnlineClassRepository interface {
 	// online class booking
-	CreateOnlineClassBooking(body *model.OnlineClassBooking, ctx context.Context) (*model.OnlineClassBooking, error)
+	CreateOnlineClassBooking(body *model.OnlineClassBooking, ctx context.Context) error
 	FindOnlineClassBookings(page *model.Pagination, ctx context.Context) ([]model.OnlineClassBooking, int, error)
 	FindOnlineClassBookingById(id uint, ctx context.Context) (*model.OnlineClassBooking, error)
 	FindOnlineClassBookingByUser(userId uint, ctx context.Context) ([]model.OnlineClassBooking, error)

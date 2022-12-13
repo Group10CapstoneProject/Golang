@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/Group10CapstoneProject/Golang/model"
@@ -15,13 +14,9 @@ type memberRepositoryImpl struct {
 }
 
 // CreateMember implements MemberRepository
-func (r *memberRepositoryImpl) CreateMember(body *model.Member, ctx context.Context) (*model.Member, error) {
+func (r *memberRepositoryImpl) CreateMember(body *model.Member, ctx context.Context) error {
 	err := r.db.WithContext(ctx).Create(body).Error
-	if err != nil {
-		return nil, err
-	}
-	fmt.Println(body.ID)
-	return body, nil
+	return err
 }
 
 // CreateMemberType implements MemberRepository
@@ -174,21 +169,6 @@ func (r *memberRepositoryImpl) UpdateMemberType(body *model.MemberType, ctx cont
 		return myerrors.ErrRecordNotFound
 	}
 	return nil
-}
-
-// ReadMembers implements MemberRepository
-func (r *memberRepositoryImpl) ReadMembers(body *model.Member, ctx context.Context) ([]model.Member, error) {
-	members := []model.Member{}
-	err := r.db.WithContext(ctx).
-		Model(&model.Member{}).
-		Preload("MemberType").
-		Preload("User").
-		Find(&members, body).
-		Order("updated_at DESC").Error
-	if err != nil {
-		return nil, err
-	}
-	return members, nil
 }
 
 func NewMemberRepository(database *gorm.DB) MemberRepository {
