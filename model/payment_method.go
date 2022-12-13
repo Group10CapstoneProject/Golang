@@ -15,6 +15,7 @@ type PaymentMethod struct {
 	Name          string         `gorm:"type:varchar(255);uniqueIndex"`
 	PaymentNumber string         `gorm:"type:varchar(255)"`
 	Description   string
+	Picture       string
 }
 
 type PaymentRequest struct {

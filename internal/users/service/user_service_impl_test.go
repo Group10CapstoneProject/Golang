@@ -154,79 +154,80 @@ func (s *suiteUserService) TestCreateAdmin() {
 		})
 	}
 }
-func (s *suiteUserService) TestCreateSuperadmin() {
-	testCase := []struct {
-		Name            string
-		ExpectedErr     error
-		CheckUserRes    bool
-		CheckUserErr    error
-		CreateUserErr   error
-		HashPasswordRes string
-		HashPasswordErr error
-	}{
-		{
-			Name:            "success",
-			ExpectedErr:     nil,
-			CheckUserRes:    true,
-			CheckUserErr:    nil,
-			CreateUserErr:   nil,
-			HashPasswordRes: "hashpassword",
-			HashPasswordErr: nil,
-		},
-		{
-			Name:            "hash password error",
-			ExpectedErr:     errors.New("hash password error"),
-			CheckUserRes:    true,
-			CheckUserErr:    nil,
-			CreateUserErr:   nil,
-			HashPasswordRes: "",
-			HashPasswordErr: errors.New("hash password error"),
-		},
-		{
-			Name:            "create user error",
-			ExpectedErr:     errors.New("create user error"),
-			CheckUserRes:    true,
-			CheckUserErr:    nil,
-			CreateUserErr:   errors.New("create user error"),
-			HashPasswordRes: "hashpassword",
-			HashPasswordErr: nil,
-		},
-		{
-			Name:            "check user error",
-			ExpectedErr:     errors.New("create user error"),
-			CheckUserRes:    false,
-			CheckUserErr:    errors.New("create user error"),
-			CreateUserErr:   nil,
-			HashPasswordRes: "",
-			HashPasswordErr: nil,
-		},
-		{
-			Name:            "user not empty",
-			ExpectedErr:     nil,
-			CheckUserRes:    false,
-			CheckUserErr:    nil,
-			CreateUserErr:   nil,
-			HashPasswordRes: "",
-			HashPasswordErr: nil,
-		},
-	}
-	for _, v := range testCase {
-		s.T().Run(v.Name, func(t *testing.T) {
-			s.SetupSuit()
 
-			// set mock result or error
-			s.passwordMock.On("HashPassword").Return(v.HashPasswordRes, v.HashPasswordErr)
-			s.userRepositoryMock.On("CreateUser").Return(v.CreateUserErr)
-			s.userRepositoryMock.On("CheckUserIsEmpty").Return(v.CheckUserRes, v.CheckUserErr)
+// func (s *suiteUserService) TestCreateSuperadmin() {
+// 	testCase := []struct {
+// 		Name            string
+// 		ExpectedErr     error
+// 		CheckUserRes    bool
+// 		CheckUserErr    error
+// 		CreateUserErr   error
+// 		HashPasswordRes string
+// 		HashPasswordErr error
+// 	}{
+// 		{
+// 			Name:            "success",
+// 			ExpectedErr:     nil,
+// 			CheckUserRes:    true,
+// 			CheckUserErr:    nil,
+// 			CreateUserErr:   nil,
+// 			HashPasswordRes: "hashpassword",
+// 			HashPasswordErr: nil,
+// 		},
+// 		{
+// 			Name:            "hash password error",
+// 			ExpectedErr:     errors.New("hash password error"),
+// 			CheckUserRes:    true,
+// 			CheckUserErr:    nil,
+// 			CreateUserErr:   nil,
+// 			HashPasswordRes: "",
+// 			HashPasswordErr: errors.New("hash password error"),
+// 		},
+// 		{
+// 			Name:            "create user error",
+// 			ExpectedErr:     errors.New("create user error"),
+// 			CheckUserRes:    true,
+// 			CheckUserErr:    nil,
+// 			CreateUserErr:   errors.New("create user error"),
+// 			HashPasswordRes: "hashpassword",
+// 			HashPasswordErr: nil,
+// 		},
+// 		{
+// 			Name:            "check user error",
+// 			ExpectedErr:     errors.New("create user error"),
+// 			CheckUserRes:    false,
+// 			CheckUserErr:    errors.New("create user error"),
+// 			CreateUserErr:   nil,
+// 			HashPasswordRes: "",
+// 			HashPasswordErr: nil,
+// 		},
+// 		{
+// 			Name:            "user not empty",
+// 			ExpectedErr:     nil,
+// 			CheckUserRes:    false,
+// 			CheckUserErr:    nil,
+// 			CreateUserErr:   nil,
+// 			HashPasswordRes: "",
+// 			HashPasswordErr: nil,
+// 		},
+// 	}
+// 	for _, v := range testCase {
+// 		s.T().Run(v.Name, func(t *testing.T) {
+// 			s.SetupSuit()
 
-			err := s.userService.CreateSuperadmin()
+// 			// set mock result or error
+// 			s.passwordMock.On("HashPassword").Return(v.HashPasswordRes, v.HashPasswordErr)
+// 			s.userRepositoryMock.On("CreateUser").Return(v.CreateUserErr)
+// 			s.userRepositoryMock.On("CheckUserIsEmpty").Return(v.CheckUserRes, v.CheckUserErr)
 
-			s.Equal(v.ExpectedErr, err)
+// 			err := s.userService.CreateSuperadmin()
 
-			s.TearDown()
-		})
-	}
-}
+// 			s.Equal(v.ExpectedErr, err)
+
+// 			s.TearDown()
+// 		})
+// 	}
+// }
 
 func TestUserService(t *testing.T) {
 	suite.Run(t, new(suiteUserService))

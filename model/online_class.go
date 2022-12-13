@@ -21,6 +21,8 @@ type OnlineClass struct {
 	Tools                 string `gorm:"type:varchar(255)"`
 	TargetArea            string `gorm:"type:varchar(255)"`
 	Duration              uint
+	TrainerID             uint
+	Trainer               Trainer
 	Level                 string `gorm:"type:varchar(255)"`
 	Picture               string
 }

@@ -20,13 +20,14 @@ import (
 	pkgOnlineClassController "github.com/Group10CapstoneProject/Golang/internal/online_classes/controller"
 	pkgOnlineClassRepostiory "github.com/Group10CapstoneProject/Golang/internal/online_classes/repository"
 	pkgOnlineClassService "github.com/Group10CapstoneProject/Golang/internal/online_classes/service"
-	pkgPaymentMethodController "github.com/Group10CapstoneProject/Golang/internal/paymentMethods/controller"
-	pkgPaymentMethodRepostiory "github.com/Group10CapstoneProject/Golang/internal/paymentMethods/repository"
-	pkgPaymentMethodService "github.com/Group10CapstoneProject/Golang/internal/paymentMethods/service"
+	pkgPaymentMethodController "github.com/Group10CapstoneProject/Golang/internal/payment_methods/controller"
+	pkgPaymentMethodRepostiory "github.com/Group10CapstoneProject/Golang/internal/payment_methods/repository"
+	pkgPaymentMethodService "github.com/Group10CapstoneProject/Golang/internal/payment_methods/service"
 	pkgUserController "github.com/Group10CapstoneProject/Golang/internal/users/controller"
 	pkgUserRepostiory "github.com/Group10CapstoneProject/Golang/internal/users/repository"
 	pkgUserService "github.com/Group10CapstoneProject/Golang/internal/users/service"
 	customMiddleware "github.com/Group10CapstoneProject/Golang/middleware"
+	"github.com/Group10CapstoneProject/Golang/model"
 	"github.com/Group10CapstoneProject/Golang/utils/imgkit"
 	jwtService "github.com/Group10CapstoneProject/Golang/utils/jwt"
 	"github.com/Group10CapstoneProject/Golang/utils/password"
@@ -122,7 +123,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	// members
 	members := v1.Group("/members")
 	members.POST("", memberController.CreateMember, md.CustomJWTWithConfig(roleUser))
-	members.GET("", memberController.GetMembers, md.CustomJWTWithConfig(allAccess))
+	members.GET("", memberController.GetMembers, md.CustomJWTWithConfig(roleAdmin))
 	members.POST("/set-status/:id", memberController.SetStatusMember, md.CustomJWTWithConfig(roleAdmin))
 	members.POST("/pay/:id", memberController.MemberPayment, md.CustomJWTWithConfig(roleUser))
 	members.GET("/user", memberController.GetMemberUser, md.CustomJWTWithConfig(roleUser))
@@ -158,7 +159,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	// online class booking
 	onlineClassBooking := onlineClasses.Group("/bookings")
 	onlineClassBooking.POST("", onlineClassController.CreateOnlineClassBooking, md.CustomJWTWithConfig(roleUser))
-	onlineClassBooking.GET("", onlineClassController.GetOnlineClassBookings, md.CustomJWTWithConfig(allAccess))
+	onlineClassBooking.GET("", onlineClassController.GetOnlineClassBookings, md.CustomJWTWithConfig(roleAdmin))
 	onlineClassBooking.GET("/user", onlineClassController.GetOnlineClassBookingUser, md.CustomJWTWithConfig(roleUser))
 	onlineClassBooking.POST("/set-status/:id", onlineClassController.SetStatusOnlineClassBooking, md.CustomJWTWithConfig(roleAdmin))
 	onlineClassBooking.POST("/pay/:id", onlineClassController.OnlineClassBookingPayment, md.CustomJWTWithConfig(roleUser))
@@ -186,7 +187,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	// offline class booking
 	offlineClassBooking := offlineClasses.Group("/bookings")
 	offlineClassBooking.POST("", offlineClassController.CreateOfflineClassBooking, md.CustomJWTWithConfig(roleUser))
-	offlineClassBooking.GET("", offlineClassController.GetOfflineClassBookings, md.CustomJWTWithConfig(allAccess))
+	offlineClassBooking.GET("", offlineClassController.GetOfflineClassBookings, md.CustomJWTWithConfig(roleAdmin))
 	offlineClassBooking.GET("/user", offlineClassController.GetOfflineClassBookingUser, md.CustomJWTWithConfig(roleUser))
 	offlineClassBooking.POST("/set-status/:id", offlineClassController.SetStatusOfflineClassBooking, md.CustomJWTWithConfig(roleAdmin))
 	offlineClassBooking.POST("/pay/:id", offlineClassController.OfflineClassBookingPayment, md.CustomJWTWithConfig(roleUser))
@@ -207,7 +208,11 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	offlineClassCategoryDetails.DELETE("/:id", offlineClassController.DeleteOfflineClassCategory, md.CustomJWTWithConfig(roleAdmin))
 
 	// create default user (superadmin)
-	if err := userService.CreateSuperadmin(); err != nil {
+	if err := userService.CreateSuperadmin(&model.User{
+		Email:    config.Env.SUPERADMIN_EMAIL,
+		Password: config.Env.SUPERADMIN_PASSWORD,
+		Name:     config.Env.SUPERADMIN_NAME,
+	}); err != nil {
 		panic(err)
 	}
 }

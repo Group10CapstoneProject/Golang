@@ -17,4 +17,5 @@ var (
 	ErrFailedUpload         = errors.New("upload file failed")
 	ErrAlredyPaid           = errors.New("alredy paid")
 	ErrAlredyTake           = errors.New("booking alredy take")
+	ErrRecordIsUsed         = errors.New("record is used by other tables")
 )

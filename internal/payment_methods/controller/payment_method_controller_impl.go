@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Group10CapstoneProject/Golang/internal/paymentMethods/dto"
-	paymentMethodServ "github.com/Group10CapstoneProject/Golang/internal/paymentMethods/service"
+	"github.com/Group10CapstoneProject/Golang/internal/payment_methods/dto"
+	paymentMethodServ "github.com/Group10CapstoneProject/Golang/internal/payment_methods/service"
 	jwtServ "github.com/Group10CapstoneProject/Golang/utils/jwt"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"github.com/labstack/echo/v4"

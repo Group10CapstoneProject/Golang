@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/Group10CapstoneProject/Golang/internal/paymentMethods/dto"
+	"github.com/Group10CapstoneProject/Golang/internal/payment_methods/dto"
 )
 
 type PaymentMethodService interface {

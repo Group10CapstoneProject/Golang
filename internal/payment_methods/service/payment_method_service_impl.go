@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	"github.com/Group10CapstoneProject/Golang/internal/paymentMethods/dto"
-	paymentMethodRepo "github.com/Group10CapstoneProject/Golang/internal/paymentMethods/repository"
+	"github.com/Group10CapstoneProject/Golang/internal/payment_methods/dto"
+	paymentMethodRepo "github.com/Group10CapstoneProject/Golang/internal/payment_methods/repository"
 	"github.com/Group10CapstoneProject/Golang/model"
 )
 
