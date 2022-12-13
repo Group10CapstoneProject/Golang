@@ -24,6 +24,7 @@ func (s *historyServiceImpl) FindHistoryActivity(request *dto.HistoryActivityReq
 	var historyActivity []dto.HistoryResource
 	if request.Type == "member" || request.Type == "" {
 		cond := &model.Member{
+			UserID: request.UserID,
 			Status: request.Status,
 		}
 		members, err := s.memberRepository.ReadMembers(cond, ctx)
@@ -37,6 +38,7 @@ func (s *historyServiceImpl) FindHistoryActivity(request *dto.HistoryActivityReq
 		}
 		if request.Status == "WAITING" {
 			cond := &model.Member{
+				UserID: request.UserID,
 				Status: model.PENDING,
 			}
 			members, err := s.memberRepository.ReadMembers(cond, ctx)
@@ -52,6 +54,7 @@ func (s *historyServiceImpl) FindHistoryActivity(request *dto.HistoryActivityReq
 	}
 	if request.Type == "online_class" || request.Type == "" {
 		cond := &model.OnlineClassBooking{
+			UserID: request.UserID,
 			Status: request.Status,
 		}
 		onlineClasses, err := s.onlineClassRepository.ReadOnlineClassBooking(cond, ctx)
@@ -65,6 +68,7 @@ func (s *historyServiceImpl) FindHistoryActivity(request *dto.HistoryActivityReq
 		}
 		if request.Status == "WAITING" {
 			cond := &model.OnlineClassBooking{
+				UserID: request.UserID,
 				Status: model.PENDING,
 			}
 			onlineClasses, err := s.onlineClassRepository.ReadOnlineClassBooking(cond, ctx)
@@ -80,6 +84,7 @@ func (s *historyServiceImpl) FindHistoryActivity(request *dto.HistoryActivityReq
 	}
 	if request.Type == "offline_class" || request.Type == "" {
 		cond := &model.OfflineClassBooking{
+			UserID: request.UserID,
 			Status: request.Status,
 		}
 		offlineClasses, err := s.offlineClassRepository.ReadOfflineClassBookings(cond, ctx)
@@ -93,6 +98,7 @@ func (s *historyServiceImpl) FindHistoryActivity(request *dto.HistoryActivityReq
 		}
 		if request.Status == "WAITING" {
 			cond := &model.OfflineClassBooking{
+				UserID: request.UserID,
 				Status: model.PENDING,
 			}
 			offlineClasses, err := s.offlineClassRepository.ReadOfflineClassBookings(cond, ctx)
@@ -127,6 +133,7 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 	var historyActivity []dto.HistoryResource
 	if request.Type == "member" || request.Type == "" {
 		cond := &model.Member{
+			UserID: request.UserID,
 			Status: model.DONE,
 		}
 		members, err := s.memberRepository.ReadMembers(cond, ctx)
@@ -139,6 +146,7 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 			historyActivity = append(historyActivity, resource)
 		}
 		cond = &model.Member{
+			UserID: request.UserID,
 			Status: model.CENCEL,
 		}
 		members, err = s.memberRepository.ReadMembers(cond, ctx)
@@ -151,6 +159,7 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 			historyActivity = append(historyActivity, resource)
 		}
 		cond = &model.Member{
+			UserID: request.UserID,
 			Status: model.REJECT,
 		}
 		members, err = s.memberRepository.ReadMembers(cond, ctx)
@@ -163,6 +172,7 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 			historyActivity = append(historyActivity, resource)
 		}
 		cond = &model.Member{
+			UserID: request.UserID,
 			Status: model.INACTIVE,
 		}
 		members, err = s.memberRepository.ReadMembers(cond, ctx)
@@ -177,6 +187,7 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 	}
 	if request.Type == "online_class" || request.Type == "" {
 		cond := &model.OnlineClassBooking{
+			UserID: request.UserID,
 			Status: model.DONE,
 		}
 		onlineClasses, err := s.onlineClassRepository.ReadOnlineClassBooking(cond, ctx)
@@ -189,6 +200,7 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 			historyActivity = append(historyActivity, resource)
 		}
 		cond = &model.OnlineClassBooking{
+			UserID: request.UserID,
 			Status: model.REJECT,
 		}
 		onlineClasses, err = s.onlineClassRepository.ReadOnlineClassBooking(cond, ctx)
@@ -201,6 +213,7 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 			historyActivity = append(historyActivity, resource)
 		}
 		cond = &model.OnlineClassBooking{
+			UserID: request.UserID,
 			Status: model.CENCEL,
 		}
 		onlineClasses, err = s.onlineClassRepository.ReadOnlineClassBooking(cond, ctx)
@@ -213,6 +226,7 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 			historyActivity = append(historyActivity, resource)
 		}
 		cond = &model.OnlineClassBooking{
+			UserID: request.UserID,
 			Status: model.INACTIVE,
 		}
 		onlineClasses, err = s.onlineClassRepository.ReadOnlineClassBooking(cond, ctx)
@@ -227,6 +241,7 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 	}
 	if request.Type == "offline_class" || request.Type == "" {
 		cond := &model.OfflineClassBooking{
+			UserID: request.UserID,
 			Status: model.DONE,
 		}
 		offlineClasses, err := s.offlineClassRepository.ReadOfflineClassBookings(cond, ctx)
@@ -239,6 +254,7 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 			historyActivity = append(historyActivity, resource)
 		}
 		cond = &model.OfflineClassBooking{
+			UserID: request.UserID,
 			Status: model.CENCEL,
 		}
 		offlineClasses, err = s.offlineClassRepository.ReadOfflineClassBookings(cond, ctx)
@@ -251,6 +267,7 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 			historyActivity = append(historyActivity, resource)
 		}
 		cond = &model.OfflineClassBooking{
+			UserID: request.UserID,
 			Status: model.REJECT,
 		}
 		offlineClasses, err = s.offlineClassRepository.ReadOfflineClassBookings(cond, ctx)
@@ -263,6 +280,7 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 			historyActivity = append(historyActivity, resource)
 		}
 		cond = &model.OfflineClassBooking{
+			UserID: request.UserID,
 			Status: model.INACTIVE,
 		}
 		offlineClasses, err = s.offlineClassRepository.ReadOfflineClassBookings(cond, ctx)
