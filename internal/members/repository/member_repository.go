@@ -8,10 +8,11 @@ import (
 
 type MemberRepository interface {
 	// member
-	CreateMember(body *model.Member, ctx context.Context) error
+	CreateMember(body *model.Member, ctx context.Context) (*model.Member, error)
 	FindMembers(page *model.Pagination, ctx context.Context) ([]model.Member, int, error)
 	FindMemberById(id uint, ctx context.Context) (*model.Member, error)
 	FindMemberByUser(userId uint, ctx context.Context) (*model.Member, error)
+	ReadMembers(body *model.Member, ctx context.Context) ([]model.Member, error)
 	UpdateMember(body *model.Member, ctx context.Context) error
 	DeleteMember(body *model.Member, ctx context.Context) error
 

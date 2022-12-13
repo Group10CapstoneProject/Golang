@@ -16,13 +16,19 @@ type offlineClassRepositoryImpl struct {
 // CreateOfflineClass implements OfflineClassRepository
 func (r *offlineClassRepositoryImpl) CreateOfflineClass(body *model.OfflineClass, ctx context.Context) error {
 	err := r.db.WithContext(ctx).Create(body).Error
-	return err
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // CreateOfflineClassBooking implements OfflineClassRepository
-func (r *offlineClassRepositoryImpl) CreateOfflineClassBooking(body *model.OfflineClassBooking, ctx context.Context) error {
+func (r *offlineClassRepositoryImpl) CreateOfflineClassBooking(body *model.OfflineClassBooking, ctx context.Context) (*model.OfflineClassBooking, error) {
 	err := r.db.WithContext(ctx).Create(body).Error
-	return err
+	if err != nil {
+		return nil, err
+	}
+	return body, nil
 }
 
 // CreateOfflineClassCategory implements OfflineClassRepository
@@ -186,8 +192,16 @@ func (r *offlineClassRepositoryImpl) FindOfflineClasses(cond *model.OfflineClass
 // ReadOfflineClassBookings implements OfflineClassRepository
 func (r *offlineClassRepositoryImpl) ReadOfflineClassBookings(cond *model.OfflineClassBooking, ctx context.Context) ([]model.OfflineClassBooking, error) {
 	offlineClassBooking := []model.OfflineClassBooking{}
-	err := r.db.WithContext(ctx).Model(&model.OfflineClassBooking{}).Preload("User").Preload("OfflineClass").Find(&offlineClassBooking, cond).Error
-	return offlineClassBooking, err
+	err := r.db.WithContext(ctx).
+		Model(&model.OfflineClassBooking{}).
+		Preload("User").
+		Preload("OfflineClass").
+		Find(&offlineClassBooking, cond).
+		Order("updated_at DESC").Error
+	if err != nil {
+		return nil, err
+	}
+	return offlineClassBooking, nil
 }
 
 // UpdateOfflineClass implements OfflineClassRepository

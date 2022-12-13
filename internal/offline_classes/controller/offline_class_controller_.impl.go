@@ -77,11 +77,17 @@ func (d *offlineclassControllerImpl) CreateOfflineClassBooking(c echo.Context) e
 	}
 	claims := d.jwtService.GetClaims(&c)
 	offlineClassBooking.UserID = uint(claims["user_id"].(float64))
-	if err := d.offlineClassService.CreateOfflineClassBooking(&offlineClassBooking, c.Request().Context()); err != nil {
+	id, err := d.offlineClassService.CreateOfflineClassBooking(&offlineClassBooking, c.Request().Context())
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	result, err := d.offlineClassService.FindOfflineClassBookingById(id, c.Request().Context())
+	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
 		"message": "new offline class booking success created",
+		"data":    result,
 	})
 }
 
