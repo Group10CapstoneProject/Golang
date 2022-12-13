@@ -4134,7 +4134,7 @@
                         "$ref": "#/components/parameters/type"
                     }
                 ],
-                "description": "to get user activities history",
+                "description": "to get user activities history, user only",
                 "responses": {
                     "200": {
                         "description": "Success get histories",
@@ -4214,7 +4214,7 @@
         "/histories/orders":{
             "get": {
                 "tags": ["Histories"],
-                "summary": "History order user its like transaction done or cenceled",
+                "summary": "History order user its like transaction done or cenceled. User only",
                 "security": [
                     {
                         "AccessToken":[]
