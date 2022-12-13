@@ -24,16 +24,13 @@ type memberServiceImpl struct {
 }
 
 // CreateMember implements MemberService
-func (s *memberServiceImpl) CreateMember(request *dto.MemberStoreRequest, ctx context.Context) (uint, error) {
+func (s *memberServiceImpl) CreateMember(request *dto.MemberStoreRequest, ctx context.Context) error {
 	member := request.ToModel()
 	member.ExpiredAt = time.Now().Add(24 * time.Hour)
 	member.ActivedAt = time.Date(0001, 1, 1, 0, 0, 0, 0, time.UTC)
 	member.Status = model.WAITING
-	result, err := s.memberRepository.CreateMember(member, ctx)
-	if err != nil {
-		return 0, err
-	}
-	return result.ID, nil
+	err := s.memberRepository.CreateMember(member, ctx)
+	return err
 }
 
 // CreateMemberType implements MemberService

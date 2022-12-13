@@ -35,19 +35,13 @@ func (r *onlineClassRepositoryImpl) CheckOnlineClassCategoryIsDeleted(body *mode
 // CreateOnlineClass implements OnlineClassRepository
 func (r *onlineClassRepositoryImpl) CreateOnlineClass(body *model.OnlineClass, ctx context.Context) error {
 	err := r.db.WithContext(ctx).Create(body).Error
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // CreateOnlineClassBooking implements OnlineClassRepository
-func (r *onlineClassRepositoryImpl) CreateOnlineClassBooking(body *model.OnlineClassBooking, ctx context.Context) (*model.OnlineClassBooking, error) {
+func (r *onlineClassRepositoryImpl) CreateOnlineClassBooking(body *model.OnlineClassBooking, ctx context.Context) error {
 	err := r.db.WithContext(ctx).Create(body).Error
-	if err != nil {
-		return nil, err
-	}
-	return body, nil
+	return err
 }
 
 // CreateOnlineClassCategory implements OnlineClassRepository
@@ -227,16 +221,8 @@ func (r *onlineClassRepositoryImpl) UpdateOnlineClassCategory(body *model.Online
 // ReadOnlineClassBooking implements OnlineClassRepository
 func (r *onlineClassRepositoryImpl) ReadOnlineClassBooking(cond *model.OnlineClassBooking, ctx context.Context) ([]model.OnlineClassBooking, error) {
 	onlineClassBooking := []model.OnlineClassBooking{}
-	err := r.db.WithContext(ctx).
-		Model(&model.OnlineClassBooking{}).
-		Preload("User").
-		Preload("OnlineClass").
-		Find(&onlineClassBooking, cond).
-		Order("updated_at DESC").Error
-	if err != nil {
-		return nil, err
-	}
-	return onlineClassBooking, nil
+	err := r.db.WithContext(ctx).Find(&onlineClassBooking, cond).Error
+	return onlineClassBooking, err
 }
 
 func NewOnlineClassRepository(database *gorm.DB) OnlineClassRepository {

@@ -22,7 +22,7 @@ type OfflineClassRepository interface {
 	DeleteOfflineClassCategory(body *model.OfflineClassCategory, ctx context.Context) error
 	CheckOfflineClassCategoryIsDeleted(body *model.OfflineClassCategory) error
 	// offline class booking
-	CreateOfflineClassBooking(body *model.OfflineClassBooking, ctx context.Context) (*model.OfflineClassBooking, error)
+	CreateOfflineClassBooking(body *model.OfflineClassBooking, ctx context.Context) error
 	FindOfflineClassBookings(page *model.Pagination, cond *model.OfflineClassBooking, ctx context.Context) ([]model.OfflineClassBooking, int, error)
 	ReadOfflineClassBookings(cond *model.OfflineClassBooking, ctx context.Context) ([]model.OfflineClassBooking, error)
 	FindOfflineClassBookingByUser(userId uint, ctx context.Context) ([]model.OfflineClassBooking, error)

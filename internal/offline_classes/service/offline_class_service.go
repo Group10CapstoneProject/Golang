@@ -9,7 +9,7 @@ import (
 
 type OfflineClassService interface {
 	// offline class booking
-	CreateOfflineClassBooking(request *dto.OfflineClassBookingStoreRequest, ctx context.Context) (uint, error)
+	CreateOfflineClassBooking(request *dto.OfflineClassBookingStoreRequest, ctx context.Context) error
 	FindOfflineClassBookings(page *model.Pagination, ctx context.Context) (*dto.OfflineClassBookingResponses, error)
 	CheckOfflineClassBookings(request *dto.TakeOfflineClassBooking, ctx context.Context) (*dto.OfflineClassBookingResource, error)
 	FindOfflineClassBookingById(id uint, ctx context.Context) (*dto.OfflineClassBookingDetailResource, error)
