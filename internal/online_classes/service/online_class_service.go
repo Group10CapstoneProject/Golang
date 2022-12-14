@@ -9,7 +9,7 @@ import (
 
 type OnlineClassService interface {
 	// online class booking
-	CreateOnlineClassBooking(request *dto.OnlineClassBookingStoreRequest, ctx context.Context) error
+	CreateOnlineClassBooking(request *dto.OnlineClassBookingStoreRequest, ctx context.Context) (uint, error)
 	FindOnlineClassBookings(page *model.Pagination, ctx context.Context) (*dto.OnlineClassBookingResponses, error)
 	FindOnlineClassBookingById(id uint, ctx context.Context) (*dto.OnlineClassBookingDetailResource, error)
 	FindOnlineClassBookingByUser(userId uint, ctx context.Context) (*dto.OnlineClassBookingResources, error)

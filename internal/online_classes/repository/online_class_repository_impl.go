@@ -35,13 +35,19 @@ func (r *onlineClassRepositoryImpl) CheckOnlineClassCategoryIsDeleted(body *mode
 // CreateOnlineClass implements OnlineClassRepository
 func (r *onlineClassRepositoryImpl) CreateOnlineClass(body *model.OnlineClass, ctx context.Context) error {
 	err := r.db.WithContext(ctx).Create(body).Error
-	return err
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // CreateOnlineClassBooking implements OnlineClassRepository
-func (r *onlineClassRepositoryImpl) CreateOnlineClassBooking(body *model.OnlineClassBooking, ctx context.Context) error {
+func (r *onlineClassRepositoryImpl) CreateOnlineClassBooking(body *model.OnlineClassBooking, ctx context.Context) (*model.OnlineClassBooking, error) {
 	err := r.db.WithContext(ctx).Create(body).Error
-	return err
+	if err != nil {
+		return nil, err
+	}
+	return body, nil
 }
 
 // CreateOnlineClassCategory implements OnlineClassRepository
@@ -162,7 +168,7 @@ func (r *onlineClassRepositoryImpl) FindOnlineClassCategoryById(id uint, ctx con
 // FindOnlineClassCategorys implements OnlineClassRepository
 func (r *onlineClassRepositoryImpl) FindOnlineClassCategories(ctx context.Context) ([]model.OnlineClassCategory, error) {
 	onlineClassCategories := []model.OnlineClassCategory{}
-	err := r.db.WithContext(ctx).Find(&onlineClassCategories).Error
+	err := r.db.WithContext(ctx).Preload("OnlineClass").Find(&onlineClassCategories).Error
 	return onlineClassCategories, err
 }
 
@@ -221,8 +227,16 @@ func (r *onlineClassRepositoryImpl) UpdateOnlineClassCategory(body *model.Online
 // ReadOnlineClassBooking implements OnlineClassRepository
 func (r *onlineClassRepositoryImpl) ReadOnlineClassBooking(cond *model.OnlineClassBooking, ctx context.Context) ([]model.OnlineClassBooking, error) {
 	onlineClassBooking := []model.OnlineClassBooking{}
-	err := r.db.WithContext(ctx).Find(&onlineClassBooking, cond).Error
-	return onlineClassBooking, err
+	err := r.db.WithContext(ctx).
+		Model(&model.OnlineClassBooking{}).
+		Preload("User").
+		Preload("OnlineClass").
+		Find(&onlineClassBooking, cond).
+		Order("updated_at DESC").Error
+	if err != nil {
+		return nil, err
+	}
+	return onlineClassBooking, nil
 }
 
 func NewOnlineClassRepository(database *gorm.DB) OnlineClassRepository {

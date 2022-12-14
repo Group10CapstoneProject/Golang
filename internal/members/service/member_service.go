@@ -9,7 +9,7 @@ import (
 
 type MemberService interface {
 	// member
-	CreateMember(request *dto.MemberStoreRequest, ctx context.Context) error
+	CreateMember(request *dto.MemberStoreRequest, ctx context.Context) (uint, error)
 	FindMembers(page *model.Pagination, ctx context.Context) (*dto.MemberResponses, error)
 	FindMemberById(id uint, ctx context.Context) (*dto.MemberDetailResource, error)
 	FindMemberByUser(userId uint, ctx context.Context) (*dto.MemberDetailResource, error)

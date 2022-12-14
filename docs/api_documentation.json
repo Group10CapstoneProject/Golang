@@ -985,7 +985,8 @@
                                             "id": 1,
                                             "name": "ShoopePay",
                                             "description": "Bisa bayar dimanapun dan kapanpun",
-                                            "payment_number": "0812342331512"
+                                            "payment_number": "0812342331512",
+                                            "picture": "https://google.com"
                                         },
                                         "total": 200000,
                                         "code": "3fb4b25e-07f1-4794-83a6-d576e95cdd29",
@@ -1238,11 +1239,16 @@
                 }
             }
         },
-        "/members/types/{id}":{
+        "/members/types/details/{id}":{
             "get": {
                 "security": [
                     {
                         "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
                     }
                 ],
                 "tags": ["Member Types"],
@@ -2362,7 +2368,8 @@
                                             "id": 1,
                                             "name": "ShoopePay",
                                             "description": "Bisa bayar dimanapun dan kapanpun",
-                                            "payment_number": "0812342331512"
+                                            "payment_number": "0812342331512",
+                                            "picture": "https://google.com"
                                         },
                                         "total": 40000,
                                         "code": "dasdw-awd23123-ea2ea21-dsasd",
@@ -3492,7 +3499,8 @@
                                             "id": 1,
                                             "name": "ShoopePay",
                                             "description": "Bisa bayar dimanapun dan kapanpun",
-                                            "payment_number": "0812342331512"
+                                            "payment_number": "0812342331512",
+                                            "picture": "https://google.com"
                                         },
                                         "total": 40000,
                                         "status": "ACTIVE"
@@ -3773,13 +3781,15 @@
                                             "id": 1,
                                             "name": "ShoopePay",
                                             "payment_number": "0812342331512",
-                                            "description": "Bisa bayar dimanapun dan kapanpun"
+                                            "description": "Bisa bayar dimanapun dan kapanpun",
+                                            "picture": "https://google.com"
                                         },
                                         {
                                             "id": 4,
                                             "name": "Transfer Bank BNI",
                                             "payment_number": "1123612712221",
-                                            "description": "Langsung transfer"
+                                            "description": "Langsung transfer",
+                                            "picture": "https://google.com"
                                         }
                                     ],
                                     "message": "success get payment methods"
@@ -3814,7 +3824,8 @@
                             "example": {
                                 "name":"Transfer Bank BNI",
                                 "payment_number":"1123612712221",
-                                "description":"Langsung transfer"
+                                "description":"Langsung transfer",
+                                "picture": "https://google.com"
                             }
                         }
                     }
@@ -3874,7 +3885,8 @@
                                         "id": 1,
                                         "name": "ShoopePay",
                                         "payment_number": "0812342331512",
-                                        "description": "Bisa bayar dimanapun dan kapanpun"
+                                        "description": "Bisa bayar dimanapun dan kapanpun",
+                                        "picture": "https://google.com"
                                     },
                                     "message": "success get payment method"
                                 }
@@ -3916,7 +3928,8 @@
                             "example": {
                                 "name":"ShoopePay",
                                 "payment_number":"0812342331512",
-                                "description":"Bisa bayar dimanapun dan kapanpun test update"
+                                "description":"Bisa bayar dimanapun dan kapanpun test update",
+                                "picture": "https://google.com"
                             }
                         }
                     }
@@ -4057,7 +4070,7 @@
                 }
             }
         },
-        "/notification":{
+        "/notifications":{
             "get": {
                 "tags": ["Notification"],
                 "summary": "Notification in admin",
@@ -4095,6 +4108,164 @@
                                         "count": 2
                                     },
                                     "message": "success get notification"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                       "$ref": "#/components/responses/badRequest"
+                    },
+                    "404":{
+                       "$ref": "#/components/responses/notFound"
+                    },
+                    "403":{
+                       "$ref": "#/components/responses/forbidden"
+                    },
+                    "401":{
+                       "$ref": "#/components/responses/unauthorized"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    }
+                }
+            }
+        },
+        "/histories/activities":{
+            "get": {
+                "tags": ["Histories"],
+                "summary": "History activities user",
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/status"
+                    },
+                    {
+                        "$ref": "#/components/parameters/type"
+                    }
+                ],
+                "description": "to get user activities history",
+                "responses": {
+                    "200": {
+                        "description": "Success get histories",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": [
+                                        {
+                                            "transaction_id": 2,
+                                            "type": "offline_class",
+                                            "status": "ACTIVE",
+                                            "created_at": "2022-12-08 13:42:15",
+                                            "product_id": 1,
+                                            "product_name": "Yoga Test",
+                                            "total": 40000
+                                        },
+                                        {
+                                            "transaction_id": 4,
+                                            "type": "member",
+                                            "status": "ACTIVE",
+                                            "created_at": "2022-12-08 11:39:06",
+                                            "product_id": 1,
+                                            "product_name": "silver",
+                                            "total": 200000
+                                        },
+                                        {
+                                            "transaction_id": 2,
+                                            "type": "online_class",
+                                            "status": "ACTIVE",
+                                            "created_at": "2022-12-06 18:19:32",
+                                            "product_id": 1,
+                                            "product_name": "Zumba Asik Ahh",
+                                            "total": 40000
+                                        },
+                                        {
+                                            "transaction_id": 1,
+                                            "type": "online_class",
+                                            "status": "ACTIVE",
+                                            "created_at": "2022-12-06 01:17:05",
+                                            "product_id": 1,
+                                            "product_name": "Zumba Asik Ahh",
+                                            "total": 40000
+                                        },
+                                        {
+                                            "transaction_id": 1,
+                                            "type": "member",
+                                            "status": "ACTIVE",
+                                            "created_at": "2022-12-06 00:54:55",
+                                            "product_id": 1,
+                                            "product_name": "silver",
+                                            "total": 200000
+                                        }
+                                    ],
+                                    "message": "success get history activity"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                       "$ref": "#/components/responses/badRequest"
+                    },
+                    "404":{
+                       "$ref": "#/components/responses/notFound"
+                    },
+                    "403":{
+                       "$ref": "#/components/responses/forbidden"
+                    },
+                    "401":{
+                       "$ref": "#/components/responses/unauthorized"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    }
+                }
+            }
+        },
+        "/histories/orders":{
+            "get": {
+                "tags": ["Histories"],
+                "summary": "History order user its like transaction done or cenceled",
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/type"
+                    }
+                ],
+                "description": "to get user orders history",
+                "responses": {
+                    "200": {
+                        "description": "Success get histories",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": [
+                                        {
+                                            "transaction_id": 4,
+                                            "type": "offline_class",
+                                            "status": "DONE",
+                                            "created_at": "2022-12-08 14:04:11",
+                                            "product_id": 1,
+                                            "product_name": "Yoga Test",
+                                            "total": 40000
+                                        },
+                                        {
+                                            "transaction_id": 3,
+                                            "type": "offline_class",
+                                            "status": "INACTIVE",
+                                            "created_at": "2022-12-08 13:49:58",
+                                            "product_id": 1,
+                                            "product_name": "Yoga Test",
+                                            "total": 40005
+                                        }
+                                    ],
+                                    "message": "success get history orders"
                                 }
                             }
                         }
@@ -4821,6 +4992,24 @@
                     "description": "The number of page (page)"
                 },
                 "example": 1
+            },
+            "status": {
+                "in": "query",
+                "name": "status",
+                "schema":{
+                    "type": "string",
+                    "description": "status in activities (ACTIVE, WAITING). This required"
+                },
+                "example": "ACTIVE"
+            },
+            "type": {
+                "in": "query",
+                "name": "type",
+                "schema":{
+                    "type": "string",
+                    "description": "type of history (member, offline_class, online_class). If empty will get all type"
+                },
+                "example": "member"
             },
             "category": {
                 "in": "query",
