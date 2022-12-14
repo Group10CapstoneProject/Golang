@@ -985,7 +985,8 @@
                                             "id": 1,
                                             "name": "ShoopePay",
                                             "description": "Bisa bayar dimanapun dan kapanpun",
-                                            "payment_number": "0812342331512"
+                                            "payment_number": "0812342331512",
+                                            "picture": "https://google.com"
                                         },
                                         "total": 200000,
                                         "code": "3fb4b25e-07f1-4794-83a6-d576e95cdd29",
@@ -2367,7 +2368,8 @@
                                             "id": 1,
                                             "name": "ShoopePay",
                                             "description": "Bisa bayar dimanapun dan kapanpun",
-                                            "payment_number": "0812342331512"
+                                            "payment_number": "0812342331512",
+                                            "picture": "https://google.com"
                                         },
                                         "total": 40000,
                                         "code": "dasdw-awd23123-ea2ea21-dsasd",
@@ -3497,7 +3499,8 @@
                                             "id": 1,
                                             "name": "ShoopePay",
                                             "description": "Bisa bayar dimanapun dan kapanpun",
-                                            "payment_number": "0812342331512"
+                                            "payment_number": "0812342331512",
+                                            "picture": "https://google.com"
                                         },
                                         "total": 40000,
                                         "status": "ACTIVE"
@@ -3778,13 +3781,15 @@
                                             "id": 1,
                                             "name": "ShoopePay",
                                             "payment_number": "0812342331512",
-                                            "description": "Bisa bayar dimanapun dan kapanpun"
+                                            "description": "Bisa bayar dimanapun dan kapanpun",
+                                            "picture": "https://google.com"
                                         },
                                         {
                                             "id": 4,
                                             "name": "Transfer Bank BNI",
                                             "payment_number": "1123612712221",
-                                            "description": "Langsung transfer"
+                                            "description": "Langsung transfer",
+                                            "picture": "https://google.com"
                                         }
                                     ],
                                     "message": "success get payment methods"
@@ -3819,7 +3824,8 @@
                             "example": {
                                 "name":"Transfer Bank BNI",
                                 "payment_number":"1123612712221",
-                                "description":"Langsung transfer"
+                                "description":"Langsung transfer",
+                                "picture": "https://google.com"
                             }
                         }
                     }
@@ -3879,7 +3885,8 @@
                                         "id": 1,
                                         "name": "ShoopePay",
                                         "payment_number": "0812342331512",
-                                        "description": "Bisa bayar dimanapun dan kapanpun"
+                                        "description": "Bisa bayar dimanapun dan kapanpun",
+                                        "picture": "https://google.com"
                                     },
                                     "message": "success get payment method"
                                 }
@@ -3921,7 +3928,8 @@
                             "example": {
                                 "name":"ShoopePay",
                                 "payment_number":"0812342331512",
-                                "description":"Bisa bayar dimanapun dan kapanpun test update"
+                                "description":"Bisa bayar dimanapun dan kapanpun test update",
+                                "picture": "https://google.com"
                             }
                         }
                     }
