@@ -168,7 +168,7 @@ func (r *onlineClassRepositoryImpl) FindOnlineClassCategoryById(id uint, ctx con
 // FindOnlineClassCategorys implements OnlineClassRepository
 func (r *onlineClassRepositoryImpl) FindOnlineClassCategories(ctx context.Context) ([]model.OnlineClassCategory, error) {
 	onlineClassCategories := []model.OnlineClassCategory{}
-	err := r.db.WithContext(ctx).Find(&onlineClassCategories).Error
+	err := r.db.WithContext(ctx).Preload("OnlineClass").Find(&onlineClassCategories).Error
 	return onlineClassCategories, err
 }
 
