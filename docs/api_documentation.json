@@ -1238,11 +1238,16 @@
                 }
             }
         },
-        "/members/types/{id}":{
+        "/members/types/details/{id}":{
             "get": {
                 "security": [
                     {
                         "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
                     }
                 ],
                 "tags": ["Member Types"],
