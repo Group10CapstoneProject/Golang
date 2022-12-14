@@ -72,7 +72,7 @@ func (j *customMiddleware) CustomJWTWithConfig(role string) echo.MiddlewareFunc 
 		if err == myerrors.ErrInvalidSession {
 			return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 		}
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+		return err
 	}
 
 	return middleware.JWTWithConfig(config)
