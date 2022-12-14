@@ -1,0 +1,53 @@
+name: deploy to development
+on:
+  push:
+    branches:
+      - "development"
+
+jobs:
+  deploy:
+    name: deploy to development
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-go@v3
+      with:
+        go-version: 1.18
+    
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+        
+    - name: Build and push
+      uses: docker/build-push-action@v3
+      with:
+        push: true
+        tags: rnwxyz/gym-membership-dev:latest
+    
+    - name: Deploy to EC2 by using SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_KEY }}
+        port: ${{ secrets.EC2_PORT }}
+        script: |
+          cd gym_membership
+          sudo docker-compose down
+          sudo docker rmi rnwxyz/gym-membership-dev:latest
+          sudo docker pull rnwxyz/gym-membership-dev:latest
+          cd docs
+          rm api_documentation.json
+          wget https://raw.githubusercontent.com/Group10CapstoneProject/Golang/development/docs/api_documentation.json
+          cd ..
+          sudo docker-compose up -d
