@@ -7,6 +7,7 @@ import (
 	"github.com/Group10CapstoneProject/Golang/model"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type trainerRepositoryImpl struct {
@@ -57,12 +58,12 @@ func (r *trainerRepositoryImpl) CreateTrainer(body *model.Trainer, ctx context.C
 }
 
 // CreateTrainerBooking implements TrainerRepository
-func (r *trainerRepositoryImpl) CreateTrainerBooking(body *model.TrainerBooking, ctx context.Context) error {
+func (r *trainerRepositoryImpl) CreateTrainerBooking(body *model.TrainerBooking, ctx context.Context) (*model.TrainerBooking, error) {
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return body, nil
 }
 
 // DeleteSkill implements TrainerRepository
@@ -130,7 +131,7 @@ func (r *trainerRepositoryImpl) FindSkillById(id uint, ctx context.Context) (*mo
 // FindSkills implements TrainerRepository
 func (r *trainerRepositoryImpl) FindSkills(ctx context.Context) ([]model.Skill, error) {
 	skills := []model.Skill{}
-	err := r.db.WithContext(ctx).Find(&skills).Error
+	err := r.db.WithContext(ctx).Find(&skills).Preload(clause.Associations).Error
 	if err != nil {
 		return nil, err
 	}
@@ -194,32 +195,106 @@ func (r *trainerRepositoryImpl) FindTrainerBookings(page *model.Pagination, ctx 
 
 // FindTrainerById implements TrainerRepository
 func (r *trainerRepositoryImpl) FindTrainerById(id uint, ctx context.Context) (*model.Trainer, error) {
-	panic("unimplemented")
+	trainer := model.Trainer{}
+	err := r.db.WithContext(ctx).Where("id = ?", id).
+		Preload("TrainerSkill").
+		Preload("TrainerSkill.Skill").
+		First(&trainer).Error
+	if err != nil {
+		return nil, err
+	}
+	return &trainer, nil
 }
 
 // FindTrainers implements TrainerRepository
-func (r *trainerRepositoryImpl) FindTrainers(ctx context.Context) ([]model.Trainer, error) {
-	panic("unimplemented")
+func (r *trainerRepositoryImpl) FindTrainers(cond *model.Trainer, priceOrder string, date string, ctx context.Context) ([]model.Trainer, error) {
+	traieners := []model.Trainer{}
+	res := r.db.WithContext(ctx).Model(&model.Trainer{}).
+		Preload("TrainerSkill").
+		Preload("TrainerSkill.Skill")
+	if priceOrder != "" {
+		res.Order("price " + priceOrder)
+	} else {
+		res.Order("id DESC")
+	}
+	if date != "" {
+		res.Where("daily_slot > (SELECT COUNT(a.id) FROM trainer_bookings a WHERE a.trainer_id = id AND DATE(a.time) = ?)", date)
+	}
+	err := res.Find(&traieners, cond).Error
+	if err != nil {
+		return nil, err
+	}
+	return traieners, err
 }
 
 // ReadTrainerBooking implements TrainerRepository
 func (r *trainerRepositoryImpl) ReadTrainerBooking(cond *model.TrainerBooking, ctx context.Context) ([]model.TrainerBooking, error) {
-	panic("unimplemented")
+	trainerBookings := []model.TrainerBooking{}
+	err := r.db.WithContext(ctx).
+		Model(&model.TrainerBooking{}).
+		Preload(clause.Associations).
+		Find(&trainerBookings, cond).
+		Error
+	if err != nil {
+		return nil, err
+	}
+	return trainerBookings, nil
 }
 
 // UpdateSkill implements TrainerRepository
 func (r *trainerRepositoryImpl) UpdateSkill(body *model.Skill, ctx context.Context) error {
-	panic("unimplemented")
+	res := r.db.WithContext(ctx).Model(body).Updates(body)
+	if res.Error != nil {
+		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+			return myerrors.ErrDuplicateRecord
+		}
+		return res.Error
+	}
+	if res.RowsAffected == 0 {
+		return myerrors.ErrRecordNotFound
+	}
+	return nil
 }
 
 // UpdateTrainer implements TrainerRepository
 func (r *trainerRepositoryImpl) UpdateTrainer(body *model.Trainer, ctx context.Context) error {
-	panic("unimplemented")
+	res := r.db.Begin()
+	if len(body.TrainerSkill) != 0 {
+		err := res.WithContext(ctx).Model(&model.TrainerSkill{}).Where("trainer_id = ?", body.ID).Delete(&model.TrainerSkill{}).Error
+		if err != nil {
+			return err
+		}
+	}
+	res.Updates(body)
+	if res.Error != nil {
+		err := r.db.WithContext(ctx).Model(&model.TrainerSkill{}).Where("trainer_id = ?", body.ID).Update("deleted_at", nil).Error
+		if err != nil {
+			return err
+		}
+		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+			return myerrors.ErrDuplicateRecord
+		}
+		return res.Error
+	}
+	if res.RowsAffected == 0 {
+		return myerrors.ErrRecordNotFound
+	}
+	return nil
 }
 
 // UpdateTrainerBooking implements TrainerRepository
 func (r *trainerRepositoryImpl) UpdateTrainerBooking(body *model.TrainerBooking, ctx context.Context) error {
-	panic("unimplemented")
+	res := r.db.WithContext(ctx).Model(body).Updates(body)
+	if res.Error != nil {
+		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+			return myerrors.ErrDuplicateRecord
+		}
+		return res.Error
+	}
+	if res.RowsAffected == 0 {
+		return myerrors.ErrRecordNotFound
+	}
+	return nil
 }
 
 func NewTrainerRepository(database *gorm.DB) TrainerRepository {

@@ -9,7 +9,7 @@ type OnlineClassBookingStoreRequest struct {
 	UserID          uint
 	OnlineCLassID   uint `json:"online_class_id" validate:"required,gte=1"`
 	Duration        uint `json:"duration" validate:"required,gte=1"`
-	PaymentMethodId uint `json:"payment_method_id" validate:"required,gte=1"`
+	PaymentMethodID uint `json:"payment_method_id" validate:"required,gte=1"`
 	Total           uint `json:"total" validate:"required,gte=1"`
 }
 
@@ -18,7 +18,7 @@ func (u *OnlineClassBookingStoreRequest) ToModel() *model.OnlineClassBooking {
 		UserID:          u.UserID,
 		OnlineClassID:   u.OnlineCLassID,
 		Duration:        u.Duration,
-		PaymentMethodId: u.PaymentMethodId,
+		PaymentMethodID: u.PaymentMethodID,
 		Total:           u.Total,
 	}
 }
@@ -26,9 +26,9 @@ func (u *OnlineClassBookingStoreRequest) ToModel() *model.OnlineClassBooking {
 type OnlineClassBookingUpdateRequest struct {
 	ID              uint   `json:"id,omitempty"`
 	UserID          uint   `json:"user_id,omitempty"`
-	OnlineCLassID   uint   `json:"member_type_id,,omitempty" validate:"omitempty,gte=1"`
+	OnlineCLassID   uint   `json:"onlinc_class_id,,omitempty" validate:"omitempty,gte=1"`
 	Duration        uint   `json:"duration,,omitempty" validate:"omitemptys,gte=1"`
-	PaymentMethodId uint   `json:"payment_method_id,omitempty" validate:"omitempty,gte=1"`
+	PaymentMethodID uint   `json:"payment_method_id,omitempty" validate:"omitempty,gte=1"`
 	ProofPayment    string `json:"proof_payment,omitempty" validate:"omitempty,url"`
 	Total           uint   `json:"total,omitempty" validate:"omitempty,gte=1"`
 }
@@ -39,7 +39,7 @@ func (u *OnlineClassBookingUpdateRequest) ToModel() *model.OnlineClassBooking {
 		UserID:          u.UserID,
 		OnlineClassID:   u.OnlineCLassID,
 		Duration:        u.Duration,
-		PaymentMethodId: u.PaymentMethodId,
+		PaymentMethodID: u.PaymentMethodID,
 		ProofPayment:    u.ProofPayment,
 		Total:           u.Total,
 	}

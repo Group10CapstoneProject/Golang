@@ -120,10 +120,10 @@ func (s *onlineClassServiceImpl) FindOnlineClassBookings(page *model.Pagination,
 	result.FromModel(onlineClassBookings)
 
 	response := dto.OnlineClassBookingResponses{
-		Members: result,
-		Page:    uint(page.Page),
-		Limit:   uint(page.Limit),
-		Count:   uint(count),
+		OnlineClassBookings: result,
+		Page:                uint(page.Page),
+		Limit:               uint(page.Limit),
+		Count:               uint(count),
 	}
 	return &response, nil
 }

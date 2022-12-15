@@ -105,10 +105,10 @@ func (u *OnlineClassBookingResources) FromModel(m []model.OnlineClassBooking) {
 }
 
 type OnlineClassBookingResponses struct {
-	Members OnlineClassBookingResources `json:"online_class_booking"`
-	Page    uint                        `json:"page"`
-	Limit   uint                        `json:"limit"`
-	Count   uint                        `json:"count"`
+	OnlineClassBookings OnlineClassBookingResources `json:"online_class_bookinga"`
+	Page                uint                        `json:"page"`
+	Limit               uint                        `json:"limit"`
+	Count               uint                        `json:"count"`
 }
 
 type OnlineClassBookingDetailResource struct {

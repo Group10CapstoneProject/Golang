@@ -8,6 +8,7 @@ import (
 	"github.com/Group10CapstoneProject/Golang/model"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type memberRepositoryImpl struct {
@@ -181,8 +182,7 @@ func (r *memberRepositoryImpl) ReadMembers(body *model.Member, ctx context.Conte
 	members := []model.Member{}
 	err := r.db.WithContext(ctx).
 		Model(&model.Member{}).
-		Preload("MemberType").
-		Preload("User").
+		Preload(clause.Associations).
 		Find(&members, body).
 		Order("updated_at DESC").Error
 	if err != nil {

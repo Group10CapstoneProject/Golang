@@ -12,7 +12,7 @@ type MemberStoreRequest struct {
 	UserID          uint
 	MemberTypeID    uint `json:"member_type_id" validate:"required,gte=1"`
 	Duration        uint `json:"duration" validate:"required,gte=1"`
-	PaymentMethodId uint `json:"payment_method_id" validate:"required,gte=1"`
+	PaymentMethodID uint `json:"payment_method_id" validate:"required,gte=1"`
 	Total           uint `json:"total" validate:"required,gte=1"`
 }
 
@@ -21,7 +21,7 @@ func (u *MemberStoreRequest) ToModel() *model.Member {
 		UserID:          u.UserID,
 		MemberTypeID:    u.MemberTypeID,
 		Duration:        u.Duration,
-		PaymentMethodId: u.PaymentMethodId,
+		PaymentMethodID: u.PaymentMethodID,
 		Total:           u.Total,
 	}
 }
@@ -30,7 +30,7 @@ type MemberUpdateRequest struct {
 	ID              uint `json:"id,omitempty"`
 	MemberTypeID    uint `json:"member_type_id,omitempty" validate:"omitempty,gte=1"`
 	Duration        uint `json:"duration,omitempty" validate:"omitempty,gte=1"`
-	PaymentMethodId uint `json:"payment_method_id,omitempty" validate:"omitempty,gte=1"`
+	PaymentMethodID uint `json:"payment_method_id,omitempty" validate:"omitempty,gte=1"`
 	Total           uint `json:"total" validate:"omitempty,required,gte=1"`
 }
 
@@ -39,7 +39,7 @@ func (u *MemberUpdateRequest) ToModel() *model.Member {
 		ID:              u.ID,
 		MemberTypeID:    u.MemberTypeID,
 		Duration:        u.Duration,
-		PaymentMethodId: u.PaymentMethodId,
+		PaymentMethodID: u.PaymentMethodID,
 		Total:           u.Total,
 	}
 }

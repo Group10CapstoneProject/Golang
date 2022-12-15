@@ -115,10 +115,10 @@ func (u *OfflineClassBookingResources) FromModel(m []model.OfflineClassBooking) 
 }
 
 type OfflineClassBookingResponses struct {
-	Members OfflineClassBookingResources `json:"offline_class_bookings"`
-	Page    uint                         `json:"page"`
-	Limit   uint                         `json:"limit"`
-	Count   uint                         `json:"count"`
+	OfflineClassBookings OfflineClassBookingResources `json:"offline_class_bookings"`
+	Page                 uint                         `json:"page"`
+	Limit                uint                         `json:"limit"`
+	Count                uint                         `json:"count"`
 }
 
 type OfflineClassBookingDetailResource struct {

@@ -11,7 +11,7 @@ import (
 type OfflineClassBookingStoreRequest struct {
 	UserID          uint
 	OfflineCLassID  uint `json:"offline_class_id" validate:"required,gte=1"`
-	PaymentMethodId uint `json:"payment_method_id" validate:"required,gte=1"`
+	PaymentMethodID uint `json:"payment_method_id" validate:"required,gte=1"`
 	Total           uint `json:"total" validate:"required,gte=1"`
 }
 
@@ -19,7 +19,7 @@ func (u *OfflineClassBookingStoreRequest) ToModel() *model.OfflineClassBooking {
 	return &model.OfflineClassBooking{
 		UserID:          u.UserID,
 		OfflineClassID:  u.OfflineCLassID,
-		PaymentMethodId: u.PaymentMethodId,
+		PaymentMethodID: u.PaymentMethodID,
 		Total:           u.Total,
 	}
 }
@@ -27,8 +27,8 @@ func (u *OfflineClassBookingStoreRequest) ToModel() *model.OfflineClassBooking {
 type OfflineClassBookingUpdateRequest struct {
 	ID              uint
 	UserID          uint   `json:"user_id,omitempty"`
-	OfflineCLassID  uint   `json:"member_type_id,,omitempty" validate:"omitempty,gte=1"`
-	PaymentMethodId uint   `json:"payment_method_id,omitempty" validate:"omitempty,gte=1"`
+	OfflineCLassID  uint   `json:"offline_class_id,,omitempty" validate:"omitempty,gte=1"`
+	PaymentMethodID uint   `json:"payment_method_id,omitempty" validate:"omitempty,gte=1"`
 	ProofPayment    string `json:"proof_payment,omitempty" validate:"omitempty,url"`
 	Total           uint   `json:"total,omitempty" validate:"omitempty,gte=1"`
 }
@@ -38,7 +38,7 @@ func (u *OfflineClassBookingUpdateRequest) ToModel() *model.OfflineClassBooking 
 		ID:              u.ID,
 		UserID:          u.UserID,
 		OfflineClassID:  u.OfflineCLassID,
-		PaymentMethodId: u.PaymentMethodId,
+		PaymentMethodID: u.PaymentMethodID,
 		ProofPayment:    u.ProofPayment,
 		Total:           u.Total,
 	}
@@ -155,7 +155,7 @@ func (u *SetStatusOfflineClassBooking) ToModel() *model.OfflineClassBooking {
 	}
 }
 
-// set status booking
+// take booking
 type TakeOfflineClassBooking struct {
 	Email string    `json:"email" validate:"required,email"`
 	Code  uuid.UUID `json:"code" validate:"required"`

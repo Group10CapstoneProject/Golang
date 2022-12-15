@@ -8,7 +8,7 @@ import (
 
 type TrainerRepository interface {
 	// trainer booking
-	CreateTrainerBooking(body *model.TrainerBooking, ctx context.Context) error
+	CreateTrainerBooking(body *model.TrainerBooking, ctx context.Context) (*model.TrainerBooking, error)
 	FindTrainerBookings(page *model.Pagination, ctx context.Context) ([]model.TrainerBooking, int, error)
 	FindTrainerBookingById(id uint, ctx context.Context) (*model.TrainerBooking, error)
 	FindTrainerBookingByUser(userId uint, ctx context.Context) ([]model.TrainerBooking, error)
@@ -18,7 +18,7 @@ type TrainerRepository interface {
 
 	// trainer
 	CreateTrainer(body *model.Trainer, ctx context.Context) error
-	FindTrainers(ctx context.Context) ([]model.Trainer, error)
+	FindTrainers(cond *model.Trainer, priceOrder string, date string, ctx context.Context) ([]model.Trainer, error)
 	FindTrainerById(id uint, ctx context.Context) (*model.Trainer, error)
 	UpdateTrainer(body *model.Trainer, ctx context.Context) error
 	DeleteTrainer(body *model.Trainer, ctx context.Context) error

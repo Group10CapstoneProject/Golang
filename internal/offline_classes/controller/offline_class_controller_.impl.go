@@ -116,9 +116,6 @@ func (d *offlineclassControllerImpl) DeleteOfflineClass(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
 	if err := d.offlineClassService.DeleteOfflineClass(uint(id), c.Request().Context()); err != nil {
-		if err == myerrors.ErrRecordNotFound {
-			return echo.NewHTTPError(http.StatusNotFound, err.Error())
-		}
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
@@ -134,9 +131,6 @@ func (d *offlineclassControllerImpl) DeleteOfflineClassBooking(c echo.Context) e
 		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
 	if err := d.offlineClassService.DeleteOfflineClassBooking(uint(id), c.Request().Context()); err != nil {
-		if err == myerrors.ErrRecordNotFound {
-			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-		}
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
@@ -152,9 +146,6 @@ func (d *offlineclassControllerImpl) DeleteOfflineClassCategory(c echo.Context) 
 		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
 	if err := d.offlineClassService.DeleteOfflineClassCategory(uint(id), c.Request().Context()); err != nil {
-		if err == myerrors.ErrRecordNotFound {
-			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-		}
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
@@ -171,9 +162,6 @@ func (d *offlineclassControllerImpl) GetOfflineClassBookingDetail(c echo.Context
 	}
 	offlineClassBooking, err := d.offlineClassService.FindOfflineClassBookingById(uint(id), c.Request().Context())
 	if err != nil {
-		if err == myerrors.ErrRecordNotFound {
-			return echo.NewHTTPError(http.StatusNotFound, err.Error())
-		}
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	claims := d.jwtService.GetClaims(&c)

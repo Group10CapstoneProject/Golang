@@ -18,4 +18,6 @@ var (
 	ErrAlredyPaid           = errors.New("alredy paid")
 	ErrAlredyTake           = errors.New("booking alredy take")
 	ErrRecordIsUsed         = errors.New("record is used by other tables")
+	ErrPaymentMethod        = errors.New("payment method declined")
+	ErrOrderExpired         = errors.New("order is expired")
 )
