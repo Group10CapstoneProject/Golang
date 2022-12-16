@@ -17,6 +17,9 @@ type offlineClassRepositoryImpl struct {
 func (r *offlineClassRepositoryImpl) CreateOfflineClass(body *model.OfflineClass, ctx context.Context) error {
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
+		if strings.Contains(err.Error(), "Error 1452:") {
+			return myerrors.ErrForeignKey(err)
+		}
 		return err
 	}
 	return nil
@@ -26,6 +29,9 @@ func (r *offlineClassRepositoryImpl) CreateOfflineClass(body *model.OfflineClass
 func (r *offlineClassRepositoryImpl) CreateOfflineClassBooking(body *model.OfflineClassBooking, ctx context.Context) (*model.OfflineClassBooking, error) {
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
+		if strings.Contains(err.Error(), "Error 1452:") {
+			return nil, myerrors.ErrForeignKey(err)
+		}
 		return nil, err
 	}
 	return body, nil
@@ -67,7 +73,15 @@ func (r *offlineClassRepositoryImpl) CheckOfflineClassCategoryIsDeleted(body *mo
 
 // DeleteOfflineClass implements OfflineClassRepository
 func (r *offlineClassRepositoryImpl) DeleteOfflineClass(body *model.OfflineClass, ctx context.Context) error {
-	res := r.db.WithContext(ctx).Delete(body)
+	check := model.OfflineClass{}
+	res := r.db.WithContext(ctx).Preload("OfflineClassBooking").First(&check, body)
+	if res.Error != nil {
+		return res.Error
+	}
+	if len(check.OfflineClassBooking) != 0 {
+		return myerrors.ErrRecordIsUsed
+	}
+	res.Delete(body)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -91,7 +105,15 @@ func (r *offlineClassRepositoryImpl) DeleteOfflineClassBooking(body *model.Offli
 
 // DeleteOfflineClassCategory implements OfflineClassRepository
 func (r *offlineClassRepositoryImpl) DeleteOfflineClassCategory(body *model.OfflineClassCategory, ctx context.Context) error {
-	res := r.db.WithContext(ctx).Delete(body)
+	check := model.OfflineClassCategory{}
+	res := r.db.WithContext(ctx).Preload("OfflineClass").First(&check, body)
+	if res.Error != nil {
+		return res.Error
+	}
+	if len(check.OfflineClass) != 0 {
+		return myerrors.ErrRecordIsUsed
+	}
+	res.Delete(body)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -258,9 +280,6 @@ func (r *offlineClassRepositoryImpl) OperationOfflineClassSlot(body *model.Offli
 		res.Update("slot_booked", body.SlotBooked-1)
 	}
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Error 1062:") {
-			return myerrors.ErrDuplicateRecord
-		}
 		return res.Error
 	}
 	if res.RowsAffected == 0 {

@@ -26,3 +26,19 @@ type Member struct {
 	Total           uint
 	Code            uuid.UUID
 }
+
+type MemberType struct {
+	ID                 uint `gorm:"primarykey"`
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
+	DeletedAt          gorm.DeletedAt `gorm:"index"`
+	Name               string         `gorm:"type:varchar(255);unique"`
+	Price              uint
+	Description        string
+	Picture            string
+	AccessOfflineClass *bool
+	AccessOnlineClass  *bool
+	AccessTrainer      *bool
+	AccessGym          *bool
+	Member             []Member
+}
