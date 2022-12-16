@@ -115,10 +115,10 @@ func (u *OfflineClassBookingResources) FromModel(m []model.OfflineClassBooking) 
 }
 
 type OfflineClassBookingResponses struct {
-	Members OfflineClassBookingResources `json:"offline_class_bookings"`
-	Page    uint                         `json:"page"`
-	Limit   uint                         `json:"limit"`
-	Count   uint                         `json:"count"`
+	OfflineClassBookings OfflineClassBookingResources `json:"offline_class_bookings"`
+	Page                 uint                         `json:"page"`
+	Limit                uint                         `json:"limit"`
+	Count                uint                         `json:"count"`
 }
 
 type OfflineClassBookingDetailResource struct {
@@ -162,7 +162,7 @@ type PaymentMethodResource struct {
 }
 
 func (u *PaymentMethodResource) FromModel(m *model.PaymentMethod) {
-	u.ID = m.ID
+	u.ID = *m.ID
 	u.Name = m.Name
 	u.Description = m.Description
 	u.PaymentNumber = m.PaymentNumber

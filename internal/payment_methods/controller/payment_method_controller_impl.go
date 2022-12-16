@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Group10CapstoneProject/Golang/internal/paymentMethods/dto"
-	paymentMethodServ "github.com/Group10CapstoneProject/Golang/internal/paymentMethods/service"
+	"github.com/Group10CapstoneProject/Golang/internal/payment_methods/dto"
+	paymentMethodServ "github.com/Group10CapstoneProject/Golang/internal/payment_methods/service"
 	jwtServ "github.com/Group10CapstoneProject/Golang/utils/jwt"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"github.com/labstack/echo/v4"
@@ -73,7 +73,16 @@ func (d *paymentMehtodControllerImpl) GetPaymentMethodDetail(c echo.Context) err
 
 // GetPaymentMethods implements PaymentMethodController
 func (d *paymentMehtodControllerImpl) GetPaymentMethods(c echo.Context) error {
-	paymentMethods, err := d.paymentMethodService.FindPaymentMethods(c.Request().Context())
+	qParam := c.QueryParam("access")
+	access := false
+	if qParam != "" {
+		temp, err := strconv.ParseBool(qParam)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		access = temp
+	}
+	paymentMethods, err := d.paymentMethodService.FindPaymentMethods(access, c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}

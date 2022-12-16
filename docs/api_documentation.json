@@ -919,6 +919,9 @@
                                     }
                                 },
                                 "example": {
+                                    "data": {
+                                        "id": 1
+                                    },
                                     "message": "new member success created"
                                 }
                             }
@@ -2305,6 +2308,9 @@
                                     }
                                 },
                                 "example": {
+                                    "data": {
+                                        "id": 1
+                                    },
                                     "message": "new offline class booking success created"
                                 }
                             }
@@ -3395,6 +3401,9 @@
                     },
                     "400":{
                         "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
                     }
                 }
             },
@@ -3437,6 +3446,9 @@
                                     }
                                 },
                                 "example": {
+                                    "data": {
+                                        "id": 1
+                                    },
                                     "message": "new online class booking success created"
                                 }
                             }
@@ -3757,6 +3769,1241 @@
                      },
                     "500":{
                         "$ref": "#/components/responses/internalServerError"
+                    }
+                }
+            }
+        },
+        "/trainers":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/date"
+                    },
+                    {
+                        "$ref":"#/components/parameters/gender"
+                    },
+                    {
+                        "$ref":"#/components/parameters/name"
+                    },
+                    {
+                        "$ref":"#/components/parameters/orderPrice"
+                    }
+                ],
+                "tags": ["Trainers"],
+                "summary": "Get all trainers",
+                "description": "pada filter date disini akan menampilkan trainer yang available pada date tersebut, trainer mimiliki daily_slot yang menjadi batas maksimal booking dalam satu hari. Jika booking berstatus inactive, reject, dan cencel maka tidak akan dihitung dalam daily_slot dari trainer. Jika jumlah booking trainer pada date tersebut melebihi atau sama dengan daily_slot maka trainer tidak akan ditampilkan. Email tidak boleh duplikat",
+                "responses": {
+                    "200": {
+                        "description": "Success get trainer",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/trainer"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 7,
+                                            "name": "Cina Iya",
+                                            "email": "wahy6u@gmail.com",
+                                            "age": 15,
+                                            "gender": "P",
+                                            "price": 22000,
+                                            "picture": "https://ik.imagekit.io/rnwxyz/trainer/33ed55c9-88f0-4370-9415-4c00838b97f5",
+                                            "trainer_skill": [
+                                                {
+                                                    "skill_id": 3,
+                                                    "skill_name": "CORE"
+                                                },
+                                                {
+                                                    "skill_id": 4,
+                                                    "skill_name": "CORE222"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": 2,
+                                            "name": "Wahyu",
+                                            "email": "wahyu1@gmail.com",
+                                            "age": 0,
+                                            "gender": "L",
+                                            "price": 20000,
+                                            "picture": "https://ik.imagekit.io/rnwxyz/trainer/33ed55c9-88f0-4370-9415-4c00838b97f5",
+                                            "trainer_skill": [
+                                                {
+                                                    "skill_id": 3,
+                                                    "skill_name": "CORE"
+                                                },
+                                                {
+                                                    "skill_id": 4,
+                                                    "skill_name": "CORE222"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": 1,
+                                            "name": "Agus",
+                                            "email": "agus@gmail.com",
+                                            "age": 20,
+                                            "gender": "L",
+                                            "price": 20000,
+                                            "picture": "https://ik.imagekit.io/rnwxyz/trainer/33ed55c9-88f0-4370-9415-4c00838b97f5",
+                                            "trainer_skill": [
+                                                {
+                                                    "skill_id": 3,
+                                                    "skill_name": "CORE"
+                                                },
+                                                {
+                                                    "skill_id": 4,
+                                                    "skill_name": "CORE222"
+                                                },
+                                                {
+                                                    "skill_id": 5,
+                                                    "skill_name": "Muatai"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "message": "success get trainers"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Trainers"],
+                "summary": "Create trainer",
+                "description": "To create new trainer and only admin have access to this service",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/trainer"
+                            },
+                            "example": {
+                                "name": "Virga",
+                                "email": "wahyu@gmail.com",
+                                "phone": "082342516111",
+                                "dob": "2006-12-30",
+                                "gender": "P",
+                                "price": 22000,
+                                "daily_slot": 2,
+                                "description": "Trainer muda",
+                                "trainer_skill": [
+                                    {
+                                        "skill_id": 3
+                                    },
+                                    {
+                                        "skill_id": 4
+                                    }
+                                ],
+                                "picture": "https://ik.imagekit.io/rnwxyz/trainer/33ed55c9-88f0-4370-9415-4c00838b97f5"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success create new trainer",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "new trainer success created"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/trainers/details/{id}":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Trainers"],
+                "summary": "Get single or detail traner",
+                "description": "To spesific trainer or detail trainer",
+                "responses": {
+                    "200": {
+                        "description": "Success get trainer",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": {
+                                        "id": 10,
+                                        "name": "Cinaya",
+                                        "email": "wahyu@gmail.com",
+                                        "phone": "082342516111",
+                                        "age": 15,
+                                        "dob": "2006-12-30T08:00:00+08:00",
+                                        "gender": "P",
+                                        "price": 22000,
+                                        "daily_slot": 2,
+                                        "description": "Trainer muda",
+                                        "picture": "https://ik.imagekit.io/rnwxyz/trainer/33ed55c9-88f0-4370-9415-4c00838b97f5",
+                                        "trainer_skill": [
+                                            {
+                                                "skill_id": 3,
+                                                "skill_name": "CORE"
+                                            },
+                                            {
+                                                "skill_id": 4,
+                                                "skill_name": "CORE222"
+                                            }
+                                        ],
+                                        "client_active": 0,
+                                        "access_trainer": true
+                                    },
+                                    "message": "success get trainer"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Trainers"],
+                "summary": "Delete trainer",
+                "description": "Only admin can delete trainer",
+                "responses": {
+                    "200": {
+                        "description": "Success delete trainer",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "success delete trainer"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Trainers"],
+                "summary": "Update trainer",
+                "description": "Update trainer only admin can access",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref":"#/components/schemas/onlineClass"
+                            },
+                            "example": {
+                                "name": "Bagis",
+                                "email": "wahyu@gmail.com",
+                                "phone": "082342516111",
+                                "dob": "2021-12-30",
+                                "gender": "P",
+                                "price": 22000,
+                                "daily_slot": 2,
+                                "description": "Trainer muda",
+                                "trainer_skill": [
+                                    {
+                                        "skill_id": 111
+                                    }
+                                ],
+                                "picture": "https://ik.imagekit.io/rnwxyz/trainer/33ed55c9-88f0-4370-9415-4c00838b97f5"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success update trainer",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success update trainer"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/trainers/skills":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Trainer Skills"],
+                "summary": "Get all trainer skill",
+                "description": "To get all trainer skill availabble",
+                "responses": {
+                    "200": {
+                        "description": "Success get trainer skill",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/skill"
+                                },
+                                "example": {
+                                    "data": {
+                                        "data": [
+                                            {
+                                                "id": 3,
+                                                "name": "CORE",
+                                                "description": ""
+                                            },
+                                            {
+                                                "id": 4,
+                                                "name": "CORE222",
+                                                "description": ""
+                                            },
+                                            {
+                                                "id": 5,
+                                                "name": "Muatai",
+                                                "description": "testt"
+                                            },
+                                            {
+                                                "id": 6,
+                                                "name": "Karate",
+                                                "description": "testt"
+                                            }
+                                        ],
+                                        "message": "success get trainer skills"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Trainer Skills"],
+                "summary": "Create new trainer skill",
+                "description": "To create new trainer skill and only admin have access to this service",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/skill"
+                            },
+                            "example": {
+                                "name": "Zumba",
+                                "description": "Ini merupakan skill zumba"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success create new trainer skill",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "new trainer skill success created"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/trainers/skills/details/{id}":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Trainer Skills"],
+                "summary": "Get single or detail trainer skill",
+                "description": "To spesific trainer skill or detail trainer skill",
+                "responses": {
+                    "200": {
+                        "description": "Success get trainer skill",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": {
+                                        "id": 3,
+                                        "name": "CORE",
+                                        "description": "ini deskripsi"
+                                    },
+                                    "message": "success get trainer skill"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Trainer Skills"],
+                "summary": "Delete trainer skill",
+                "description": "Only admin can delete trainer skill",
+                "responses": {
+                    "200": {
+                        "description": "Success delete trainer skill",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "success delete trainer skill"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Trainer Skills"],
+                "summary": "Update trainer skill",
+                "description": "Update trainer skill only admin can access",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref":"#/components/schemas/skill"
+                            },
+                            "example": {
+                                "name": "Zumba Baru",
+                                "description": "Ini merupakan skill untuk zumba baru"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success update trainer skilly",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success update trainer skill"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/trainers/bookings":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/components/parameters/q"
+                    }
+                ],
+                "tags": ["Trainer Bookings"],
+                "summary": "Get all trainer booking or transaction",
+                "description": "To get all trainer booking or transaction, only admin can access",
+                "responses": {
+                    "200": {
+                        "description": "Success get trainer transaction",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "$ref":"#/components/schemas/trainerBooking"
+                                },
+                                "example": {
+                                    "data": {
+                                        "data": {
+                                            "data": {
+                                                "trainer_bookings": [
+                                                    {
+                                                        "id": 2,
+                                                        "user_name": "Rian Wijaya",
+                                                        "user_email": "r@gmail.com",
+                                                        "trainer_name": "Agus",
+                                                        "expired_at": "2022-12-18T07:59:59+08:00",
+                                                        "actived_at": "0001-01-01T00:00:00Z",
+                                                        "time": "2022-12-17T23:00:00+08:00",
+                                                        "status": "WAITING"
+                                                    },
+                                                    {
+                                                        "id": 3,
+                                                        "user_name": "Rian Wijaya",
+                                                        "user_email": "r@gmail.com",
+                                                        "trainer_name": "Agus",
+                                                        "expired_at": "2022-12-17T23:59:59+08:00",
+                                                        "actived_at": "0001-01-01T00:00:00+08:00",
+                                                        "time": "2022-12-17T15:00:00+08:00",
+                                                        "status": "WAITING"
+                                                    },
+                                                    {
+                                                        "id": 4,
+                                                        "user_name": "Rian Wijaya",
+                                                        "user_email": "r@gmail.com",
+                                                        "trainer_name": "Agus",
+                                                        "expired_at": "2022-12-17T23:59:59+08:00",
+                                                        "actived_at": "0001-01-01T00:00:00+08:00",
+                                                        "time": "2022-12-17T15:30:10+08:00",
+                                                        "status": "WAITING"
+                                                    },
+                                                    {
+                                                        "id": 6,
+                                                        "user_name": "Rian Wijaya",
+                                                        "user_email": "r@gmail.com",
+                                                        "trainer_name": "Agus",
+                                                        "expired_at": "2022-12-17T23:59:59+08:00",
+                                                        "actived_at": "2022-12-16T12:13:15.578+08:00",
+                                                        "time": "2022-12-17T15:30:10+08:00",
+                                                        "status": "ACTIVE"
+                                                    }
+                                                ],
+                                                "page": 1,
+                                                "limit": 10,
+                                                "count": 4
+                                            },
+                                            "message": "success get trainer bookings"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "tags": ["Trainer Bookings"],
+                "summary": "Create new trainer booking or transaction",
+                "description": "To create new trainer booking or new transaction",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref": "#/components/schemas/onlineClassBooking"
+                            },
+                            "example": {
+                                "trainer_id": 1,
+                                "payment_method_id": 1,
+                                "time": "2022-12-18 15:30:10",
+                                "total": 20000
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success create new trainer booking",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "data": {
+                                        "id": 1
+                                    },
+                                    "message": "new trainer booking success created"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/trainers/bookings/details/{id}":{
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Trainer Bookings"],
+                "summary": "Get single or details trainer booking",
+                "description": "To spesific trainer booking or detail trainer booking",
+                "responses": {
+                    "200": {
+                        "description": "Success get trainer booking",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": {
+                                        "id": 13,
+                                        "user": {
+                                            "id": 6,
+                                            "name": "Rian Wijaya",
+                                            "email": "re@gmail.com"
+                                        },
+                                        "trainer": {
+                                            "id": 1,
+                                            "name": "Agus",
+                                            "email": "agus@gmail.com",
+                                            "age": 20,
+                                            "gender": "L",
+                                            "price": 20000,
+                                            "picture": "https://ik.imagekit.io/rnwxyz/trainer/33ed55c9-88f0-4370-9415-4c00838b97f5",
+                                            "trainer_skill": [
+                                                {
+                                                    "skill_id": 3,
+                                                    "skill_name": "CORE"
+                                                },
+                                                {
+                                                    "skill_id": 4,
+                                                    "skill_name": "CORE222"
+                                                },
+                                                {
+                                                    "skill_id": 5,
+                                                    "skill_name": "Muatai"
+                                                }
+                                            ]
+                                        },
+                                        "expired_at": "2022-12-18T23:59:59+08:00",
+                                        "actived_at": "2022-12-16T14:04:44.446+08:00",
+                                        "time": "2022-12-18T15:30:00+08:00",
+                                        "proof_payment": "https://ik.imagekit.io/rnwxyz/trainer_booking/7dca1673-1176-4616-8d5f-62191ccf2f3e",
+                                        "payment_method": {
+                                            "id": 1,
+                                            "name": "ShoopePay",
+                                            "description": "Bisa bayar dimanapun dan kapanpun",
+                                            "payment_number": "0812342331512"
+                                        },
+                                        "total": 25000,
+                                        "code": "2e762f95-8931-447f-a05a-7265f64a7345",
+                                        "status": "INACTIVE"
+                                    },
+                                    "message": "success trainer booking"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Trainer Bookings"],
+                "summary": "Delete trainer booking",
+                "description": "Only admin can delete trainer booking",
+                "responses": {
+                    "200": {
+                        "description": "Success delete trainer booking",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "success delete trainer booking"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Trainer Bookings"],
+                "summary": "Update trainer booking",
+                "description": "Update trainer booking from user or from admin",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "$ref":"#/components/schemas/trainerBooking"
+                            },
+                            "example": {
+                                "user_id": 6,
+                                "trainer_id": 1,
+                                "payment_method_id": 1,
+                                "time": "2022-12-18 15:30:00",
+                                "total": 25000
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success update trainer booking",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success update trainer booking"
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/trainers/bookings/set-status/{id}":{
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Trainer Bookings"],
+                "summary": "Set trainer booking status",
+                "description": "Only admin can set trainer booking status. Status set allowed (ACTIVE, INACTIVE, REJECT)",
+                "requestBody":{
+                    "required": true,
+                    "content": {
+                        "application/json":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "status":{
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "example": {
+                                "status":"ACTIVE"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success set status",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success set status"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/trainers/bookings/pay/{id}":{
+            "post": {
+                "tags": ["Trainer Bookings"],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "summary": "Upload proof of trainers booking payment, id is online class booking id",
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "description": "only support image file (validation from extention file)",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "file":{
+                                        "type": "string",
+                                        "format": "binary",
+                                        "required": ["true"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment success",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "message": "payment success"
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                       "$ref": "#/components/responses/badRequest"
+                    },
+                    "404":{
+                       "$ref": "#/components/responses/notFound"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                     },
+                     "403":{
+                        "$ref": "#/components/responses/forbidden"
+                     },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    }
+                }
+            }
+        },
+        "/trainers/bookings/take":{
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/email"
+                    },
+                    {
+                        "$ref":"#/components/parameters/code"
+                    }
+                ],
+                "tags": ["Trainer Bookings"],
+                "summary": "User take the booking (user comes to trainer)",
+                "description": "Only admin can take user trainer booking. Status booking will set to DONE",
+                "responses": {
+                    "200": {
+                        "description": "Success take booking",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "success take booking"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            },
+            "get": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/email"
+                    },
+                    {
+                        "$ref":"#/components/parameters/code"
+                    }
+                ],
+                "tags": ["Trainer Bookings"],
+                "summary": "User take the booking (user comes to trainer)",
+                "description": "Only admin can take user trainer booking. Will check booking user from email and code",
+                "responses": {
+                    "200": {
+                        "description": "Success take booking",
+                        "content": {
+                            "application/json":{
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 4,
+                                            "user_name": "superadmin",
+                                            "user_email": "superadmin@gmail.com",
+                                            "trainer_name": "Yoga",
+                                            "expired_at": "2022-12-12T19:30:00+08:00",
+                                            "actived_at": "2022-12-08T15:31:56.657+08:00",
+                                            "time": "2022-12-08T15:31:56.657+08:00",
+                                            "status": "ACTIVE"
+                                        }
+                                    ],
+                                    "message": "success get trainer booking"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "400":{
+                        "$ref": "#/components/responses/badRequest"
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
                     }
                 }
             }
@@ -4671,6 +5918,57 @@
                     }
                 }
             },
+            "trainer":{
+                "type":"object",
+                "properties": {
+                    "id":{
+                        "type": "integer"
+                    },
+                    "name":{
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "dob": {
+                        "type": "string",
+                        "description": "date of birth"
+                    },
+                    "gender": {
+                        "type": "string",
+                        "description": "date of birth"
+                    },
+                    "price": {
+                        "type": "integer"
+                    },
+                    "daily_slot": {
+                        "type": "integer"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "picture": {
+                        "type": "string"
+                    },
+                    "trainerSkill":{
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id":{
+                                    "type": "integer"
+                                },
+                                "name":{
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "onlineClassCategory":{
                 "type": "object",
                 "properties": {
@@ -4684,6 +5982,20 @@
                         "type": "string"
                     },
                     "picture":{
+                        "type": "string"
+                    }
+                }
+            },
+            "skill":{
+                "type": "object",
+                "properties": {
+                    "id":{
+                        "type": "integer"
+                    },
+                    "name":{
+                        "type": "string"
+                    },
+                    "description":{
                         "type": "string"
                     }
                 }
@@ -4761,6 +6073,46 @@
                     },
                     "total": {
                         "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "description": "same as status in member"
+                    }
+                }
+            },
+            "trainerBooking":{
+                "type":"object",
+                "properties": {
+                    "id":{
+                        "type": "integer"
+                    },
+                    "user_id":{
+                        "type": "integer"
+                    },
+                    "trainer_id": {
+                        "type": "integer"
+                    },
+                    "expired_at": {
+                        "type": "string"
+                    },
+                    "time": {
+                        "type": "string"
+                    },
+                    "actived_at": {
+                        "type": "string"
+                    },
+                    "payment_method_id": {
+                        "type": "integer"
+                    },
+                    "proof_payment": {
+                        "type": "string"
+                    },
+                    "total": {
+                        "type": "string"
+                    },
+                    "code":{
+                        "type": "string",
+                        "description": "when status active booking will generate unique code"
                     },
                     "status": {
                         "type": "string",
@@ -4992,6 +6344,33 @@
                     "description": "The number of page (page)"
                 },
                 "example": 1
+            },
+            "date": {
+                "in": "query",
+                "name": "date",
+                "schema":{
+                    "type": "string",
+                    "description": "filter trainer is available or not in this date"
+                },
+                "example": "2022-01-01"
+            },
+            "gender": {
+                "in": "query",
+                "name": "gender",
+                "schema":{
+                    "type": "string",
+                    "description": "filter from trainer gender P or L"
+                },
+                "example": "P"
+            },
+            "name": {
+                "in": "query",
+                "name": "name",
+                "schema":{
+                    "type": "string",
+                    "description": "filter from trainer name"
+                },
+                "example": "agus"
             },
             "status": {
                 "in": "query",

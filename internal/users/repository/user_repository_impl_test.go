@@ -80,7 +80,7 @@ func (s *suiteUserRepository) TestCreateUser() {
 				Role:     "user",
 			},
 			ExpectedErr: myerrors.ErrEmailAlredyExist,
-			MockReturn:  errors.New("Duplicate entry"),
+			MockReturn:  errors.New("Error 1062:"),
 		},
 	}
 

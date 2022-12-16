@@ -17,7 +17,7 @@ type paymentMethodRepositoryImpl struct {
 func (r *paymentMethodRepositoryImpl) CreatePaymentMethod(body *model.PaymentMethod, ctx context.Context) error {
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
-		if strings.Contains(err.Error(), "Duplicate entry") {
+		if strings.Contains(err.Error(), "Error 1062:") {
 			if err := r.CheckPaymentMethodIsDeleted(body); err == nil {
 				return nil
 			}
@@ -67,17 +67,26 @@ func (r *paymentMethodRepositoryImpl) FindPaymentMethodById(id uint, ctx context
 }
 
 // FindPaymentMethods implements PaymentMethodRepository
-func (r *paymentMethodRepositoryImpl) FindPaymentMethods(ctx context.Context) ([]model.PaymentMethod, error) {
+func (r *paymentMethodRepositoryImpl) FindPaymentMethods(access bool, ctx context.Context) ([]model.PaymentMethod, error) {
 	paymentMethods := []model.PaymentMethod{}
-	err := r.db.WithContext(ctx).Find(&paymentMethods).Error
-	return paymentMethods, err
+	res := r.db.WithContext(ctx).Model(&model.PaymentMethod{})
+	if !access {
+		res.Where("id != ?", 0).Find(&paymentMethods)
+	} else {
+		res.Find(&paymentMethods)
+	}
+	err := res.Error
+	if err != nil {
+		return nil, err
+	}
+	return paymentMethods, nil
 }
 
 // UpdatePaymentMethod implements PaymentMethodRepository
 func (r *paymentMethodRepositoryImpl) UpdatePaymentMethod(body *model.PaymentMethod, ctx context.Context) error {
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+		if strings.Contains(res.Error.Error(), "Error 1062:") {
 			return myerrors.ErrDuplicateRecord
 		}
 		return res.Error

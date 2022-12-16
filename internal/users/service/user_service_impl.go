@@ -76,7 +76,7 @@ func (s *userServiceImpl) CreateAdmin(user *dto.NewUser, ctx context.Context) er
 }
 
 // CreateSuperadmin implements UserService
-func (s *userServiceImpl) CreateSuperadmin() error {
+func (s *userServiceImpl) CreateSuperadmin(superadmin *model.User) error {
 	isEmpty, err := s.userRepository.CheckUserIsEmpty(context.Background())
 	if err != nil {
 		return err
@@ -84,18 +84,18 @@ func (s *userServiceImpl) CreateSuperadmin() error {
 	if !isEmpty {
 		return nil
 	}
-	hashPassword, err := s.password.HashPassword(constans.Superadmin_password)
+	hashPassword, err := s.password.HashPassword(superadmin.Password)
 	if err != nil {
 		return err
 	}
-	superadmin := model.User{
+	model := model.User{
 		ID:       1,
-		Name:     constans.Superadmin_name,
-		Email:    constans.Superadmin_email,
+		Name:     superadmin.Name,
+		Email:    superadmin.Email,
 		Role:     constans.Role_superadmin,
 		Password: hashPassword,
 	}
-	err = s.userRepository.CreateUser(&superadmin, context.Background())
+	err = s.userRepository.CreateUser(&model, context.Background())
 	return err
 }
 

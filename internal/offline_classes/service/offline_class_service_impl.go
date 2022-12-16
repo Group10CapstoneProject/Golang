@@ -134,10 +134,10 @@ func (s *offlineClassServiceImpl) FindOfflineClassBookings(page *model.Paginatio
 	result.FromModel(offlineClassBookings)
 
 	response := dto.OfflineClassBookingResponses{
-		Members: result,
-		Page:    uint(page.Page),
-		Limit:   uint(page.Limit),
-		Count:   uint(count),
+		OfflineClassBookings: result,
+		Page:                 uint(page.Page),
+		Limit:                uint(page.Limit),
+		Count:                uint(count),
 	}
 	return &response, nil
 }
