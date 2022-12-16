@@ -20,6 +20,7 @@ type OfflineClass struct {
 	Price                  uint
 	Picture                string
 	TrainerID              uint
+	Trainer                Trainer
 	Description            string `gorm:"type:varchar(255)"`
 	Location               string `gorm:"type:varchar(255)"`
 	OfflineClassCategoryID uint
@@ -52,8 +53,6 @@ type OfflineClassBooking struct {
 	Status          StatusType `gorm:"type:enum('PENDING', 'WAITING', 'ACTIVE', 'INACTIVE', 'REJECT', 'DONE', 'CENCEL');column:status"`
 	ProofPayment    string
 	PaymentMethodID uint
-	TrainerID       uint
-	Trainer         Trainer
 	PaymentMethod   PaymentMethod
 	Code            uuid.UUID
 	Total           uint
