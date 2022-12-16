@@ -59,7 +59,23 @@ func (r *trainerRepositoryImpl) CreateTrainer(body *model.Trainer, ctx context.C
 
 // CreateTrainerBooking implements TrainerRepository
 func (r *trainerRepositoryImpl) CreateTrainerBooking(body *model.TrainerBooking, ctx context.Context) (*model.TrainerBooking, error) {
-	err := r.db.WithContext(ctx).Create(body).Error
+	var count int64
+	var dailySlot int64
+	date := body.Time.Format("2006-01-02")
+	err := r.db.WithContext(ctx).Model(&model.TrainerBooking{}).Where("trainer_id = ? AND DATE(time) = ? AND status NOT IN (?,?,?)",
+		body.TrainerID, date, model.CENCEL, model.INACTIVE, model.REJECT).
+		Count(&count).Error
+	if err != nil {
+		return nil, err
+	}
+	err = r.db.WithContext(ctx).Model(&model.Trainer{}).Where("id = ?", body.TrainerID).Select("daily_slot").First(&dailySlot).Error
+	if err != nil {
+		return nil, err
+	}
+	if count >= dailySlot {
+		return nil, myerrors.ErrTrainerIsFull
+	}
+	err = r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
 		return nil, err
 	}
@@ -145,6 +161,7 @@ func (r *trainerRepositoryImpl) FindTrainerBookingById(id uint, ctx context.Cont
 		Preload("User").
 		Preload("Trainer").
 		Preload("Trainer.TrainerSkill").
+		Preload("Trainer.TrainerSkill.Skill").
 		Preload("PaymentMethod").
 		First(&trainerBooking).Error
 	if err != nil {
@@ -174,13 +191,13 @@ func (r *trainerRepositoryImpl) FindTrainerBookings(page *model.Pagination, ctx 
 
 	query := r.db.WithContext(ctx).Model(&model.TrainerBooking{}).
 		Joins("LEFT JOIN users ON users.id = trainer_bookings.user_id").
-		Joins("LEFT JOIN trainer ON trainer.id = trainer_bookings.trainer_id")
+		Joins("LEFT JOIN trainers ON trainers.id = trainer_bookings.trainer_id")
 	if page.Q != "" {
-		query.Where("users.name LIKE ? OR users.email LIKE ? OR trainer.name LIKE ?", "%"+page.Q+"%", "%"+page.Q+"%", "%"+page.Q+"%")
+		query.Where("users.name LIKE ? OR users.email LIKE ? OR trainers.name LIKE ?", "%"+page.Q+"%", "%"+page.Q+"%", "%"+page.Q+"%")
 	}
 	err := query.
 		Preload("User").
-		Preload("trainer").
+		Preload("Trainer").
 		Count(&count).
 		Offset(offset).
 		Limit(page.Limit).
@@ -198,6 +215,7 @@ func (r *trainerRepositoryImpl) FindTrainerById(id uint, ctx context.Context) (*
 	trainer := model.Trainer{}
 	err := r.db.WithContext(ctx).Where("id = ?", id).
 		Preload("TrainerSkill").
+		Preload("TrainerBooking", "status = ?", model.ACTIVE).
 		Preload("TrainerSkill.Skill").
 		First(&trainer).Error
 	if err != nil {
@@ -218,7 +236,8 @@ func (r *trainerRepositoryImpl) FindTrainers(cond *model.Trainer, priceOrder str
 		res.Order("id DESC")
 	}
 	if date != "" {
-		res.Where("daily_slot > (SELECT COUNT(a.id) FROM trainer_bookings a WHERE a.trainer_id = id AND DATE(a.time) = ?)", date)
+		res.Where("daily_slot > (SELECT COUNT(a.id) FROM trainer_bookings a WHERE a.trainer_id = id AND DATE(a.time) = ? AND a.status NOT IN (?,?,?))",
+			date, model.CENCEL, model.INACTIVE, model.REJECT)
 	}
 	err := res.Find(&traieners, cond).Error
 	if err != nil {
@@ -259,37 +278,37 @@ func (r *trainerRepositoryImpl) UpdateSkill(body *model.Skill, ctx context.Conte
 // UpdateTrainer implements TrainerRepository
 func (r *trainerRepositoryImpl) UpdateTrainer(body *model.Trainer, ctx context.Context) error {
 	res := r.db.Begin()
-	if len(body.TrainerSkill) != 0 {
-		err := res.WithContext(ctx).Model(&model.TrainerSkill{}).Where("trainer_id = ?", body.ID).Delete(&model.TrainerSkill{}).Error
-		if err != nil {
-			return err
-		}
-	}
-	res.Updates(body)
-	if res.Error != nil {
-		err := r.db.WithContext(ctx).Model(&model.TrainerSkill{}).Where("trainer_id = ?", body.ID).Update("deleted_at", nil).Error
-		if err != nil {
-			return err
-		}
-		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+	res.WithContext(ctx).
+		Model(&model.TrainerSkill{}).
+		Where("trainer_id = ?", body.ID).
+		Delete(&model.TrainerSkill{})
+	err := res.WithContext(ctx).Model(body).Updates(body).Error
+	res.Rollback()
+	if err != nil {
+		if strings.Contains(err.Error(), "Duplicate entry") {
 			return myerrors.ErrDuplicateRecord
 		}
-		return res.Error
+		if strings.Contains(err.Error(), "Error 1452:") {
+			return myerrors.ErrForeignKey(err)
+		}
+		return err
 	}
-	if res.RowsAffected == 0 {
-		return myerrors.ErrRecordNotFound
-	}
+	res.Commit()
 	return nil
 }
 
 // UpdateTrainerBooking implements TrainerRepository
 func (r *trainerRepositoryImpl) UpdateTrainerBooking(body *model.TrainerBooking, ctx context.Context) error {
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
-	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+	err := res.Error
+	if err != nil {
+		if strings.Contains(err.Error(), "Duplicate entry") {
 			return myerrors.ErrDuplicateRecord
 		}
-		return res.Error
+		if strings.Contains(err.Error(), "Error 1452:") {
+			return myerrors.ErrForeignKey(err)
+		}
+		return err
 	}
 	if res.RowsAffected == 0 {
 		return myerrors.ErrRecordNotFound

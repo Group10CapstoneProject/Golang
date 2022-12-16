@@ -29,7 +29,7 @@ type PaymentMethodUpdateRequest struct {
 
 func (u *PaymentMethodUpdateRequest) ToModel() *model.PaymentMethod {
 	return &model.PaymentMethod{
-		ID:            u.ID,
+		ID:            &u.ID,
 		Name:          u.Name,
 		Picture:       u.Picture,
 		PaymentNumber: u.PaymentNumber,
@@ -47,7 +47,7 @@ type PaymentMethodResource struct {
 }
 
 func (u *PaymentMethodResource) FromModel(m *model.PaymentMethod) {
-	u.ID = m.ID
+	u.ID = *m.ID
 	u.Name = m.Name
 	u.Picture = m.Picture
 	u.PaymentNumber = m.PaymentNumber

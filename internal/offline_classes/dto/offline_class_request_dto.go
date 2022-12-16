@@ -10,16 +10,16 @@ import (
 // offline class booking store and update request
 type OfflineClassBookingStoreRequest struct {
 	UserID          uint
-	OfflineCLassID  uint `json:"offline_class_id" validate:"required,gte=1"`
-	PaymentMethodID uint `json:"payment_method_id" validate:"required,gte=1"`
-	Total           uint `json:"total" validate:"required,gte=1"`
+	OfflineCLassID  uint  `json:"offline_class_id" validate:"required,gte=1"`
+	PaymentMethodID *uint `json:"payment_method_id" validate:"required,gte=0"`
+	Total           uint  `json:"total" validate:"required,gte=1"`
 }
 
 func (u *OfflineClassBookingStoreRequest) ToModel() *model.OfflineClassBooking {
 	return &model.OfflineClassBooking{
 		UserID:          u.UserID,
 		OfflineClassID:  u.OfflineCLassID,
-		PaymentMethodID: u.PaymentMethodID,
+		PaymentMethodID: *u.PaymentMethodID,
 		Total:           u.Total,
 	}
 }
@@ -28,7 +28,7 @@ type OfflineClassBookingUpdateRequest struct {
 	ID              uint
 	UserID          uint   `json:"user_id,omitempty"`
 	OfflineCLassID  uint   `json:"offline_class_id,,omitempty" validate:"omitempty,gte=1"`
-	PaymentMethodID uint   `json:"payment_method_id,omitempty" validate:"omitempty,gte=1"`
+	PaymentMethodID *uint  `json:"payment_method_id,omitempty" validate:"omitempty,gte=0"`
 	ProofPayment    string `json:"proof_payment,omitempty" validate:"omitempty,url"`
 	Total           uint   `json:"total,omitempty" validate:"omitempty,gte=1"`
 }
@@ -38,7 +38,7 @@ func (u *OfflineClassBookingUpdateRequest) ToModel() *model.OfflineClassBooking 
 		ID:              u.ID,
 		UserID:          u.UserID,
 		OfflineClassID:  u.OfflineCLassID,
-		PaymentMethodID: u.PaymentMethodID,
+		PaymentMethodID: *u.PaymentMethodID,
 		ProofPayment:    u.ProofPayment,
 		Total:           u.Total,
 	}

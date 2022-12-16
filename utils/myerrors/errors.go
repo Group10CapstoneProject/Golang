@@ -1,6 +1,10 @@
 package myerrors
 
-import "errors"
+import (
+	"errors"
+	"regexp"
+	"strings"
+)
 
 var (
 	ErrEmailAlredyExist     = errors.New("email is used")
@@ -20,4 +24,12 @@ var (
 	ErrRecordIsUsed         = errors.New("record is used by other tables")
 	ErrPaymentMethod        = errors.New("payment method declined")
 	ErrOrderExpired         = errors.New("order is expired")
+	ErrTrainerIsFull        = errors.New("trainer slot is full for this day")
+	ErrForeignKey           = func(err error) error {
+		src := regexp.MustCompile(`REFERENCES`)
+		temp := src.Split(err.Error(), -1)
+		massage := strings.Replace(temp[1], "(", "", -1)
+		massage = strings.Replace(massage, ")", "", -1)
+		return errors.New("invalid" + massage)
+	}
 )

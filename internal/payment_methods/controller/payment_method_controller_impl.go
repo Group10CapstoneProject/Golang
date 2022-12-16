@@ -73,7 +73,16 @@ func (d *paymentMehtodControllerImpl) GetPaymentMethodDetail(c echo.Context) err
 
 // GetPaymentMethods implements PaymentMethodController
 func (d *paymentMehtodControllerImpl) GetPaymentMethods(c echo.Context) error {
-	paymentMethods, err := d.paymentMethodService.FindPaymentMethods(c.Request().Context())
+	qParam := c.QueryParam("access")
+	access := false
+	if qParam != "" {
+		temp, err := strconv.ParseBool(qParam)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		access = temp
+	}
+	paymentMethods, err := d.paymentMethodService.FindPaymentMethods(access, c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}

@@ -7,10 +7,10 @@ import (
 // online class booking store and update request
 type OnlineClassBookingStoreRequest struct {
 	UserID          uint
-	OnlineCLassID   uint `json:"online_class_id" validate:"required,gte=1"`
-	Duration        uint `json:"duration" validate:"required,gte=1"`
-	PaymentMethodID uint `json:"payment_method_id" validate:"required,gte=1"`
-	Total           uint `json:"total" validate:"required,gte=1"`
+	OnlineCLassID   uint  `json:"online_class_id" validate:"required,gte=1"`
+	Duration        uint  `json:"duration" validate:"required,gte=1"`
+	PaymentMethodID *uint `json:"payment_method_id" validate:"required,gte=0"`
+	Total           uint  `json:"total" validate:"required,gte=1"`
 }
 
 func (u *OnlineClassBookingStoreRequest) ToModel() *model.OnlineClassBooking {
@@ -18,7 +18,7 @@ func (u *OnlineClassBookingStoreRequest) ToModel() *model.OnlineClassBooking {
 		UserID:          u.UserID,
 		OnlineClassID:   u.OnlineCLassID,
 		Duration:        u.Duration,
-		PaymentMethodID: u.PaymentMethodID,
+		PaymentMethodID: *u.PaymentMethodID,
 		Total:           u.Total,
 	}
 }
@@ -28,7 +28,7 @@ type OnlineClassBookingUpdateRequest struct {
 	UserID          uint   `json:"user_id,omitempty"`
 	OnlineCLassID   uint   `json:"onlinc_class_id,,omitempty" validate:"omitempty,gte=1"`
 	Duration        uint   `json:"duration,,omitempty" validate:"omitemptys,gte=1"`
-	PaymentMethodID uint   `json:"payment_method_id,omitempty" validate:"omitempty,gte=1"`
+	PaymentMethodID *uint  `json:"payment_method_id,omitempty" validate:"omitempty,gte=0"`
 	ProofPayment    string `json:"proof_payment,omitempty" validate:"omitempty,url"`
 	Total           uint   `json:"total,omitempty" validate:"omitempty,gte=1"`
 }
@@ -39,7 +39,7 @@ func (u *OnlineClassBookingUpdateRequest) ToModel() *model.OnlineClassBooking {
 		UserID:          u.UserID,
 		OnlineClassID:   u.OnlineCLassID,
 		Duration:        u.Duration,
-		PaymentMethodID: u.PaymentMethodID,
+		PaymentMethodID: *u.PaymentMethodID,
 		ProofPayment:    u.ProofPayment,
 		Total:           u.Total,
 	}

@@ -74,7 +74,7 @@ func (d *trainerControllerImpl) CreateTrainerBooking(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "new offline class booking success created",
+		"message": "new trainer booking success created",
 		"data":    echo.Map{"id": id},
 	})
 }

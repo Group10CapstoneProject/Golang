@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/Group10CapstoneProject/Golang/model"
+	"github.com/google/uuid"
 )
 
 // trainer resource
@@ -164,6 +165,7 @@ type TrainerBookingDetailResource struct {
 	ProofPayment  string                `json:"proof_payment"`
 	PaymentMethod PaymentMethodResource `json:"payment_method"`
 	Total         uint                  `json:"total"`
+	Code          uuid.UUID             `json:"code"`
 	Status        model.StatusType      `json:"status"`
 }
 
@@ -183,6 +185,7 @@ func (u *TrainerBookingDetailResource) FromModel(m *model.TrainerBooking) {
 	u.Time = m.Time
 	u.ProofPayment = m.ProofPayment
 	u.PaymentMethod = paymentMethod
+	u.Code = m.Code
 	u.Total = m.Total
 	u.Status = m.Status
 }
@@ -195,7 +198,7 @@ type PaymentMethodResource struct {
 }
 
 func (u *PaymentMethodResource) FromModel(m *model.PaymentMethod) {
-	u.ID = m.ID
+	u.ID = *m.ID
 	u.Name = m.Name
 	u.Description = m.Description
 	u.PaymentNumber = m.PaymentNumber

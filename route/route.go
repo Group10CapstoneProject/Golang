@@ -174,7 +174,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	onlineClassBooking.POST("/set-status/:id", onlineClassController.SetStatusOnlineClassBooking, md.CustomJWTWithConfig(roleAdmin)).Name = "set-status-online-class-booking"
 	onlineClassBooking.POST("/pay/:id", onlineClassController.OnlineClassBookingPayment, md.CustomJWTWithConfig(roleUser)).Name = "online-class-booking-payment"
 	onlineClassBookingDetails := onlineClassBooking.Group("/details")
-	onlineClassBookingDetails.GET("/:id", onlineClassController.GetOnlineClassBookingDetail, md.CustomJWTWithConfig(roleUser)).Name = "get-online-class-booking-detail"
+	onlineClassBookingDetails.GET("/:id", onlineClassController.GetOnlineClassBookingDetail, md.CustomJWTWithConfig(allAccess)).Name = "get-online-class-booking-detail"
 	onlineClassBookingDetails.PUT("/:id", onlineClassController.UpdateOnlineClassBooking, md.CustomJWTWithConfig(roleAdmin)).Name = "update-online-class-booking"
 	onlineClassBookingDetails.DELETE("/:id", onlineClassController.DeleteOnlineClassBooking, md.CustomJWTWithConfig(roleAdmin)).Name = "delete-online-class-booking"
 	// online class category

@@ -48,7 +48,8 @@ func (s *trainerServiceImpl) CreateTrainer(request *dto.TrainerStoreRequest, ctx
 // CreateTrainerBooking implements TrainerService
 func (s *trainerServiceImpl) CreateTrainerBooking(request *dto.TrainerBookingStoreRequest, ctx context.Context) (uint, error) {
 	trainerBooking := request.ToModel()
-	if trainerBooking.PaymentMethodID == 0 {
+	t := time.Now()
+	if *trainerBooking.PaymentMethodID == 0 {
 		member, err := s.memberRepository.ReadMembers(&model.Member{
 			UserID: trainerBooking.UserID,
 			Status: model.ACTIVE,
@@ -59,14 +60,15 @@ func (s *trainerServiceImpl) CreateTrainerBooking(request *dto.TrainerBookingSto
 		if len(member) == 0 || !*member[0].MemberType.AccessTrainer {
 			return 0, myerrors.ErrPaymentMethod
 		}
-		trainerBooking.ExpiredAt = time.Date(trainerBooking.Time.Year(), trainerBooking.Time.Month(), trainerBooking.Time.Day(), 23, 59, 59, 0, time.UTC)
+		trainerBooking.ExpiredAt = time.Date(trainerBooking.Time.Year(), trainerBooking.Time.Month(), trainerBooking.Time.Day(), 23, 59, 59, 0, t.Location())
 		trainerBooking.ActivedAt = time.Now()
 		trainerBooking.ProofPayment = "https://ik.imagekit.io/rnwxyz/gymmember.png"
+		trainerBooking.Code = uuid.New()
 		trainerBooking.Status = model.ACTIVE
 	} else {
 		trainerBooking.ExpiredAt = time.Now().Add(24 * time.Hour)
-		trainerBooking.ExpiredAt = time.Date(trainerBooking.ExpiredAt.Year(), trainerBooking.ExpiredAt.Month(), trainerBooking.ExpiredAt.Day(), 23, 59, 59, 0, time.UTC)
-		trainerBooking.ActivedAt = time.Date(0001, 1, 1, 0, 0, 0, 0, time.UTC)
+		trainerBooking.ExpiredAt = time.Date(trainerBooking.ExpiredAt.Year(), trainerBooking.ExpiredAt.Month(), trainerBooking.ExpiredAt.Day(), 23, 59, 59, 0, t.Location())
+		trainerBooking.ActivedAt = time.Date(0001, 1, 1, 0, 0, 0, 0, t.Location())
 		trainerBooking.Status = model.WAITING
 	}
 	result, err := s.trainerRepository.CreateTrainerBooking(trainerBooking, ctx)
@@ -102,10 +104,10 @@ func (s *trainerServiceImpl) DeleteTrainer(id uint, ctx context.Context) error {
 
 // DeleteTrainerBooking implements TrainerService
 func (s *trainerServiceImpl) DeleteTrainerBooking(id uint, ctx context.Context) error {
-	trainer := model.Trainer{
+	trainerBooking := model.TrainerBooking{
 		ID: id,
 	}
-	err := s.trainerRepository.DeleteTrainer(&trainer, ctx)
+	err := s.trainerRepository.DeleteTrainerBooking(&trainerBooking, ctx)
 	if err != nil {
 		return err
 	}
@@ -208,9 +210,9 @@ func (s *trainerServiceImpl) SetStatusTrainerBooking(request *dto.SetStatusTrain
 		return err
 	}
 	trainerBooking := request.ToModel()
-
+	t := time.Now()
 	if trainerBooking.Status == model.ACTIVE && check.Status != model.ACTIVE && check.Status != model.INACTIVE {
-		trainerBooking.ExpiredAt = time.Date(trainerBooking.Time.Year(), trainerBooking.Time.Month(), trainerBooking.Time.Day(), 23, 59, 59, 0, time.UTC)
+		trainerBooking.ExpiredAt = time.Date(check.Time.Year(), check.Time.Month(), check.Time.Day(), 23, 59, 59, 0, t.Location())
 		trainerBooking.ActivedAt = time.Now()
 		trainerBooking.Code = uuid.New()
 	} else if trainerBooking.Status == model.REJECT && check.Status != model.REJECT {
@@ -257,7 +259,7 @@ func (s *trainerServiceImpl) TrainerPayment(request *model.PaymentRequest, ctx c
 	body := model.TrainerBooking{
 		ID:           id,
 		ProofPayment: url,
-		ExpiredAt:    time.Date(exp.Year(), exp.Month(), exp.Day(), 23, 59, 59, 0, time.UTC),
+		ExpiredAt:    time.Date(exp.Year(), exp.Month(), exp.Day(), 23, 59, 59, 0, exp.Location()),
 		Status:       model.PENDING,
 	}
 	err = s.trainerRepository.UpdateTrainerBooking(&body, ctx)

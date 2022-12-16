@@ -60,7 +60,7 @@ type TrainerBooking struct {
 	Time            time.Time
 	Status          StatusType `gorm:"type:enum('PENDING', 'WAITING', 'ACTIVE', 'INACTIVE', 'REJECT', 'DONE', 'CENCEL');column:status"`
 	ProofPayment    string
-	PaymentMethodID uint
+	PaymentMethodID *uint
 	PaymentMethod   PaymentMethod
 	Code            uuid.UUID
 	Total           uint

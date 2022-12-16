@@ -13,12 +13,13 @@ type TrainerBookingStoreRequest struct {
 	UserID          uint
 	TrainerID       uint   `json:"trainer_id" validate:"required,gte=1"`
 	Time            string `json:"time" validate:"required,mytime"`
-	PaymentMethodID uint   `json:"payment_method_id" validate:"required,gte=1"`
+	PaymentMethodID *uint  `json:"payment_method_id" validate:"required,gte=0"`
 	Total           uint   `json:"total" validate:"required,gte=1"`
 }
 
 func (u *TrainerBookingStoreRequest) ToModel() *model.TrainerBooking {
-	time, err := time.Parse(constans.FormatTime, u.Time)
+	zone, _ := time.Now().Zone()
+	time, err := time.Parse(constans.FormatTime, u.Time+" "+zone)
 	if err != nil {
 		return nil
 	}
@@ -33,17 +34,18 @@ func (u *TrainerBookingStoreRequest) ToModel() *model.TrainerBooking {
 }
 
 type TrainerBookingUpdateRequest struct {
-	ID              uint   `json:"id,omitempty"`
-	UserID          uint   `json:"user_id,omitempty"`
+	ID              uint
+	UserID          uint   `json:"user_id,omitempty" validate:"omitempty,gte=1"`
 	TrainerID       uint   `json:"trainer_id,omitempty" validate:"omitempty,gte=1"`
-	Time            string `json:"time,omitempty" validate:"omitemptys,gte=1"`
-	PaymentMethodID uint   `json:"payment_method_id,omitempty" validate:"omitempty,gte=1"`
+	Time            string `json:"time,omitempty" validate:"omitempty,mytime"`
+	PaymentMethodID *uint  `json:"payment_method_id,omitempty" validate:"omitempty,gte=1"`
 	ProofPayment    string `json:"proof_payment,omitempty" validate:"omitempty,url"`
 	Total           uint   `json:"total,omitempty" validate:"omitempty,gte=1"`
 }
 
 func (u *TrainerBookingUpdateRequest) ToModel() *model.TrainerBooking {
-	time, err := time.Parse(constans.FormatTime, u.Time)
+	zone, _ := time.Now().Zone()
+	time, err := time.Parse(constans.FormatTime, u.Time+" "+zone)
 	if err != nil {
 		return nil
 	}

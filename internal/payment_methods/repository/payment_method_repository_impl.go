@@ -67,10 +67,19 @@ func (r *paymentMethodRepositoryImpl) FindPaymentMethodById(id uint, ctx context
 }
 
 // FindPaymentMethods implements PaymentMethodRepository
-func (r *paymentMethodRepositoryImpl) FindPaymentMethods(ctx context.Context) ([]model.PaymentMethod, error) {
+func (r *paymentMethodRepositoryImpl) FindPaymentMethods(access bool, ctx context.Context) ([]model.PaymentMethod, error) {
 	paymentMethods := []model.PaymentMethod{}
-	err := r.db.WithContext(ctx).Find(&paymentMethods).Error
-	return paymentMethods, err
+	res := r.db.WithContext(ctx).Model(&model.PaymentMethod{})
+	if !access {
+		res.Where("id != ?", 0).Find(&paymentMethods)
+	} else {
+		res.Find(&paymentMethods)
+	}
+	err := res.Error
+	if err != nil {
+		return nil, err
+	}
+	return paymentMethods, nil
 }
 
 // UpdatePaymentMethod implements PaymentMethodRepository
