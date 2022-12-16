@@ -16,6 +16,10 @@ type PaymentMethod struct {
 	PaymentNumber string         `gorm:"type:varchar(255)"`
 	Description   string
 	Picture       string
+	Member        []Member
+	OnlineClass   []OnlineClassBooking
+	OfflineClass  []OfflineClassBooking
+	Trainer       []TrainerBooking
 }
 
 type PaymentRequest struct {

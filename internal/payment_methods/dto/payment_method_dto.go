@@ -6,7 +6,7 @@ import "github.com/Group10CapstoneProject/Golang/model"
 type PaymentMethodStoreRequest struct {
 	Name          string `json:"name" validate:"required,name"`
 	PaymentNumber string `json:"payment_number" validate:"required,number"`
-	Picture       string `json:"picture" validate:"required,url"`
+	Picture       string `json:"picture,omitempty" validate:"omitempty"`
 	Description   string `json:"description,omitempty"`
 }
 
@@ -39,7 +39,7 @@ func (u *PaymentMethodUpdateRequest) ToModel() *model.PaymentMethod {
 
 // payment method resource
 type PaymentMethodResource struct {
-	ID            uint   `json:"id"`
+	ID            *uint  `json:"id"`
 	Name          string `json:"name"`
 	PaymentNumber string `json:"payment_number"`
 	Picture       string `json:"picture"`
@@ -47,7 +47,7 @@ type PaymentMethodResource struct {
 }
 
 func (u *PaymentMethodResource) FromModel(m *model.PaymentMethod) {
-	u.ID = *m.ID
+	u.ID = m.ID
 	u.Name = m.Name
 	u.Picture = m.Picture
 	u.PaymentNumber = m.PaymentNumber
