@@ -33,11 +33,30 @@ func (r *trainerRepositoryImpl) CheckSkillIsDeleted(body *model.Skill) error {
 	return nil
 }
 
+// CheckTrainerIsDeleted implements TrainerRepository
+func (r *trainerRepositoryImpl) CheckTrainerIsDeleted(body *model.Trainer) error {
+	trainer := model.Trainer{}
+	err := r.db.Where("email = ?", body.Email).First(&model.Trainer{}).Error
+	if err == nil {
+		return myerrors.ErrDuplicateRecord
+	}
+	err = r.db.Unscoped().Where("email = ?", body.Email).First(&trainer).Update("deleted_at", nil).Error
+	if err != nil {
+		return err
+	}
+	body.ID = trainer.ID
+
+	if err := r.UpdateTrainer(body, context.Background()); err != nil {
+		return err
+	}
+	return nil
+}
+
 // CreateSkill implements TrainerRepository
 func (r *trainerRepositoryImpl) CreateSkill(body *model.Skill, ctx context.Context) error {
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
-		if strings.Contains(err.Error(), "Duplicate entry") {
+		if strings.Contains(err.Error(), "Error 1062:") {
 			if err := r.CheckSkillIsDeleted(body); err == nil {
 				return nil
 			}
@@ -52,6 +71,15 @@ func (r *trainerRepositoryImpl) CreateSkill(body *model.Skill, ctx context.Conte
 func (r *trainerRepositoryImpl) CreateTrainer(body *model.Trainer, ctx context.Context) error {
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
+		if strings.Contains(err.Error(), "Error 1062:") {
+			if err := r.CheckTrainerIsDeleted(body); err == nil {
+				return nil
+			}
+			return myerrors.ErrDuplicateRecord
+		}
+		if strings.Contains(err.Error(), "Error 1452:") {
+			return myerrors.ErrForeignKey(err)
+		}
 		return err
 	}
 	return nil
@@ -77,6 +105,9 @@ func (r *trainerRepositoryImpl) CreateTrainerBooking(body *model.TrainerBooking,
 	}
 	err = r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
+		if strings.Contains(err.Error(), "Error 1452:") {
+			return nil, myerrors.ErrForeignKey(err)
+		}
 		return nil, err
 	}
 	return body, nil
@@ -239,7 +270,13 @@ func (r *trainerRepositoryImpl) FindTrainers(cond *model.Trainer, priceOrder str
 		res.Where("daily_slot > (SELECT COUNT(a.id) FROM trainer_bookings a WHERE a.trainer_id = id AND DATE(a.time) = ? AND a.status NOT IN (?,?,?))",
 			date, model.CENCEL, model.INACTIVE, model.REJECT)
 	}
-	err := res.Find(&traieners, cond).Error
+	if cond.Name != "" {
+		res.Where("name LIKE ?", "%"+cond.Name+"%")
+	}
+	if cond.Gender != "" {
+		res.Where("gender = ?", cond.Gender)
+	}
+	err := res.Find(&traieners).Error
 	if err != nil {
 		return nil, err
 	}
@@ -264,7 +301,7 @@ func (r *trainerRepositoryImpl) ReadTrainerBooking(cond *model.TrainerBooking, c
 func (r *trainerRepositoryImpl) UpdateSkill(body *model.Skill, ctx context.Context) error {
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+		if strings.Contains(res.Error.Error(), "Error 1062:") {
 			return myerrors.ErrDuplicateRecord
 		}
 		return res.Error
@@ -285,7 +322,7 @@ func (r *trainerRepositoryImpl) UpdateTrainer(body *model.Trainer, ctx context.C
 	err := res.WithContext(ctx).Model(body).Updates(body).Error
 	res.Rollback()
 	if err != nil {
-		if strings.Contains(err.Error(), "Duplicate entry") {
+		if strings.Contains(err.Error(), "Error 1062:") {
 			return myerrors.ErrDuplicateRecord
 		}
 		if strings.Contains(err.Error(), "Error 1452:") {
@@ -302,7 +339,7 @@ func (r *trainerRepositoryImpl) UpdateTrainerBooking(body *model.TrainerBooking,
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	err := res.Error
 	if err != nil {
-		if strings.Contains(err.Error(), "Duplicate entry") {
+		if strings.Contains(err.Error(), "Error 1062:") {
 			return myerrors.ErrDuplicateRecord
 		}
 		if strings.Contains(err.Error(), "Error 1452:") {

@@ -29,7 +29,7 @@ func (r *memberRepositoryImpl) CreateMember(body *model.Member, ctx context.Cont
 func (r *memberRepositoryImpl) CreateMemberType(body *model.MemberType, ctx context.Context) error {
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
-		if strings.Contains(err.Error(), "Duplicate entry") {
+		if strings.Contains(err.Error(), "Error 1062:") {
 			if err := r.CheckMemberTypeIsDeleted(body); err == nil {
 				return nil
 			}
@@ -151,7 +151,7 @@ func (r *memberRepositoryImpl) FindMembers(page *model.Pagination, ctx context.C
 func (r *memberRepositoryImpl) UpdateMember(body *model.Member, ctx context.Context) error {
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+		if strings.Contains(res.Error.Error(), "Error 1062:") {
 			return myerrors.ErrDuplicateRecord
 		}
 		return res.Error
@@ -166,7 +166,7 @@ func (r *memberRepositoryImpl) UpdateMember(body *model.Member, ctx context.Cont
 func (r *memberRepositoryImpl) UpdateMemberType(body *model.MemberType, ctx context.Context) error {
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+		if strings.Contains(res.Error.Error(), "Error 1062:") {
 			return myerrors.ErrDuplicateRecord
 		}
 		return res.Error

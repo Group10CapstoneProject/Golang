@@ -54,7 +54,7 @@ func (r *onlineClassRepositoryImpl) CreateOnlineClassBooking(body *model.OnlineC
 func (r *onlineClassRepositoryImpl) CreateOnlineClassCategory(body *model.OnlineClassCategory, ctx context.Context) error {
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
-		if strings.Contains(err.Error(), "Duplicate entry") {
+		if strings.Contains(err.Error(), "Error 1062:") {
 			if err := r.CheckOnlineClassCategoryIsDeleted(body); err == nil {
 				return nil
 			}
@@ -183,7 +183,7 @@ func (r *onlineClassRepositoryImpl) FindOnlineClasses(ctx context.Context) ([]mo
 func (r *onlineClassRepositoryImpl) UpdateOnlineClass(body *model.OnlineClass, ctx context.Context) error {
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+		if strings.Contains(res.Error.Error(), "Error 1062:") {
 			return myerrors.ErrDuplicateRecord
 		}
 		return res.Error
@@ -198,7 +198,7 @@ func (r *onlineClassRepositoryImpl) UpdateOnlineClass(body *model.OnlineClass, c
 func (r *onlineClassRepositoryImpl) UpdateOnlineClassBooking(body *model.OnlineClassBooking, ctx context.Context) error {
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+		if strings.Contains(res.Error.Error(), "Error 1062:") {
 			return myerrors.ErrDuplicateRecord
 		}
 		return res.Error
@@ -213,7 +213,7 @@ func (r *onlineClassRepositoryImpl) UpdateOnlineClassBooking(body *model.OnlineC
 func (r *onlineClassRepositoryImpl) UpdateOnlineClassCategory(body *model.OnlineClassCategory, ctx context.Context) error {
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+		if strings.Contains(res.Error.Error(), "Error 1062:") {
 			return myerrors.ErrDuplicateRecord
 		}
 		return res.Error

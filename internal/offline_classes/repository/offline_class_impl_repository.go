@@ -35,7 +35,7 @@ func (r *offlineClassRepositoryImpl) CreateOfflineClassBooking(body *model.Offli
 func (r *offlineClassRepositoryImpl) CreateOfflineClassCategory(body *model.OfflineClassCategory, ctx context.Context) error {
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
-		if strings.Contains(err.Error(), "Duplicate entry") {
+		if strings.Contains(err.Error(), "Error 1062:") {
 			if err := r.CheckOfflineClassCategoryIsDeleted(body); err == nil {
 				return nil
 			}
@@ -208,7 +208,7 @@ func (r *offlineClassRepositoryImpl) ReadOfflineClassBookings(cond *model.Offlin
 func (r *offlineClassRepositoryImpl) UpdateOfflineClass(body *model.OfflineClass, ctx context.Context) error {
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+		if strings.Contains(res.Error.Error(), "Error 1062:") {
 			return myerrors.ErrDuplicateRecord
 		}
 		return res.Error
@@ -223,7 +223,7 @@ func (r *offlineClassRepositoryImpl) UpdateOfflineClass(body *model.OfflineClass
 func (r *offlineClassRepositoryImpl) UpdateOfflineClassBooking(body *model.OfflineClassBooking, ctx context.Context) error {
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+		if strings.Contains(res.Error.Error(), "Error 1062:") {
 			return myerrors.ErrDuplicateRecord
 		}
 		return res.Error
@@ -238,7 +238,7 @@ func (r *offlineClassRepositoryImpl) UpdateOfflineClassBooking(body *model.Offli
 func (r *offlineClassRepositoryImpl) UpdateOfflineClassCategory(body *model.OfflineClassCategory, ctx context.Context) error {
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+		if strings.Contains(res.Error.Error(), "Error 1062:") {
 			return myerrors.ErrDuplicateRecord
 		}
 		return res.Error
@@ -258,7 +258,7 @@ func (r *offlineClassRepositoryImpl) OperationOfflineClassSlot(body *model.Offli
 		res.Update("slot_booked", body.SlotBooked-1)
 	}
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+		if strings.Contains(res.Error.Error(), "Error 1062:") {
 			return myerrors.ErrDuplicateRecord
 		}
 		return res.Error

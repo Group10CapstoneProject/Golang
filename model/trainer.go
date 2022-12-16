@@ -13,15 +13,15 @@ type Trainer struct {
 	UpdatedAt      time.Time
 	DeletedAt      gorm.DeletedAt `gorm:"index"`
 	Name           string         `gorm:"type:varchar(255)"`
-	Email          string         `gorm:"type:varchar(255)"`
+	Email          string         `gorm:"type:varchar(255);uniqueIndex"`
 	Phone          string         `gorm:"type:varchar(20)"`
 	Dob            time.Time
 	Gender         string `gorm:"type:varchar(5)"`
 	Price          uint
 	DailySlot      uint
 	Description    string
-	TrainerSkill   []TrainerSkill
 	Picture        string
+	TrainerSkill   []TrainerSkill
 	TrainerBooking []TrainerBooking
 }
 

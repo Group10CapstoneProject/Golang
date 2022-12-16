@@ -77,6 +77,9 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 			case "ordertype":
 				msg := fmt.Sprintf("%s must DESC|desc (descending) or ASC|asc (ascending)", each.Field())
 				return echo.NewHTTPError(http.StatusBadRequest, msg)
+			case "gender":
+				msg := fmt.Sprintf("%s must L (male) or P (fimale)", each.Field())
+				return echo.NewHTTPError(http.StatusBadRequest, msg)
 			default:
 				msg := fmt.Sprintf("Invalid field %s", each.Field())
 				return echo.NewHTTPError(http.StatusBadRequest, msg)
@@ -119,6 +122,9 @@ func NewCustomValidator(e *echo.Echo) {
 		panic(err)
 	}
 	if err := validator.RegisterValidation("ordertype", orderTypeValidator); err != nil {
+		panic(err)
+	}
+	if err := validator.RegisterValidation("gender", genderValidator); err != nil {
 		panic(err)
 	}
 
@@ -181,5 +187,10 @@ func mydateValidator(fl validator.FieldLevel) bool {
 
 func orderTypeValidator(fl validator.FieldLevel) bool {
 	nameRegex := regexp.MustCompile("^(DESC|ASC|desc|asc)*$")
+	return nameRegex.MatchString(fl.Field().String())
+}
+
+func genderValidator(fl validator.FieldLevel) bool {
+	nameRegex := regexp.MustCompile("^(P|L)*$")
 	return nameRegex.MatchString(fl.Field().String())
 }

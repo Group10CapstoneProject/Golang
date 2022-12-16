@@ -64,9 +64,9 @@ func (u *TrainerBookingUpdateRequest) ToModel() *model.TrainerBooking {
 type TrainerStoreRequest struct {
 	Name         string               `json:"name" validate:"required,personname"`
 	Email        string               `json:"email" validate:"required,email"`
-	Phone        string               `json:"phone" validate:"required,min=11,max=13"`
+	Phone        string               `json:"phone" validate:"required,numeric,min=11,max=13"`
 	Dob          string               `json:"dob" validate:"required,dob"`
-	Gender       string               `json:"gender" validate:"required,alpha,min=1,max=1"`
+	Gender       string               `json:"gender" validate:"required,gender"`
 	Price        uint                 `json:"price" validate:"required,gte=1"`
 	DailySlot    uint                 `json:"daily_slot" validate:"required,gte=1"`
 	Description  string               `json:"description,omitempty"`
@@ -99,9 +99,9 @@ type TrainerUpdateRequest struct {
 	ID           uint
 	Name         string               `json:"name,omitempty" validate:"omitempty,personname"`
 	Email        string               `json:"email,omitempty" validate:"omitempty,email"`
-	Phone        string               `json:"phone,omitempty" validate:"omitempty,min=11,max=13"`
+	Phone        string               `json:"phone,omitempty" validate:"omitempty,numeric,min=11,max=13"`
 	Dob          string               `json:"dob,omitempty" validate:"omitempty,dob"`
-	Gender       string               `json:"gender,omitempty" validate:"omitempty,alpha,min=1,max=1"`
+	Gender       string               `json:"gender,omitempty" validate:"omitempty,gender"`
 	Price        uint                 `json:"price,omitempty" validate:"omitempty,gte=1"`
 	DailySlot    uint                 `json:"daily_slot,omitempty" validate:"omitempty,gte=1"`
 	Description  string               `json:"description,omitempty"`
@@ -197,8 +197,8 @@ func (u *SetStatusTrainerBooking) ToModel() *model.TrainerBooking {
 type FilterTrainer struct {
 	Name       string `json:"name,omitempty" validate:"omitempty,personname"`
 	Date       string `json:"date,omitempty" validate:"omitempty,mydate"`
-	Gender     string `json:"gender,omitempty" validate:"omitempty,min=1,max=1"`
-	PriceOrder string `json:"price,omitempty" validate:"omitempty,ordertype"`
+	Gender     string `json:"gender,omitempty" validate:"omitempty,gender"`
+	PriceOrder string `json:"order_by_price,omitempty" validate:"omitempty,ordertype"`
 }
 
 // take booking

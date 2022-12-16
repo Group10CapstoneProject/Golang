@@ -11,12 +11,10 @@ import (
 type TrainerResource struct {
 	ID           uint                  `json:"id"`
 	Name         string                `json:"name"`
-	Phone        string                `json:"phone"`
+	Email        string                `json:"email"`
 	Age          uint                  `json:"age"`
 	Gender       string                `json:"gender"`
 	Price        uint                  `json:"price"`
-	DailySlot    uint                  `json:"daily_slot"`
-	Description  string                `json:"description"`
 	Picture      string                `json:"picture"`
 	TrainerSkill TrainerSkillResources `json:"trainer_skill"`
 }
@@ -33,12 +31,10 @@ func (u *TrainerResource) FromModel(m *model.Trainer) {
 
 	u.ID = m.ID
 	u.Name = m.Name
-	u.Phone = m.Phone
+	u.Email = m.Email
 	u.Age = age
 	u.Gender = m.Gender
 	u.Price = m.Price
-	u.DailySlot = m.DailySlot
-	u.Description = m.Description
 	u.Picture = m.Picture
 	u.TrainerSkill = trainerSkill
 }
@@ -56,6 +52,7 @@ func (u *TrainerResources) FromModel(m []model.Trainer) {
 type TrainerDetailResource struct {
 	ID            uint                  `json:"id"`
 	Name          string                `json:"name"`
+	Email         string                `json:"email"`
 	Phone         string                `json:"phone"`
 	Age           uint                  `json:"age"`
 	Dob           time.Time             `json:"dob"`
@@ -82,6 +79,7 @@ func (u *TrainerDetailResource) FromModel(m *model.Trainer) {
 
 	u.ID = m.ID
 	u.Name = m.Name
+	u.Email = m.Email
 	u.Phone = m.Phone
 	u.Age = age
 	u.Dob = m.Dob

@@ -246,7 +246,7 @@ func (d *trainerControllerImpl) GetTrainers(c echo.Context) error {
 	filter.Name = c.QueryParam("name")
 	filter.Date = c.QueryParam("date")
 	filter.Gender = c.QueryParam("gender")
-	filter.PriceOrder = c.QueryParam("price_order")
+	filter.PriceOrder = c.QueryParam("order_by_price")
 
 	if err := c.Validate(filter); err != nil {
 		return err
