@@ -19,7 +19,7 @@ func (u *OfflineClassBookingStoreRequest) ToModel() *model.OfflineClassBooking {
 	return &model.OfflineClassBooking{
 		UserID:          u.UserID,
 		OfflineClassID:  u.OfflineCLassID,
-		PaymentMethodID: *u.PaymentMethodID,
+		PaymentMethodID: u.PaymentMethodID,
 		Total:           u.Total,
 	}
 }
@@ -38,7 +38,7 @@ func (u *OfflineClassBookingUpdateRequest) ToModel() *model.OfflineClassBooking 
 		ID:              u.ID,
 		UserID:          u.UserID,
 		OfflineClassID:  u.OfflineCLassID,
-		PaymentMethodID: *u.PaymentMethodID,
+		PaymentMethodID: u.PaymentMethodID,
 		ProofPayment:    u.ProofPayment,
 		Total:           u.Total,
 	}

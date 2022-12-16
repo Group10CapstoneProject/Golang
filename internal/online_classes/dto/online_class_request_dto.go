@@ -18,7 +18,7 @@ func (u *OnlineClassBookingStoreRequest) ToModel() *model.OnlineClassBooking {
 		UserID:          u.UserID,
 		OnlineClassID:   u.OnlineCLassID,
 		Duration:        u.Duration,
-		PaymentMethodID: *u.PaymentMethodID,
+		PaymentMethodID: u.PaymentMethodID,
 		Total:           u.Total,
 	}
 }
@@ -39,7 +39,7 @@ func (u *OnlineClassBookingUpdateRequest) ToModel() *model.OnlineClassBooking {
 		UserID:          u.UserID,
 		OnlineClassID:   u.OnlineCLassID,
 		Duration:        u.Duration,
-		PaymentMethodID: *u.PaymentMethodID,
+		PaymentMethodID: u.PaymentMethodID,
 		ProofPayment:    u.ProofPayment,
 		Total:           u.Total,
 	}

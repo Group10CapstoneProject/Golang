@@ -52,7 +52,7 @@ type OnlineClassBooking struct {
 	Duration        uint
 	Status          StatusType `gorm:"type:enum('PENDING', 'WAITING', 'ACTIVE', 'INACTIVE', 'REJECT', 'DONE', 'CENCEL');column:status"`
 	ProofPayment    string
-	PaymentMethodID uint
+	PaymentMethodID *uint
 	PaymentMethod   PaymentMethod
 	Total           uint
 }
