@@ -176,7 +176,11 @@ func (r *onlineClassRepositoryImpl) FindOnlineClassBookings(page *model.Paginati
 // FindOnlineClassById implements OnlineClassRepository
 func (r *onlineClassRepositoryImpl) FindOnlineClassById(id uint, ctx context.Context) (*model.OnlineClass, error) {
 	onlineClass := model.OnlineClass{}
-	err := r.db.WithContext(ctx).Where("id = ?", id).Preload("OnlineClassCategory").Preload("OnlineClassCategory.OnlineClass").First(&onlineClass).Error
+	err := r.db.WithContext(ctx).Where("id = ?", id).
+		Preload("OnlineClassCategory").
+		Preload("Trainer").
+		Preload("OnlineClassCategory.OnlineClass").
+		First(&onlineClass).Error
 	return &onlineClass, err
 }
 

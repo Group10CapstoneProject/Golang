@@ -55,6 +55,7 @@ type OnlineClassStoreRequest struct {
 	Tools                 string `json:"tools,omitempty"`
 	TargetArea            string `json:"target_area,omitempty"`
 	Duration              uint   `json:"duration" validate:"required,gte=1"`
+	TrainerID             uint   `json:"trainer_id" validate:"required,gte=1"`
 	Level                 string `json:"level,omitempty"`
 	Picture               string `json:"picture" validate:"required,url"`
 }
@@ -69,6 +70,7 @@ func (u *OnlineClassStoreRequest) ToModel() *model.OnlineClass {
 		Tools:                 u.Tools,
 		TargetArea:            u.TargetArea,
 		Duration:              u.Duration,
+		TrainerID:             u.TrainerID,
 		Level:                 u.Level,
 		Picture:               u.Picture,
 	}
@@ -84,6 +86,7 @@ type OnlineClassUpdateRequest struct {
 	Tools                 string `json:"tools,omitempty"`
 	TargetArea            string `json:"target_area,omitempty"`
 	Duration              uint   `json:"duration" validate:"omitempty,gte=1"`
+	TrainerID             uint   `json:"trainer_id" validate:"omitempty,gte=1"`
 	Level                 string `json:"level,omitempty"`
 	Picture               string `json:"picture" validate:"omitempty,url"`
 }
@@ -98,6 +101,7 @@ func (u *OnlineClassUpdateRequest) ToModel() *model.OnlineClass {
 		OnlineClassCategoryID: u.OnlineClassCategoryID,
 		Tools:                 u.Tools,
 		TargetArea:            u.TargetArea,
+		TrainerID:             u.TrainerID,
 		Duration:              u.Duration,
 		Level:                 u.Level,
 		Picture:               u.Picture,

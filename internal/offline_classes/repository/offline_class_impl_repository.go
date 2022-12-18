@@ -7,6 +7,7 @@ import (
 	"github.com/Group10CapstoneProject/Golang/model"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type offlineClassRepositoryImpl struct {
@@ -129,6 +130,7 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassBookingById(id uint, ctx co
 	err := r.db.WithContext(ctx).Where("id = ?", id).
 		Preload("User").
 		Preload("OfflineClass").
+		Preload("OfflineClass.Trainer").
 		Preload("OfflineClass.OfflineClassCategory").
 		Preload("PaymentMethod").
 		First(&offlineClassBooking).Error
@@ -142,6 +144,7 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassBookingByUser(userId uint, 
 	err := r.db.WithContext(ctx).Where("user_id = ?", userId).
 		Preload("User").
 		Preload("OfflineClass").
+		Preload("OfflineClass.Trainer").
 		Preload("OfflineClass.OfflineClassCategory").
 		Preload("PaymentMethod").
 		Find(&offlineClassBookings).Count(&count).Error
@@ -176,6 +179,7 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassById(id uint, ctx context.C
 	offlineClass := model.OfflineClass{}
 	err := r.db.WithContext(ctx).Where("id = ?", id).
 		Preload("OfflineClassCategory").
+		Preload("Trainer").
 		Preload("OfflineClassCategory.OfflineClass").
 		First(&offlineClass).Error
 	return &offlineClass, err
@@ -204,7 +208,7 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassCategories(cond *model.Offl
 // FindOfflineClasses implements OfflineClassRepository
 func (r *offlineClassRepositoryImpl) FindOfflineClasses(cond *model.OfflineClass, ctx context.Context) ([]model.OfflineClass, error) {
 	offlineClasses := []model.OfflineClass{}
-	err := r.db.WithContext(ctx).Model(&model.OfflineClass{}).
+	err := r.db.WithContext(ctx).Model(&model.OfflineClass{}).Preload(clause.Associations).
 		Find(&offlineClasses, cond).
 		Error
 
@@ -218,6 +222,7 @@ func (r *offlineClassRepositoryImpl) ReadOfflineClassBookings(cond *model.Offlin
 		Model(&model.OfflineClassBooking{}).
 		Preload("User").
 		Preload("OfflineClass").
+		Preload("OfflineClass.Trainer").
 		Find(&offlineClassBooking, cond).
 		Order("updated_at DESC").Error
 	if err != nil {

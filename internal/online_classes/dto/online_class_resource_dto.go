@@ -8,13 +8,14 @@ import (
 
 // online class resource
 type OnlineClassResource struct {
-	ID                    uint   `json:"id"`
-	Title                 string `json:"title"`
-	Price                 uint   `json:"price"`
-	Duration              uint   `json:"duration"`
-	Level                 string `json:"level"`
-	Picture               string `json:"picture"`
-	OnlineClassCategoryID uint   `json:"online_class_category_id"`
+	ID                      uint   `json:"id"`
+	Title                   string `json:"title"`
+	Price                   uint   `json:"price"`
+	Duration                uint   `json:"duration"`
+	Level                   string `json:"level"`
+	Picture                 string `json:"picture"`
+	OnlineClassCategoryID   uint   `json:"online_class_category_id"`
+	OnlineClassCategoryName string `json:"online_class_category_name"`
 }
 
 func (u *OnlineClassResource) FromModel(m *model.OnlineClass) {
@@ -25,6 +26,7 @@ func (u *OnlineClassResource) FromModel(m *model.OnlineClass) {
 	u.Level = m.Level
 	u.Picture = m.Picture
 	u.OnlineClassCategoryID = m.OnlineClassCategoryID
+	u.OnlineClassCategoryName = m.OnlineClassCategory.Name
 }
 
 type OnlineClassResources []OnlineClassResource
@@ -50,12 +52,15 @@ type OnlineClassDetailResource struct {
 	Level               string                      `json:"level"`
 	Picture             string                      `json:"picture"`
 	OnlineClassCategory OnlineClassCategoryResource `json:"online_class_category"`
+	Trainer             TrainerResource             `json:"trainer"`
 	AccessClass         bool                        `json:"access_class"`
 }
 
 func (u *OnlineClassDetailResource) FromModel(m *model.OnlineClass) {
 	category := OnlineClassCategoryResource{}
 	category.FromModel(&m.OnlineClassCategory)
+	trainer := TrainerResource{}
+	trainer.FromModel(&m.Trainer)
 
 	u.ID = m.ID
 	u.Title = m.Title
@@ -69,6 +74,7 @@ func (u *OnlineClassDetailResource) FromModel(m *model.OnlineClass) {
 	u.Level = m.Level
 	u.Picture = m.Picture
 	u.OnlineClassCategory = category
+	u.Trainer = trainer
 }
 
 // online class booking
@@ -220,4 +226,32 @@ func (u *OnlineClassByCategoryResource) FromModel(m *model.OnlineClassCategory) 
 	u.Description = m.Description
 	u.OnlineClassCount = uint(count)
 	u.OnlineClasses = onlineClasses
+}
+
+// trainer resource
+type TrainerResource struct {
+	ID      uint   `json:"id"`
+	Name    string `json:"name"`
+	Email   string `json:"email"`
+	Phone   string `json:"phone"`
+	Age     uint   `json:"age"`
+	Gender  string `json:"gender"`
+	Picture string `json:"picture"`
+}
+
+func (u *TrainerResource) FromModel(m *model.Trainer) {
+	age := uint(time.Now().Year() - m.Dob.Year())
+	if time.Now().Month() < m.Dob.Month() {
+		age--
+	} else if time.Now().Month() == m.Dob.Month() && time.Now().Day() < m.Dob.Day() {
+		age--
+	}
+
+	u.ID = m.ID
+	u.Name = m.Name
+	u.Email = m.Email
+	u.Phone = m.Phone
+	u.Age = age
+	u.Gender = m.Gender
+	u.Picture = m.Picture
 }

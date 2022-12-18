@@ -12,6 +12,7 @@ type TrainerResource struct {
 	ID           uint                  `json:"id"`
 	Name         string                `json:"name"`
 	Email        string                `json:"email"`
+	Phone        string                `json:"phone"`
 	Age          uint                  `json:"age"`
 	Gender       string                `json:"gender"`
 	Price        uint                  `json:"price"`
@@ -32,6 +33,7 @@ func (u *TrainerResource) FromModel(m *model.Trainer) {
 	u.ID = m.ID
 	u.Name = m.Name
 	u.Email = m.Email
+	u.Phone = m.Phone
 	u.Age = age
 	u.Gender = m.Gender
 	u.Price = m.Price
