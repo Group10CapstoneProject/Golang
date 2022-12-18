@@ -19,6 +19,9 @@ type memberRepositoryImpl struct {
 func (r *memberRepositoryImpl) CreateMember(body *model.Member, ctx context.Context) (*model.Member, error) {
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
+		if strings.Contains(err.Error(), "Error 1452:") {
+			return nil, myerrors.ErrForeignKey(err)
+		}
 		return nil, err
 	}
 	fmt.Println(body.ID)
@@ -73,7 +76,15 @@ func (r *memberRepositoryImpl) DeleteMember(body *model.Member, ctx context.Cont
 
 // DeleteMemberType implements MemberRepository
 func (r *memberRepositoryImpl) DeleteMemberType(body *model.MemberType, ctx context.Context) error {
-	res := r.db.WithContext(ctx).Delete(body)
+	check := model.MemberType{}
+	res := r.db.WithContext(ctx).Preload("Member").First(&check, body)
+	if res.Error != nil {
+		return res.Error
+	}
+	if len(check.Member) != 0 {
+		return myerrors.ErrRecordIsUsed
+	}
+	res.Delete(body)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -149,15 +160,44 @@ func (r *memberRepositoryImpl) FindMembers(page *model.Pagination, ctx context.C
 
 // UpdateMember implements MemberRepository
 func (r *memberRepositoryImpl) UpdateMember(body *model.Member, ctx context.Context) error {
-	res := r.db.WithContext(ctx).Model(body).Updates(body)
-	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Error 1062:") {
-			return myerrors.ErrDuplicateRecord
+	if body.Status == model.ACTIVE {
+		err := r.MemberInactive(*body, ctx)
+		if err != nil {
+			return err
 		}
-		return res.Error
+	}
+	res := r.db.WithContext(ctx).Model(body).Updates(body)
+	err := res.Error
+	if err != nil {
+		if strings.Contains(err.Error(), "Error 1452:") {
+			return myerrors.ErrForeignKey(err)
+		}
+		return err
 	}
 	if res.RowsAffected == 0 {
 		return myerrors.ErrRecordNotFound
+	}
+	return nil
+}
+
+// MemberInactive implements MemberRepository
+func (r *memberRepositoryImpl) MemberInactive(body model.Member, ctx context.Context) error {
+	err := r.db.WithContext(ctx).
+		Model(&body).
+		First(&body).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return myerrors.ErrRecordNotFound
+		}
+		return err
+	}
+	err = r.db.WithContext(ctx).
+		Model(&model.Member{}).
+		Where("user_id = ? AND status = ?", body.UserID, model.ACTIVE).
+		Update("status", model.INACTIVE).
+		Error
+	if err != nil {
+		return err
 	}
 	return nil
 }

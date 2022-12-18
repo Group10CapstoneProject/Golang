@@ -15,6 +15,7 @@ type MemberRepository interface {
 	ReadMembers(body *model.Member, ctx context.Context) ([]model.Member, error)
 	UpdateMember(body *model.Member, ctx context.Context) error
 	DeleteMember(body *model.Member, ctx context.Context) error
+	MemberInactive(body model.Member, ctx context.Context) error
 
 	// member type
 	CreateMemberType(body *model.MemberType, ctx context.Context) error

@@ -8,6 +8,7 @@ import (
 	memberRepo "github.com/Group10CapstoneProject/Golang/internal/members/repository"
 	offlineClassRepo "github.com/Group10CapstoneProject/Golang/internal/offline_classes/repository"
 	onlineClassRepo "github.com/Group10CapstoneProject/Golang/internal/online_classes/repository"
+	trainerRepo "github.com/Group10CapstoneProject/Golang/internal/trainers/repository"
 	"github.com/Group10CapstoneProject/Golang/model"
 )
 
@@ -15,6 +16,7 @@ type historyServiceImpl struct {
 	memberRepository       memberRepo.MemberRepository
 	onlineClassRepository  onlineClassRepo.OnlineClassRepository
 	offlineClassRepository offlineClassRepo.OfflineClassRepository
+	trainerRepository      trainerRepo.TrainerRepository
 }
 
 // FindHistoryActivity implements HistoryService
@@ -46,6 +48,36 @@ func (s *historyServiceImpl) FindHistoryActivity(request *dto.HistoryActivityReq
 			for _, member := range members {
 				var resource dto.HistoryResource
 				resource.FromModelMembers(&member)
+				historyActivity = append(historyActivity, resource)
+			}
+		}
+	}
+	if request.Type == "trainer" || request.Type == "" {
+		cond := &model.TrainerBooking{
+			UserID: request.UserID,
+			Status: request.Status,
+		}
+		trainers, err := s.trainerRepository.ReadTrainerBooking(cond, ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, trainer := range trainers {
+			var resource dto.HistoryResource
+			resource.FromModelTrainer(&trainer)
+			historyActivity = append(historyActivity, resource)
+		}
+		if request.Status == "WAITING" {
+			cond := &model.TrainerBooking{
+				UserID: request.UserID,
+				Status: model.PENDING,
+			}
+			trainers, err := s.trainerRepository.ReadTrainerBooking(cond, ctx)
+			if err != nil {
+				return nil, err
+			}
+			for _, trainer := range trainers {
+				var resource dto.HistoryResource
+				resource.FromModelTrainer(&trainer)
 				historyActivity = append(historyActivity, resource)
 			}
 		}
@@ -291,10 +323,12 @@ func NewHistoryService(
 	memberRepository memberRepo.MemberRepository,
 	onlineClassRepository onlineClassRepo.OnlineClassRepository,
 	offlineClassRepository offlineClassRepo.OfflineClassRepository,
+	trainerRepository trainerRepo.TrainerRepository,
 ) HistoryService {
 	return &historyServiceImpl{
 		memberRepository:       memberRepository,
 		onlineClassRepository:  onlineClassRepository,
 		offlineClassRepository: offlineClassRepository,
+		trainerRepository:      trainerRepository,
 	}
 }

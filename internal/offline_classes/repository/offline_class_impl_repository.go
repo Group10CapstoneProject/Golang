@@ -7,6 +7,7 @@ import (
 	"github.com/Group10CapstoneProject/Golang/model"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type offlineClassRepositoryImpl struct {
@@ -17,6 +18,9 @@ type offlineClassRepositoryImpl struct {
 func (r *offlineClassRepositoryImpl) CreateOfflineClass(body *model.OfflineClass, ctx context.Context) error {
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
+		if strings.Contains(err.Error(), "Error 1452:") {
+			return myerrors.ErrForeignKey(err)
+		}
 		return err
 	}
 	return nil
@@ -26,6 +30,9 @@ func (r *offlineClassRepositoryImpl) CreateOfflineClass(body *model.OfflineClass
 func (r *offlineClassRepositoryImpl) CreateOfflineClassBooking(body *model.OfflineClassBooking, ctx context.Context) (*model.OfflineClassBooking, error) {
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
+		if strings.Contains(err.Error(), "Error 1452:") {
+			return nil, myerrors.ErrForeignKey(err)
+		}
 		return nil, err
 	}
 	return body, nil
@@ -67,7 +74,15 @@ func (r *offlineClassRepositoryImpl) CheckOfflineClassCategoryIsDeleted(body *mo
 
 // DeleteOfflineClass implements OfflineClassRepository
 func (r *offlineClassRepositoryImpl) DeleteOfflineClass(body *model.OfflineClass, ctx context.Context) error {
-	res := r.db.WithContext(ctx).Delete(body)
+	check := model.OfflineClass{}
+	res := r.db.WithContext(ctx).Preload("OfflineClassBooking").First(&check, body)
+	if res.Error != nil {
+		return res.Error
+	}
+	if len(check.OfflineClassBooking) != 0 {
+		return myerrors.ErrRecordIsUsed
+	}
+	res.Delete(body)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -91,7 +106,15 @@ func (r *offlineClassRepositoryImpl) DeleteOfflineClassBooking(body *model.Offli
 
 // DeleteOfflineClassCategory implements OfflineClassRepository
 func (r *offlineClassRepositoryImpl) DeleteOfflineClassCategory(body *model.OfflineClassCategory, ctx context.Context) error {
-	res := r.db.WithContext(ctx).Delete(body)
+	check := model.OfflineClassCategory{}
+	res := r.db.WithContext(ctx).Preload("OfflineClass").First(&check, body)
+	if res.Error != nil {
+		return res.Error
+	}
+	if len(check.OfflineClass) != 0 {
+		return myerrors.ErrRecordIsUsed
+	}
+	res.Delete(body)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -107,6 +130,7 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassBookingById(id uint, ctx co
 	err := r.db.WithContext(ctx).Where("id = ?", id).
 		Preload("User").
 		Preload("OfflineClass").
+		Preload("OfflineClass.Trainer").
 		Preload("OfflineClass.OfflineClassCategory").
 		Preload("PaymentMethod").
 		First(&offlineClassBooking).Error
@@ -120,6 +144,7 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassBookingByUser(userId uint, 
 	err := r.db.WithContext(ctx).Where("user_id = ?", userId).
 		Preload("User").
 		Preload("OfflineClass").
+		Preload("OfflineClass.Trainer").
 		Preload("OfflineClass.OfflineClassCategory").
 		Preload("PaymentMethod").
 		Find(&offlineClassBookings).Count(&count).Error
@@ -154,6 +179,7 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassById(id uint, ctx context.C
 	offlineClass := model.OfflineClass{}
 	err := r.db.WithContext(ctx).Where("id = ?", id).
 		Preload("OfflineClassCategory").
+		Preload("Trainer").
 		Preload("OfflineClassCategory.OfflineClass").
 		First(&offlineClass).Error
 	return &offlineClass, err
@@ -182,7 +208,7 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassCategories(cond *model.Offl
 // FindOfflineClasses implements OfflineClassRepository
 func (r *offlineClassRepositoryImpl) FindOfflineClasses(cond *model.OfflineClass, ctx context.Context) ([]model.OfflineClass, error) {
 	offlineClasses := []model.OfflineClass{}
-	err := r.db.WithContext(ctx).Model(&model.OfflineClass{}).
+	err := r.db.WithContext(ctx).Model(&model.OfflineClass{}).Preload(clause.Associations).
 		Find(&offlineClasses, cond).
 		Error
 
@@ -196,6 +222,7 @@ func (r *offlineClassRepositoryImpl) ReadOfflineClassBookings(cond *model.Offlin
 		Model(&model.OfflineClassBooking{}).
 		Preload("User").
 		Preload("OfflineClass").
+		Preload("OfflineClass.Trainer").
 		Find(&offlineClassBooking, cond).
 		Order("updated_at DESC").Error
 	if err != nil {
@@ -258,9 +285,6 @@ func (r *offlineClassRepositoryImpl) OperationOfflineClassSlot(body *model.Offli
 		res.Update("slot_booked", body.SlotBooked-1)
 	}
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Error 1062:") {
-			return myerrors.ErrDuplicateRecord
-		}
 		return res.Error
 	}
 	if res.RowsAffected == 0 {

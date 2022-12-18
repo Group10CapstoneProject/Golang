@@ -25,6 +25,7 @@ type OnlineClass struct {
 	Trainer               Trainer
 	Level                 string `gorm:"type:varchar(255)"`
 	Picture               string
+	OnlineClassBooking    []OnlineClassBooking
 }
 
 type OnlineClassCategory struct {
