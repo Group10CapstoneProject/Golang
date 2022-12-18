@@ -36,8 +36,10 @@ func (s *offlineClassServiceImpl) CreateOfflineClass(request *dto.OfflineClassSt
 // CreateOfflineClassBooking implements OfflineClassService
 func (s *offlineClassServiceImpl) CreateOfflineClassBooking(request *dto.OfflineClassBookingStoreRequest, ctx context.Context) (uint, error) {
 	offlineClassBooking := request.ToModel()
-	offlineClassBooking.ExpiredAt = time.Now().Add(24 * time.Hour)
-	offlineClassBooking.ActivedAt = time.Date(0001, 1, 1, 0, 0, 0, 0, time.UTC)
+	t := time.Now()
+	exp := time.Now().Add(24 * time.Hour)
+	offlineClassBooking.ExpiredAt = time.Date(exp.Year(), exp.Month(), exp.Day(), 23, 59, 59, 0, exp.Location())
+	offlineClassBooking.ActivedAt = time.Date(0001, 1, 1, 0, 0, 0, 0, t.Location())
 	offlineClassBooking.Status = model.WAITING
 	result, err := s.offlineClassRepository.CreateOfflineClassBooking(offlineClassBooking, ctx)
 	if err != nil {
@@ -96,17 +98,6 @@ func (s *offlineClassServiceImpl) FindOfflineClassBookingById(id uint, ctx conte
 	offlineClassBooking, err := s.offlineClassRepository.FindOfflineClassBookingById(id, ctx)
 	if err != nil {
 		return nil, err
-	}
-	if offlineClassBooking.Status != model.INACTIVE && time.Now().After(offlineClassBooking.ExpiredAt) {
-		offlineClassBooking.Status = model.INACTIVE
-		body := model.OfflineClassBooking{
-			ID:     offlineClassBooking.ID,
-			Status: model.INACTIVE,
-		}
-		err := s.offlineClassRepository.UpdateOfflineClassBooking(&body, ctx)
-		if err != nil {
-			return nil, err
-		}
 	}
 	var result dto.OfflineClassBookingDetailResource
 	result.FromModel(offlineClassBooking)
@@ -214,10 +205,11 @@ func (s *offlineClassServiceImpl) OfflineClassPayment(request *model.PaymentRequ
 		return myerrors.ErrFailedUpload
 	}
 	// update offline class booking
+	exp := time.Now().Add(24 * time.Hour)
 	body := model.OfflineClassBooking{
 		ID:           id,
 		ProofPayment: url,
-		ExpiredAt:    time.Now().Add(24 * time.Hour),
+		ExpiredAt:    time.Date(exp.Year(), exp.Month(), exp.Day(), 23, 59, 59, 0, exp.Location()),
 		Status:       model.PENDING,
 	}
 	err = s.offlineClassRepository.UpdateOfflineClassBooking(&body, ctx)
@@ -244,9 +236,9 @@ func (s *offlineClassServiceImpl) SetStatusOfflineClassBooking(request *dto.SetS
 		return err
 	}
 	offlineClassBooking := request.ToModel()
-
 	if offlineClassBooking.Status == model.ACTIVE && check.Status != model.ACTIVE && check.Status != model.INACTIVE {
-		offlineClassBooking.ExpiredAt = check.OfflineClass.Time.Add(time.Duration(check.OfflineClass.Duration) * time.Minute)
+		exp := check.OfflineClass.Time
+		offlineClassBooking.ExpiredAt = time.Date(exp.Year(), exp.Month(), exp.Day(), 23, 59, 59, 0, exp.Location())
 		offlineClassBooking.ActivedAt = time.Now()
 		offlineClassBooking.Code = uuid.New()
 	} else if offlineClassBooking.Status == model.REJECT && check.Status != model.REJECT {
@@ -258,7 +250,7 @@ func (s *offlineClassServiceImpl) SetStatusOfflineClassBooking(request *dto.SetS
 	}
 
 	if time.Now().After(check.ExpiredAt) {
-		offlineClassBooking.Status = model.INACTIVE
+		return myerrors.ErrOrderExpired
 	}
 
 	err = s.offlineClassRepository.UpdateOfflineClassBooking(offlineClassBooking, ctx)

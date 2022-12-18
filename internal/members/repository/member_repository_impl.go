@@ -160,6 +160,12 @@ func (r *memberRepositoryImpl) FindMembers(page *model.Pagination, ctx context.C
 
 // UpdateMember implements MemberRepository
 func (r *memberRepositoryImpl) UpdateMember(body *model.Member, ctx context.Context) error {
+	if body.Status == model.ACTIVE {
+		err := r.MemberInactive(*body, ctx)
+		if err != nil {
+			return err
+		}
+	}
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	err := res.Error
 	if err != nil {
@@ -170,6 +176,28 @@ func (r *memberRepositoryImpl) UpdateMember(body *model.Member, ctx context.Cont
 	}
 	if res.RowsAffected == 0 {
 		return myerrors.ErrRecordNotFound
+	}
+	return nil
+}
+
+// MemberInactive implements MemberRepository
+func (r *memberRepositoryImpl) MemberInactive(body model.Member, ctx context.Context) error {
+	err := r.db.WithContext(ctx).
+		Model(&body).
+		First(&body).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return myerrors.ErrRecordNotFound
+		}
+		return err
+	}
+	err = r.db.WithContext(ctx).
+		Model(&model.Member{}).
+		Where("user_id = ? AND status = ?", body.UserID, model.ACTIVE).
+		Update("status", model.INACTIVE).
+		Error
+	if err != nil {
+		return err
 	}
 	return nil
 }

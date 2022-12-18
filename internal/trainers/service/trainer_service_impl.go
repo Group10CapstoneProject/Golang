@@ -254,7 +254,7 @@ func (s *trainerServiceImpl) TrainerPayment(request *model.PaymentRequest, ctx c
 	if url == "" {
 		return myerrors.ErrFailedUpload
 	}
-	// update offline class booking
+	// update tainer booking
 	exp := time.Now().Add(24 * time.Hour)
 	body := model.TrainerBooking{
 		ID:           id,

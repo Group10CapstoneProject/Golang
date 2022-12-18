@@ -315,13 +315,17 @@ func (r *trainerRepositoryImpl) UpdateSkill(body *model.Skill, ctx context.Conte
 // UpdateTrainer implements TrainerRepository
 func (r *trainerRepositoryImpl) UpdateTrainer(body *model.Trainer, ctx context.Context) error {
 	res := r.db.Begin()
-	res.WithContext(ctx).
+	err := res.WithContext(ctx).
 		Model(&model.TrainerSkill{}).
 		Where("trainer_id = ?", body.ID).
-		Delete(&model.TrainerSkill{})
-	err := res.WithContext(ctx).Model(body).Updates(body).Error
-	res.Rollback()
+		Delete(&model.TrainerSkill{}).Error
 	if err != nil {
+		res.Rollback()
+		return err
+	}
+	err = res.WithContext(ctx).Model(body).Updates(body).Error
+	if err != nil {
+		res.Rollback()
 		if strings.Contains(err.Error(), "Error 1062:") {
 			return myerrors.ErrDuplicateRecord
 		}
