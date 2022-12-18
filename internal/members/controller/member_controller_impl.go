@@ -37,13 +37,9 @@ func (d *memberControllerImpl) CreateMember(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	result, err := d.memberService.FindMemberById(id, c.Request().Context())
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
 	return c.JSON(http.StatusOK, echo.Map{
 		"message": "new member success created",
-		"data":    result,
+		"data":    echo.Map{"id": id},
 	})
 }
 

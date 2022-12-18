@@ -81,13 +81,9 @@ func (d *offlineclassControllerImpl) CreateOfflineClassBooking(c echo.Context) e
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	result, err := d.offlineClassService.FindOfflineClassBookingById(id, c.Request().Context())
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
 	return c.JSON(http.StatusOK, echo.Map{
 		"message": "new offline class booking success created",
-		"data":    result,
+		"data":    echo.Map{"id": id},
 	})
 }
 
