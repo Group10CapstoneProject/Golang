@@ -31,6 +31,9 @@ func (s *authServiceImpl) Login(credential dto.UserCredential, ctx context.Conte
 	if err != nil {
 		return nil, myerrors.ErrInvalidEmailPassword
 	}
+	if user.Role == constans.Role_admin {
+		return nil, myerrors.ErrPermission
+	}
 	if !s.password.CheckPasswordHash(credential.Password, user.Password) {
 		return nil, myerrors.ErrInvalidEmailPassword
 	}
