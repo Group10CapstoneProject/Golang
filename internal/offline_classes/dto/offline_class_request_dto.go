@@ -3,6 +3,7 @@ package dto
 import (
 	"time"
 
+	"github.com/Group10CapstoneProject/Golang/constans"
 	"github.com/Group10CapstoneProject/Golang/model"
 	"github.com/google/uuid"
 )
@@ -59,8 +60,8 @@ type OfflineClassStoreRequest struct {
 }
 
 func (u *OfflineClassStoreRequest) ToModel() *model.OfflineClass {
-	layoutFormat := "2006-01-02 15:04:05"
-	time, err := time.Parse(layoutFormat, u.Time)
+	zone, _ := time.Now().Zone()
+	time, err := time.Parse(constans.FormatTime, u.Time+" "+zone)
 	if err != nil {
 		return nil
 	}
@@ -89,13 +90,13 @@ type OfflineClassUpdateRequest struct {
 	Picture                string `json:"picture" validate:"omitempty,url"`
 	Description            string `json:"description,omitempty"`
 	Location               string `json:"location" validate:"omitempty"`
-	TrainerID              uint   `json:"trainer_id" validate:"omitemptymgte=1"`
+	TrainerID              uint   `json:"trainer_id" validate:"omitempty,gte=1"`
 	OfflineClassCategoryID uint   `json:"offline_class_category_id" validate:"omitempty,gte=1"`
 }
 
 func (u *OfflineClassUpdateRequest) ToModel() *model.OfflineClass {
-	layoutFormat := "2006-01-02 15:04:05"
-	time, err := time.Parse(layoutFormat, u.Time)
+	zone, _ := time.Now().Zone()
+	time, err := time.Parse(constans.FormatTime, u.Time+" "+zone)
 	if err != nil {
 		return nil
 	}
