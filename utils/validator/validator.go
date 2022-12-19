@@ -154,7 +154,7 @@ func activityValidator(fl validator.FieldLevel) bool {
 }
 
 func titleValidator(fl validator.FieldLevel) bool {
-	nameRegex := regexp.MustCompile("^(member_booking|offline_class_booking|online_class_booking|trainer|profile|member_type|online_class|offline_class|online_class_category|offline_class_category|payment_method)*$")
+	nameRegex := regexp.MustCompile("^(member_booking|offline_class_booking|online_class_booking|trainer|profile|member_type|online_class|offline_class|online_class_category|offline_class_category|payment_method|article)*$")
 	return nameRegex.MatchString(fl.Field().String())
 }
 
