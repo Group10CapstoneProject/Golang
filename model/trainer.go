@@ -58,7 +58,7 @@ type TrainerBooking struct {
 	ExpiredAt       time.Time
 	ActivedAt       time.Time `gorm:"default:null"`
 	Time            time.Time
-	Status          StatusType `gorm:"type:enum('PENDING', 'WAITING', 'ACTIVE', 'INACTIVE', 'REJECT', 'DONE', 'CENCEL');column:status"`
+	Status          StatusType `gorm:"type:enum('PENDING', 'WAITING', 'ACTIVE', 'INACTIVE', 'REJECT', 'DONE', 'CANCEL');column:status"`
 	ProofPayment    string
 	PaymentMethodID *uint
 	PaymentMethod   PaymentMethod

@@ -167,7 +167,7 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 		}
 		cond = &model.Member{
 			UserID: request.UserID,
-			Status: model.CENCEL,
+			Status: model.CANCEL,
 		}
 		members, err = s.memberRepository.ReadMembers(cond, ctx)
 		if err != nil {
@@ -234,7 +234,7 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 		}
 		cond = &model.OnlineClassBooking{
 			UserID: request.UserID,
-			Status: model.CENCEL,
+			Status: model.CANCEL,
 		}
 		onlineClasses, err = s.onlineClassRepository.ReadOnlineClassBooking(cond, ctx)
 		if err != nil {
@@ -275,7 +275,7 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 		}
 		cond = &model.OfflineClassBooking{
 			UserID: request.UserID,
-			Status: model.CENCEL,
+			Status: model.CANCEL,
 		}
 		offlineClasses, err = s.offlineClassRepository.ReadOfflineClassBookings(cond, ctx)
 		if err != nil {
@@ -310,6 +310,60 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 		for _, offlineClass := range offlineClasses {
 			var resource dto.HistoryResource
 			resource.FromModelOfflineClass(&offlineClass)
+			historyActivity = append(historyActivity, resource)
+		}
+	}
+	if request.Type == "trainer" || request.Type == "" {
+		cond := &model.TrainerBooking{
+			UserID: request.UserID,
+			Status: model.DONE,
+		}
+		trainers, err := s.trainerRepository.ReadTrainerBooking(cond, ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, trainer := range trainers {
+			var resource dto.HistoryResource
+			resource.FromModelTrainer(&trainer)
+			historyActivity = append(historyActivity, resource)
+		}
+		cond = &model.TrainerBooking{
+			UserID: request.UserID,
+			Status: model.CANCEL,
+		}
+		trainers, err = s.trainerRepository.ReadTrainerBooking(cond, ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, trainer := range trainers {
+			var resource dto.HistoryResource
+			resource.FromModelTrainer(&trainer)
+			historyActivity = append(historyActivity, resource)
+		}
+		cond = &model.TrainerBooking{
+			UserID: request.UserID,
+			Status: model.REJECT,
+		}
+		trainers, err = s.trainerRepository.ReadTrainerBooking(cond, ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, trainer := range trainers {
+			var resource dto.HistoryResource
+			resource.FromModelTrainer(&trainer)
+			historyActivity = append(historyActivity, resource)
+		}
+		cond = &model.TrainerBooking{
+			UserID: request.UserID,
+			Status: model.INACTIVE,
+		}
+		trainers, err = s.trainerRepository.ReadTrainerBooking(cond, ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, trainer := range trainers {
+			var resource dto.HistoryResource
+			resource.FromModelTrainer(&trainer)
 			historyActivity = append(historyActivity, resource)
 		}
 	}

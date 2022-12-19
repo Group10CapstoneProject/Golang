@@ -19,6 +19,7 @@ type TrainerService interface {
 	DeleteTrainerBooking(id uint, ctx context.Context) error
 	CheckTrainerBooking(request *dto.TakeTrainerBooking, ctx context.Context) (*dto.TrainerBookingResource, error)
 	TakeTrainerBooking(request *dto.TakeTrainerBooking, ctx context.Context) error
+	CancelTrainerBooking(id uint, userId uint, ctx context.Context) error
 
 	// trainer
 	CreateTrainer(request *dto.TrainerStoreRequest, ctx context.Context) error

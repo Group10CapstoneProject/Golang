@@ -24,6 +24,26 @@ type trainerControllerImpl struct {
 	notificationService notifServ.NotificationService
 }
 
+// CancelTrainerBooking implements TrainerController
+func (d *trainerControllerImpl) CancelTrainerBooking(c echo.Context) error {
+	param := c.Param("id")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	claims := d.jwtService.GetClaims(&c)
+	userId := uint(claims["user_id"].(float64))
+	if err := d.trainerService.CancelTrainerBooking(uint(id), userId, c.Request().Context()); err != nil {
+		if err == myerrors.ErrPermission {
+			return echo.NewHTTPError(http.StatusForbidden, err.Error())
+		}
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "trainer booking success canceled",
+	})
+}
+
 // CreateSkill implements TrainerController
 func (d *trainerControllerImpl) CreateSkill(c echo.Context) error {
 	var skill dto.SkillStoreRequest

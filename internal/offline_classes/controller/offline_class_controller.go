@@ -13,6 +13,7 @@ type OfflineClassController interface {
 	OfflineClassBookingPayment(c echo.Context) error
 	DeleteOfflineClassBooking(c echo.Context) error
 	TakeOfflineClassBooking(c echo.Context) error
+	CancelOfflineClassBooking(c echo.Context) error
 	CheckOfflineClassBooking(c echo.Context) error
 
 	// offline class

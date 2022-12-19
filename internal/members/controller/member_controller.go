@@ -12,6 +12,7 @@ type MemberController interface {
 	SetStatusMember(c echo.Context) error
 	MemberPayment(c echo.Context) error
 	DeleteMember(c echo.Context) error
+	CancelMember(c echo.Context) error
 
 	// member type
 	CreateMemberType(c echo.Context) error

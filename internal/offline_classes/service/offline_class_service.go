@@ -18,6 +18,7 @@ type OfflineClassService interface {
 	SetStatusOfflineClassBooking(request *dto.SetStatusOfflineClassBooking, ctx context.Context) error
 	TakeOfflineClassBooking(request *dto.TakeOfflineClassBooking, ctx context.Context) error
 	OfflineClassPayment(request *model.PaymentRequest, ctx context.Context) error
+	CancelOfflineClassBooking(id uint, userId uint, ctx context.Context) error
 	DeleteOfflineClassBooking(id uint, ctx context.Context) error
 
 	// offline class

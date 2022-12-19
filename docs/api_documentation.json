@@ -1530,6 +1530,55 @@
                 }
             }
         },
+        "/members/cancel/{id}":{
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Members"],
+                "summary": "Cancel Members",
+                "description": "Only user can cancel the order that are created, id is member id or member booking id when create member",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "member success cenceled"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
         "/members/pay/{id}":{
             "post": {
                 "tags": ["Members"],
@@ -3773,6 +3822,55 @@
                 }
             }
         },
+        "/online-classes/bookings/cancel/{id}":{
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Online Class Bookings"],
+                "summary": "Cancel online class booking",
+                "description": "Only user can cancel the order that are created, id is online class booking id",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "online class booking success cenceled"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
         "/trainers":{
             "get": {
                 "security": [
@@ -3796,7 +3894,7 @@
                 ],
                 "tags": ["Trainers"],
                 "summary": "Get all trainers",
-                "description": "pada filter date disini akan menampilkan trainer yang available pada date tersebut, trainer mimiliki daily_slot yang menjadi batas maksimal booking dalam satu hari. Jika booking berstatus inactive, reject, dan cencel maka tidak akan dihitung dalam daily_slot dari trainer. Jika jumlah booking trainer pada date tersebut melebihi atau sama dengan daily_slot maka trainer tidak akan ditampilkan. Email tidak boleh duplikat",
+                "description": "pada filter date disini akan menampilkan trainer yang available pada date tersebut, trainer mimiliki daily_slot yang menjadi batas maksimal booking dalam satu hari. Jika booking berstatus inactive, reject, dan cancel maka tidak akan dihitung dalam daily_slot dari trainer. Jika jumlah booking trainer pada date tersebut melebihi atau sama dengan daily_slot maka trainer tidak akan ditampilkan. Email tidak boleh duplikat",
                 "responses": {
                     "200": {
                         "description": "Success get trainer",
@@ -5008,6 +5106,104 @@
                 }
             }
         },
+        "/offline-classes/bookings/cancel/{id}":{
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Offline Class Bookings"],
+                "summary": "Cancel offline class booking",
+                "description": "Only user can cancel the order that are created, id is offline class booking id",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "offline class booking success cenceled"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
+        "/trainers/bookings/cancel/{id}":{
+            "post": {
+                "security": [
+                    {
+                        "AccessToken":[]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/idUint"
+                    }
+                ],
+                "tags": ["Trainer Bookings"],
+                "summary": "Cancel trainer booking",
+                "description": "Only user can cancel the order that are created, id is trainer booking id",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json":{
+                                "schema":{
+                                    "type":"object",
+                                    "properties": {
+                                        "message":{
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "trainer booking success cenceled"
+                                }
+                            }
+                        }
+                    },
+                    "500":{
+                        "$ref": "#/components/responses/internalServerError"
+                    },
+                    "401":{
+                        "$ref": "#/components/responses/unauthorized"
+                    },
+                    "404":{
+                        "$ref": "#/components/responses/notFound"
+                    },
+                    "403":{
+                        "$ref": "#/components/responses/forbidden"
+                    }
+                }
+            }
+        },
         "/payment-methods":{
             "get": {
                 "security": [
@@ -5474,7 +5670,7 @@
         "/histories/orders":{
             "get": {
                 "tags": ["Histories"],
-                "summary": "History order user its like transaction done or cenceled",
+                "summary": "History order user its like transaction done or canceled",
                 "security": [
                     {
                         "AccessToken":[]

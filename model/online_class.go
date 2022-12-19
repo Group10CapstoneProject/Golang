@@ -51,7 +51,7 @@ type OnlineClassBooking struct {
 	ExpiredAt       time.Time
 	ActivedAt       time.Time `gorm:"default:null"`
 	Duration        uint
-	Status          StatusType `gorm:"type:enum('PENDING', 'WAITING', 'ACTIVE', 'INACTIVE', 'REJECT', 'DONE', 'CENCEL');column:status"`
+	Status          StatusType `gorm:"type:enum('PENDING', 'WAITING', 'ACTIVE', 'INACTIVE', 'REJECT', 'DONE', 'CANCEL');column:status"`
 	ProofPayment    string
 	PaymentMethodID *uint
 	PaymentMethod   PaymentMethod

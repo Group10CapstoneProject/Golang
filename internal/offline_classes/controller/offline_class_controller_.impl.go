@@ -24,6 +24,26 @@ type offlineclassControllerImpl struct {
 	notificationService notificationServ.NotificationService
 }
 
+// CancelOfflineClassBooking implements OfflineClassController
+func (d *offlineclassControllerImpl) CancelOfflineClassBooking(c echo.Context) error {
+	param := c.Param("id")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	claims := d.jwtService.GetClaims(&c)
+	userId := uint(claims["user_id"].(float64))
+	if err := d.offlineClassService.CancelOfflineClassBooking(uint(id), userId, c.Request().Context()); err != nil {
+		if err == myerrors.ErrPermission {
+			return echo.NewHTTPError(http.StatusForbidden, err.Error())
+		}
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "offline class booking success canceled",
+	})
+}
+
 // CheckOfflineClassBooking implements OfflineClassController
 func (d *offlineclassControllerImpl) CheckOfflineClassBooking(c echo.Context) error {
 	emailParam := c.QueryParam("email")
