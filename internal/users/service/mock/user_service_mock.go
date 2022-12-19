@@ -22,7 +22,7 @@ func (m *UserServiceMock) CreateAdmin(user *dto.NewUser, ctx context.Context) er
 	return args.Error(0)
 }
 
-func (m *UserServiceMock) CreateSuperadmin() error {
+func (m *UserServiceMock) CreateSuperadmin(superadmin *model.User) error {
 	args := m.Called()
 	return args.Error(0)
 }

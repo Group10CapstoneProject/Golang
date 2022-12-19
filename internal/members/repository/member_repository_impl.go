@@ -8,6 +8,7 @@ import (
 	"github.com/Group10CapstoneProject/Golang/model"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type memberRepositoryImpl struct {
@@ -18,6 +19,9 @@ type memberRepositoryImpl struct {
 func (r *memberRepositoryImpl) CreateMember(body *model.Member, ctx context.Context) (*model.Member, error) {
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
+		if strings.Contains(err.Error(), "Error 1452:") {
+			return nil, myerrors.ErrForeignKey(err)
+		}
 		return nil, err
 	}
 	fmt.Println(body.ID)
@@ -28,7 +32,7 @@ func (r *memberRepositoryImpl) CreateMember(body *model.Member, ctx context.Cont
 func (r *memberRepositoryImpl) CreateMemberType(body *model.MemberType, ctx context.Context) error {
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
-		if strings.Contains(err.Error(), "Duplicate entry") {
+		if strings.Contains(err.Error(), "Error 1062:") {
 			if err := r.CheckMemberTypeIsDeleted(body); err == nil {
 				return nil
 			}
@@ -72,7 +76,15 @@ func (r *memberRepositoryImpl) DeleteMember(body *model.Member, ctx context.Cont
 
 // DeleteMemberType implements MemberRepository
 func (r *memberRepositoryImpl) DeleteMemberType(body *model.MemberType, ctx context.Context) error {
-	res := r.db.WithContext(ctx).Delete(body)
+	check := model.MemberType{}
+	res := r.db.WithContext(ctx).Preload("Member").First(&check, body)
+	if res.Error != nil {
+		return res.Error
+	}
+	if len(check.Member) != 0 {
+		return myerrors.ErrRecordIsUsed
+	}
+	res.Delete(body)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -148,15 +160,44 @@ func (r *memberRepositoryImpl) FindMembers(page *model.Pagination, ctx context.C
 
 // UpdateMember implements MemberRepository
 func (r *memberRepositoryImpl) UpdateMember(body *model.Member, ctx context.Context) error {
-	res := r.db.WithContext(ctx).Model(body).Updates(body)
-	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Duplicate entry") {
-			return myerrors.ErrDuplicateRecord
+	if body.Status == model.ACTIVE {
+		err := r.MemberInactive(*body, ctx)
+		if err != nil {
+			return err
 		}
-		return res.Error
+	}
+	res := r.db.WithContext(ctx).Model(body).Updates(body)
+	err := res.Error
+	if err != nil {
+		if strings.Contains(err.Error(), "Error 1452:") {
+			return myerrors.ErrForeignKey(err)
+		}
+		return err
 	}
 	if res.RowsAffected == 0 {
 		return myerrors.ErrRecordNotFound
+	}
+	return nil
+}
+
+// MemberInactive implements MemberRepository
+func (r *memberRepositoryImpl) MemberInactive(body model.Member, ctx context.Context) error {
+	err := r.db.WithContext(ctx).
+		Model(&body).
+		First(&body).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return myerrors.ErrRecordNotFound
+		}
+		return err
+	}
+	err = r.db.WithContext(ctx).
+		Model(&model.Member{}).
+		Where("user_id = ? AND status = ?", body.UserID, model.ACTIVE).
+		Update("status", model.INACTIVE).
+		Error
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -165,7 +206,7 @@ func (r *memberRepositoryImpl) UpdateMember(body *model.Member, ctx context.Cont
 func (r *memberRepositoryImpl) UpdateMemberType(body *model.MemberType, ctx context.Context) error {
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Duplicate entry") {
+		if strings.Contains(res.Error.Error(), "Error 1062:") {
 			return myerrors.ErrDuplicateRecord
 		}
 		return res.Error
@@ -181,8 +222,7 @@ func (r *memberRepositoryImpl) ReadMembers(body *model.Member, ctx context.Conte
 	members := []model.Member{}
 	err := r.db.WithContext(ctx).
 		Model(&model.Member{}).
-		Preload("MemberType").
-		Preload("User").
+		Preload(clause.Associations).
 		Find(&members, body).
 		Order("updated_at DESC").Error
 	if err != nil {

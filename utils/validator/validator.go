@@ -65,8 +65,20 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 			case "mytime":
 				msg := fmt.Sprintf("%s invalid format time, use (YYYY-MM-DD hh:mm:ss), example 2006-01-02 15:04:05", each.Field())
 				return echo.NewHTTPError(http.StatusBadRequest, msg)
+			case "mydate":
+				msg := fmt.Sprintf("%s invalid format date, use (YYYY-MM-DD), example 2006-01-02", each.Field())
+				return echo.NewHTTPError(http.StatusBadRequest, msg)
+			case "dob":
+				msg := fmt.Sprintf("%s invalid date of birth", each.Field())
+				return echo.NewHTTPError(http.StatusBadRequest, msg)
 			case "activity":
 				msg := fmt.Sprintf("%s invalid or status not allowed", each.Field())
+				return echo.NewHTTPError(http.StatusBadRequest, msg)
+			case "ordertype":
+				msg := fmt.Sprintf("%s must DESC|desc (descending) or ASC|asc (ascending)", each.Field())
+				return echo.NewHTTPError(http.StatusBadRequest, msg)
+			case "gender":
+				msg := fmt.Sprintf("%s must L (male) or P (fimale)", each.Field())
 				return echo.NewHTTPError(http.StatusBadRequest, msg)
 			default:
 				msg := fmt.Sprintf("Invalid field %s", each.Field())
@@ -103,6 +115,18 @@ func NewCustomValidator(e *echo.Echo) {
 	if err := validator.RegisterValidation("activity", activityValidator); err != nil {
 		panic(err)
 	}
+	if err := validator.RegisterValidation("dob", dobValidator); err != nil {
+		panic(err)
+	}
+	if err := validator.RegisterValidation("mydate", mydateValidator); err != nil {
+		panic(err)
+	}
+	if err := validator.RegisterValidation("ordertype", orderTypeValidator); err != nil {
+		panic(err)
+	}
+	if err := validator.RegisterValidation("gender", genderValidator); err != nil {
+		panic(err)
+	}
 
 	e.Validator = &CustomValidator{validator}
 }
@@ -130,7 +154,7 @@ func activityValidator(fl validator.FieldLevel) bool {
 }
 
 func titleValidator(fl validator.FieldLevel) bool {
-	nameRegex := regexp.MustCompile("^(member_booking|offline_class_booking|online_class_booking|trainer|profile|member_type|online_class|offline_class|online_class_category|offline_class_category)*$")
+	nameRegex := regexp.MustCompile("^(member_booking|offline_class_booking|online_class_booking|trainer|profile|member_type|online_class|offline_class|online_class_category|offline_class_category|payment_method)*$")
 	return nameRegex.MatchString(fl.Field().String())
 }
 
@@ -143,4 +167,30 @@ func mytimeValidator(fl validator.FieldLevel) bool {
 	layoutFormat := "2006-01-02 15:04:05"
 	_, err := time.Parse(layoutFormat, fl.Field().String())
 	return err == nil
+}
+
+func dobValidator(fl validator.FieldLevel) bool {
+	layoutFormat := "2006-01-02"
+	dob, err := time.Parse(layoutFormat, fl.Field().String())
+	if err != nil {
+		return false
+	}
+	now := time.Now()
+	return dob.Before(now)
+}
+
+func mydateValidator(fl validator.FieldLevel) bool {
+	layoutFormat := "2006-01-02"
+	_, err := time.Parse(layoutFormat, fl.Field().String())
+	return err == nil
+}
+
+func orderTypeValidator(fl validator.FieldLevel) bool {
+	nameRegex := regexp.MustCompile("^(DESC|ASC|desc|asc)*$")
+	return nameRegex.MatchString(fl.Field().String())
+}
+
+func genderValidator(fl validator.FieldLevel) bool {
+	nameRegex := regexp.MustCompile("^(P|L)*$")
+	return nameRegex.MatchString(fl.Field().String())
 }

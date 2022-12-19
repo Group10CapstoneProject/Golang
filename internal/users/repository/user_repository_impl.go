@@ -17,7 +17,7 @@ type userRepositoryImpl struct {
 func (r *userRepositoryImpl) CreateUser(model *model.User, ctx context.Context) error {
 	err := r.db.WithContext(ctx).Create(model).Error
 	if err != nil {
-		if strings.Contains(err.Error(), "Duplicate entry") {
+		if strings.Contains(err.Error(), "Error 1062:") {
 			return myerrors.ErrEmailAlredyExist
 		}
 		return err

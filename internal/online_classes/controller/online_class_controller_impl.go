@@ -55,13 +55,9 @@ func (d *onlineClassControllerImpl) CreateOnlineClassBooking(c echo.Context) err
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	result, err := d.onlineClassService.FindOnlineClassBookingById(id, c.Request().Context())
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
 	return c.JSON(http.StatusOK, echo.Map{
 		"message": "new online class booking success created",
-		"data":    result,
+		"data":    echo.Map{"id": id},
 	})
 }
 
