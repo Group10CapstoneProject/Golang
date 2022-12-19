@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
 	"strings"
 	"time"
@@ -19,6 +20,33 @@ type onlineClassServiceImpl struct {
 	onlineClassRepository  onlineClassRepo.OnlineClassRepository
 	notificationRepository notifRepo.NotificationRepository
 	imagekitService        imgkit.ImagekitService
+}
+
+// CancelOnlineClassBooking implements OnlineClassService
+func (s *onlineClassServiceImpl) CancelOnlineClassBooking(id uint, userId uint, ctx context.Context) error {
+	onlineClassBooking, err := s.onlineClassRepository.FindOnlineClassBookingById(id, ctx)
+	if err != nil {
+		return err
+	}
+	if onlineClassBooking.User.ID != userId {
+		return myerrors.ErrPermission
+	}
+	if onlineClassBooking.Status == model.CANCEL {
+		return myerrors.ErrIsCanceled
+	}
+	if onlineClassBooking.Status != model.WAITING {
+		return myerrors.ErrCantCanceled
+	}
+	cancelonlineClassBooking := model.OnlineClassBooking{
+		ID:        id,
+		Status:    model.CANCEL,
+		ExpiredAt: time.Now(),
+	}
+	err = s.onlineClassRepository.UpdateOnlineClassBooking(&cancelonlineClassBooking, ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // CreateOnlineClass implements OnlineClassService
@@ -196,6 +224,9 @@ func (s *onlineClassServiceImpl) SetStatusOnlineClassBooking(request *dto.SetSta
 	}
 
 	if time.Now().After(check.ExpiredAt) {
+		if check.Status == model.CANCEL {
+			return myerrors.ErrIsCanceled
+		}
 		return myerrors.ErrOrderExpired
 	}
 
@@ -235,8 +266,17 @@ func (s *onlineClassServiceImpl) OnlineClassPayment(request *model.PaymentReques
 	if onlineClassBooking.UserID != request.UserID {
 		return myerrors.ErrPermission
 	}
-	if onlineClassBooking.ProofPayment != "" {
-		return myerrors.ErrAlredyPaid
+	switch onlineClassBooking.Status {
+	case model.ACTIVE:
+		return errors.New("online class booking is active")
+	case model.REJECT:
+		return errors.New("online class booking is rejected")
+	case model.INACTIVE:
+		return errors.New("online class booking is inactive")
+	case model.CANCEL:
+		return errors.New("online class booking is canceled")
+	case model.PENDING:
+		return errors.New("online class booking is already paid")
 	}
 	// create file buffer
 	buf := bytes.NewBuffer(nil)

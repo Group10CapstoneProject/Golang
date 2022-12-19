@@ -24,6 +24,8 @@ var (
 	ErrRecordIsUsed         = errors.New("record is used by other tables")
 	ErrPaymentMethod        = errors.New("payment method declined")
 	ErrOrderExpired         = errors.New("order is expired")
+	ErrIsCanceled           = errors.New("order is canceled")
+	ErrCantCanceled         = errors.New("order can't canceled")
 	ErrTrainerIsFull        = errors.New("trainer slot is full for this day")
 	ErrForeignKey           = func(err error) error {
 		src := regexp.MustCompile(`REFERENCES`)

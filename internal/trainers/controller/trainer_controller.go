@@ -14,6 +14,7 @@ type TrainerController interface {
 	DeleteTrainerBooking(c echo.Context) error
 	CheckTrainerBooking(c echo.Context) error
 	TakeTrainerBooking(c echo.Context) error
+	CancelTrainerBooking(c echo.Context) error
 
 	// trainer
 	CreateTrainer(c echo.Context) error

@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
 	"time"
 
@@ -19,6 +20,33 @@ type offlineClassServiceImpl struct {
 	offlineClassRepository offlineClassRepo.OfflineClassRepository
 	notificationRepository notifRepo.NotificationRepository
 	imagekitService        imgkit.ImagekitService
+}
+
+// CancelOfflineClassBooking implements OfflineClassService
+func (s *offlineClassServiceImpl) CancelOfflineClassBooking(id uint, userId uint, ctx context.Context) error {
+	offlineClassBooking, err := s.offlineClassRepository.FindOfflineClassBookingById(id, ctx)
+	if err != nil {
+		return err
+	}
+	if offlineClassBooking.User.ID != userId {
+		return myerrors.ErrPermission
+	}
+	if offlineClassBooking.Status == model.CANCEL {
+		return myerrors.ErrIsCanceled
+	}
+	if offlineClassBooking.Status != model.WAITING {
+		return myerrors.ErrCantCanceled
+	}
+	cancelofflineClassBooking := model.OfflineClassBooking{
+		ID:        id,
+		Status:    model.CANCEL,
+		ExpiredAt: time.Now(),
+	}
+	err = s.offlineClassRepository.UpdateOfflineClassBooking(&cancelofflineClassBooking, ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // CheckAccessOfflineClass implements OfflineClassService
@@ -188,8 +216,19 @@ func (s *offlineClassServiceImpl) OfflineClassPayment(request *model.PaymentRequ
 	if offlineClassBooking.UserID != request.UserID {
 		return myerrors.ErrPermission
 	}
-	if offlineClassBooking.ProofPayment != "" {
-		return myerrors.ErrAlredyPaid
+	switch offlineClassBooking.Status {
+	case model.ACTIVE:
+		return errors.New("offline class booking is active")
+	case model.REJECT:
+		return errors.New("offline class booking is rejected")
+	case model.INACTIVE:
+		return errors.New("offline class booking is inactive")
+	case model.CANCEL:
+		return errors.New("offline class booking is canceled")
+	case model.PENDING:
+		return errors.New("offline class booking is already paid")
+	case model.DONE:
+		return errors.New("offline class booking is done")
 	}
 	// create file buffer
 	buf := bytes.NewBuffer(nil)
@@ -250,6 +289,9 @@ func (s *offlineClassServiceImpl) SetStatusOfflineClassBooking(request *dto.SetS
 	}
 
 	if time.Now().After(check.ExpiredAt) {
+		if check.Status == model.CANCEL {
+			return myerrors.ErrIsCanceled
+		}
 		return myerrors.ErrOrderExpired
 	}
 

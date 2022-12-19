@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"time"
@@ -22,6 +23,33 @@ type trainerServiceImpl struct {
 	memberRepository       memberRepo.MemberRepository
 	notificationRepository notifRepo.NotificationRepository
 	imagekitService        imgkit.ImagekitService
+}
+
+// CancelTrainerBooking implements TrainerService
+func (s *trainerServiceImpl) CancelTrainerBooking(id uint, userId uint, ctx context.Context) error {
+	trainerBooking, err := s.trainerRepository.FindTrainerBookingById(id, ctx)
+	if err != nil {
+		return err
+	}
+	if trainerBooking.User.ID != userId {
+		return myerrors.ErrPermission
+	}
+	if trainerBooking.Status == model.CANCEL {
+		return myerrors.ErrIsCanceled
+	}
+	if trainerBooking.Status != model.WAITING {
+		return myerrors.ErrCantCanceled
+	}
+	cancelTrainerBooking := model.TrainerBooking{
+		ID:        id,
+		Status:    model.CANCEL,
+		ExpiredAt: time.Now(),
+	}
+	err = s.trainerRepository.UpdateTrainerBooking(&cancelTrainerBooking, ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // CreateSkill implements TrainerService
@@ -220,6 +248,9 @@ func (s *trainerServiceImpl) SetStatusTrainerBooking(request *dto.SetStatusTrain
 	}
 
 	if time.Now().After(check.ExpiredAt) {
+		if check.Status == model.CANCEL {
+			return myerrors.ErrIsCanceled
+		}
 		return myerrors.ErrOrderExpired
 	}
 
@@ -238,8 +269,17 @@ func (s *trainerServiceImpl) TrainerPayment(request *model.PaymentRequest, ctx c
 	if trainerBooking.UserID != request.UserID {
 		return myerrors.ErrPermission
 	}
-	if trainerBooking.ProofPayment != "" {
-		return myerrors.ErrAlredyPaid
+	switch trainerBooking.Status {
+	case model.ACTIVE:
+		return errors.New("trainer booking is active")
+	case model.REJECT:
+		return errors.New("trainer booking is rejected")
+	case model.INACTIVE:
+		return errors.New("trainer booking is inactive")
+	case model.CANCEL:
+		return errors.New("trainer booking is canceled")
+	case model.PENDING:
+		return errors.New("trainer booking is already paid")
 	}
 	// create file buffer
 	buf := bytes.NewBuffer(nil)

@@ -91,7 +91,7 @@ func (r *trainerRepositoryImpl) CreateTrainerBooking(body *model.TrainerBooking,
 	var dailySlot int64
 	date := body.Time.Format("2006-01-02")
 	err := r.db.WithContext(ctx).Model(&model.TrainerBooking{}).Where("trainer_id = ? AND DATE(time) = ? AND status NOT IN (?,?,?)",
-		body.TrainerID, date, model.CENCEL, model.INACTIVE, model.REJECT).
+		body.TrainerID, date, model.CANCEL, model.INACTIVE, model.REJECT).
 		Count(&count).Error
 	if err != nil {
 		return nil, err
@@ -268,7 +268,7 @@ func (r *trainerRepositoryImpl) FindTrainers(cond *model.Trainer, priceOrder str
 	}
 	if date != "" {
 		res.Where("daily_slot > (SELECT COUNT(a.id) FROM trainer_bookings a WHERE a.trainer_id = id AND DATE(a.time) = ? AND a.status NOT IN (?,?,?))",
-			date, model.CENCEL, model.INACTIVE, model.REJECT)
+			date, model.CANCEL, model.INACTIVE, model.REJECT)
 	}
 	if cond.Name != "" {
 		res.Where("name LIKE ?", "%"+cond.Name+"%")

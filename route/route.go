@@ -143,6 +143,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	members.POST("/set-status/:id", memberController.SetStatusMember, md.CustomJWTWithConfig(roleAdmin)).Name = "set-status-member"
 	members.POST("/pay/:id", memberController.MemberPayment, md.CustomJWTWithConfig(roleUser)).Name = "member-payment"
 	members.GET("/user", memberController.GetMemberUser, md.CustomJWTWithConfig(roleUser)).Name = "get-member-user"
+	members.POST("/cancel/:id", memberController.CancelMember, md.CustomJWTWithConfig(roleUser)).Name = "cancle-member"
 	memberDetails := members.Group("/details")
 	memberDetails.GET("/:id", memberController.GetMemberDetail, md.CustomJWTWithConfig(allAccess)).Name = "get-member-detail"
 	memberDetails.PUT("/:id", memberController.UpdateMember, md.CustomJWTWithConfig(roleAdmin)).Name = "update-member"
@@ -179,6 +180,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	onlineClassBooking.GET("/user", onlineClassController.GetOnlineClassBookingUser, md.CustomJWTWithConfig(roleUser)).Name = "get-online-class-booking-user"
 	onlineClassBooking.POST("/set-status/:id", onlineClassController.SetStatusOnlineClassBooking, md.CustomJWTWithConfig(roleAdmin)).Name = "set-status-online-class-booking"
 	onlineClassBooking.POST("/pay/:id", onlineClassController.OnlineClassBookingPayment, md.CustomJWTWithConfig(roleUser)).Name = "online-class-booking-payment"
+	onlineClassBooking.POST("/cancel/:id", onlineClassController.CancelOnlineClassBooking, md.CustomJWTWithConfig(roleUser)).Name = "cancle-online-class-booking"
 	onlineClassBookingDetails := onlineClassBooking.Group("/details")
 	onlineClassBookingDetails.GET("/:id", onlineClassController.GetOnlineClassBookingDetail, md.CustomJWTWithConfig(allAccess)).Name = "get-online-class-booking-detail"
 	onlineClassBookingDetails.PUT("/:id", onlineClassController.UpdateOnlineClassBooking, md.CustomJWTWithConfig(roleAdmin)).Name = "update-online-class-booking"
@@ -207,6 +209,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	offlineClassBooking.GET("/user", offlineClassController.GetOfflineClassBookingUser, md.CustomJWTWithConfig(roleUser)).Name = "get-offline-class-booking-user"
 	offlineClassBooking.POST("/set-status/:id", offlineClassController.SetStatusOfflineClassBooking, md.CustomJWTWithConfig(roleAdmin)).Name = "set-status-offline-class-booking"
 	offlineClassBooking.POST("/pay/:id", offlineClassController.OfflineClassBookingPayment, md.CustomJWTWithConfig(roleUser)).Name = "offline-class-booking-payment"
+	offlineClassBooking.POST("/cancel/:id", offlineClassController.CancelOfflineClassBooking, md.CustomJWTWithConfig(roleUser)).Name = "cancle-offline-class-booking"
 	offlineClassBookingTake := offlineClassBooking.Group("/take")
 	offlineClassBookingTake.GET("", offlineClassController.CheckOfflineClassBooking, md.CustomJWTWithConfig(roleAdmin)).Name = "check-offline-class-booking"
 	offlineClassBookingTake.POST("", offlineClassController.TakeOfflineClassBooking, md.CustomJWTWithConfig(roleAdmin)).Name = "take-offline-class-booking"
@@ -249,6 +252,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	trainerBooking.GET("/user", trainerController.GetTrainerBookingUser, md.CustomJWTWithConfig(roleUser)).Name = "get-trainer-booking-user"
 	trainerBooking.POST("/set-status/:id", trainerController.SetStatusTrainerBooking, md.CustomJWTWithConfig(roleAdmin)).Name = "set-status-trainer-booking"
 	trainerBooking.POST("/pay/:id", trainerController.TrainerBookingPayment, md.CustomJWTWithConfig(roleUser)).Name = "trainer-booking-payment"
+	trainerBooking.POST("/cancel/:id", trainerController.CancelTrainerBooking, md.CustomJWTWithConfig(roleUser)).Name = "cancel-trainer-booking"
 	trainerBookingTake := trainerBooking.Group("/take")
 	trainerBookingTake.GET("", trainerController.CheckTrainerBooking, md.CustomJWTWithConfig(roleAdmin)).Name = "check-trainer-booking"
 	trainerBookingTake.POST("", trainerController.TakeTrainerBooking, md.CustomJWTWithConfig(roleAdmin)).Name = "take-trainer-booking"

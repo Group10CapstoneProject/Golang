@@ -23,6 +23,33 @@ type memberServiceImpl struct {
 	imagekitService        imgkit.ImagekitService
 }
 
+// CancelMember implements MemberService
+func (s *memberServiceImpl) CancelMember(id uint, userId uint, ctx context.Context) error {
+	member, err := s.memberRepository.FindMemberById(id, ctx)
+	if err != nil {
+		return err
+	}
+	if member.User.ID != userId {
+		return myerrors.ErrPermission
+	}
+	if member.Status == model.CANCEL {
+		return myerrors.ErrIsCanceled
+	}
+	if member.Status != model.WAITING {
+		return myerrors.ErrCantCanceled
+	}
+	cancelMember := model.Member{
+		ID:        id,
+		Status:    model.CANCEL,
+		ExpiredAt: time.Now(),
+	}
+	err = s.memberRepository.UpdateMember(&cancelMember, ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // CreateMember implements MemberService
 func (s *memberServiceImpl) CreateMember(request *dto.MemberStoreRequest, ctx context.Context) (uint, error) {
 	t := time.Now()
@@ -156,6 +183,9 @@ func (s *memberServiceImpl) SetStatusMember(request *dto.SetStatusMember, ctx co
 		member.ExpiredAt = time.Now()
 	}
 	if time.Now().After(check.ExpiredAt) {
+		if check.Status == model.CANCEL {
+			return myerrors.ErrIsCanceled
+		}
 		return myerrors.ErrOrderExpired
 	}
 
@@ -174,8 +204,17 @@ func (s *memberServiceImpl) MemberPayment(request *model.PaymentRequest, ctx con
 	if member.UserID != request.UserID {
 		return myerrors.ErrPermission
 	}
-	if member.ProofPayment != "" {
-		return errors.New("member already paid")
+	switch member.Status {
+	case model.ACTIVE:
+		return errors.New("member is active")
+	case model.REJECT:
+		return errors.New("member is rejected")
+	case model.INACTIVE:
+		return errors.New("member is inactive")
+	case model.CANCEL:
+		return errors.New("member is canceled")
+	case model.PENDING:
+		return errors.New("member is already paid")
 	}
 	// create file buffer
 	buf := bytes.NewBuffer(nil)
