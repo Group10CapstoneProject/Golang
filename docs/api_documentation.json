@@ -5555,27 +5555,20 @@
                                 },
                                 "example": {
                                     "data": {
-                                        "data": {
-                                            "articles": [
-                                                {
-                                                    "id": 1,
-                                                    "title": "Artikel aja",
-                                                    "description": "Ini artikel",
-                                                    "picture":"https://google.com",
-                                                    "pinned": false,
-                                                    "updated_at": "2022-10-21 13:23:12"
-                                                },
-                                                {
-                                                    "id": 2,
-                                                    "title": "Artikel aja 2",
-                                                    "description": "Ini artikel",
-                                                    "picture":"https://google.com",
-                                                    "pinned": false,
-                                                    "updated_at": "2022-10-21 13:23:12"
-                                                }
-                                            ],
-                                            "count": 2
-                                        },
+                                        "data": [
+                                            {
+                                                "id": 1,
+                                                "title": "Artikel aja",
+                                                "picture":"https://google.com",
+                                                "updated_at": "2022-10-21 13:23:12"
+                                            },
+                                            {
+                                                "id": 2,
+                                                "title": "Artikel aja 2",
+                                                "picture":"https://google.com",
+                                                "updated_at": "2022-10-21 13:23:12"
+                                            }
+                                        ],
                                         "message": "success get articles"
                                     }
                                 }
@@ -5611,10 +5604,8 @@
                             },
                             "example": {
                                 "title": "Artikel aja 2",
-                                "description": "Ini artikel",
                                 "picture":"https://google.com",
-                                "content":"contoh artikel bla blaa",
-                                "pinned": false
+                                "content":"contoh artikel bla blaa"
                             }
                         }
                     }
@@ -5677,13 +5668,11 @@
                                     "data": {
                                         "id": 2,
                                         "title": "Artikel aja 2",
-                                        "description": "Ini artikel",
                                         "picture":"https://google.com",
                                         "content":"contoh artikel bla blaa",
-                                        "pinned": false,
                                         "updated_at": "2022-10-21 13:23:12"
                                     },
-                                    "message": "success get online calss category"
+                                    "message": "success get articles"
                                 }
                             }
                         }
@@ -5767,10 +5756,8 @@
                             },
                             "example": {
                                 "title": "Artikel aja 2",
-                                "description": "Ini artikel",
                                 "picture":"https://google.com",
-                                "content":"contoh artikel bla blaa",
-                                "pinned": false
+                                "content":"contoh artikel bla blaa"
                             }
                         }
                     }

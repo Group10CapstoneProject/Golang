@@ -3,6 +3,9 @@ package route
 import (
 	"github.com/Group10CapstoneProject/Golang/config"
 	"github.com/Group10CapstoneProject/Golang/constans"
+	pkgArticleController "github.com/Group10CapstoneProject/Golang/internal/articles/controller"
+	pkgArticleRepostiory "github.com/Group10CapstoneProject/Golang/internal/articles/repository"
+	pkgArticleService "github.com/Group10CapstoneProject/Golang/internal/articles/service"
 	pkgAuthController "github.com/Group10CapstoneProject/Golang/internal/auth/controller"
 	pkgAuthRepostiory "github.com/Group10CapstoneProject/Golang/internal/auth/repository"
 	pkgAuthService "github.com/Group10CapstoneProject/Golang/internal/auth/service"
@@ -72,6 +75,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	onlineClassRepository := pkgOnlineClassRepostiory.NewOnlineClassRepository(db)
 	offlineClassRepository := pkgOfflineClassRepostiory.NewOfflineClassRepository(db)
 	trainerRepository := pkgTrainerRepostiory.NewTrainerRepository(db)
+	articleRepository := pkgArticleRepostiory.NewArticlesRepository(db)
 
 	// init utils service
 	jwtService := jwtService.NewJWTService(config.Env.JWT_SECRET_ACCESS, config.Env.JWT_SECRET_REFRESH)
@@ -89,6 +93,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	offlineClassService := pkgOfflineClassService.NewOfflineClassService(offlineClassRepository, notificationRepository, imagekitService)
 	historyService := pkgHistoryService.NewHistoryService(memberRepository, onlineClassRepository, offlineClassRepository, trainerRepository)
 	trainerService := pkgTrainerService.NewTrainerService(trainerRepository, memberRepository, notificationRepository, imagekitService)
+	articleService := pkgArticleService.NewArticlesService(articleRepository)
 
 	// init controller
 	userController := pkgUserController.NewUserController(userService, jwtService)
@@ -101,6 +106,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	offlineClassController := pkgOfflineClassController.NewOfflineClassController(offlineClassService, jwtService, memberService, noticationService)
 	historyController := pkgHistoryController.NewHistoryController(historyService, jwtService)
 	trainerController := pkgTrainerController.NewTrainerController(memberService, jwtService, noticationService, trainerService)
+	articleController := pkgArticleController.NewArticlesController(articleService)
 
 	// int route
 	// auth
@@ -250,6 +256,15 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	trainerBookingDetails.GET("/:id", trainerController.GetTrainerBookingDetail, md.CustomJWTWithConfig(allAccess)).Name = "get-trainer-booking-detail"
 	trainerBookingDetails.PUT("/:id", trainerController.UpdateTrainerBooking, md.CustomJWTWithConfig(roleAdmin)).Name = "update-trainer-booking"
 	trainerBookingDetails.DELETE("/:id", trainerController.DeleteTrainerBooking, md.CustomJWTWithConfig(roleAdmin)).Name = "delete-trainer-booking"
+
+	// articles
+	article := v1.Group("/articles")
+	article.POST("", articleController.CreateArticles, md.CustomJWTWithConfig(roleAdmin)).Name = "create-article"
+	article.GET("", articleController.GetArticles, md.CustomJWTWithConfig(allAccess)).Name = "get-all-articles"
+	articleDetails := article.Group("/details")
+	articleDetails.GET("/:id", articleController.GetArticlesDetail, md.CustomJWTWithConfig(allAccess)).Name = "get-article-detail"
+	articleDetails.PUT("/:id", articleController.UpdateArticles, md.CustomJWTWithConfig(roleAdmin)).Name = "update-article"
+	articleDetails.DELETE("/:id", articleController.DeleteArticles, md.CustomJWTWithConfig(roleAdmin)).Name = "delete-article"
 
 	// create default user (superadmin)
 	if err := userService.CreateSuperadmin(&model.User{
