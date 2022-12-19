@@ -41,5 +41,6 @@ func MigrateDB(db *gorm.DB) error {
 		model.OfflineClassCategory{},
 		model.OfflineClass{},
 		model.OfflineClassBooking{},
+		model.Articles{},
 	)
 }

@@ -30,23 +30,23 @@ func (s *articlesServiceImpl) DeleteArticles(id uint, ctx context.Context) error
 }
 
 // FindArticlesById implements ArticlesService
-func (s *articlesServiceImpl) FindArticlesById(id uint, ctx context.Context) (*dto.ArticlesResource, error) {
+func (s *articlesServiceImpl) FindArticlesById(id uint, ctx context.Context) (*dto.ArticlesDetailResource, error) {
 	articles, err := s.articlesRepository.FindArticlesById(id, ctx)
 	if err != nil {
 		return nil, err
 	}
-	var result dto.ArticlesResource
+	var result dto.ArticlesDetailResource
 	result.FromModel(articles)
 	return &result, nil
 }
 
 // FindArticles implements ArticlesService
-func (s *articlesServiceImpl) FindArticles(ctx context.Context) (*dto.ArticlesResource, error) {
+func (s *articlesServiceImpl) FindArticles(ctx context.Context) (*dto.ArticlesResources, error) {
 	articles, err := s.articlesRepository.FindArticles(ctx)
 	if err != nil {
 		return nil, err
 	}
-	var result dto.ArticlesResource
+	var result dto.ArticlesResources
 	result.FromModel(articles)
 	return &result, nil
 }
