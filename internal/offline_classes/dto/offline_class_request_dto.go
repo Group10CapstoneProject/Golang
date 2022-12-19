@@ -81,7 +81,7 @@ func (u *OfflineClassStoreRequest) ToModel() *model.OfflineClass {
 
 type OfflineClassUpdateRequest struct {
 	ID                     uint
-	Title                  string `json:"title" validate:"omitemptry,name"`
+	Title                  string `json:"title" validate:"omitempty,name"`
 	Time                   string `json:"time" validate:"omitempty,mytime"`
 	Duration               uint   `json:"duration" validate:"omitempty,gte=1"`
 	Slot                   uint   `json:"slot" validate:"omitempty,gte=1"`
