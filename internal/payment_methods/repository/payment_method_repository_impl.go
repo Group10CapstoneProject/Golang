@@ -18,30 +18,8 @@ func (r *paymentMethodRepositoryImpl) CreatePaymentMethod(body *model.PaymentMet
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
 		if strings.Contains(err.Error(), "Error 1062:") {
-			if err := r.CheckPaymentMethodIsDeleted(body); err == nil {
-				return nil
-			}
 			return myerrors.ErrDuplicateRecord
 		}
-		return err
-	}
-	return nil
-}
-
-// CheckPaymentMethodIsDeleted implements PaymentMethodRepository
-func (r *paymentMethodRepositoryImpl) CheckPaymentMethodIsDeleted(body *model.PaymentMethod) error {
-	paymentMethod := model.PaymentMethod{}
-	err := r.db.Where("name = ?", body.Name).First(&model.PaymentMethod{}).Error
-	if err == nil {
-		return myerrors.ErrDuplicateRecord
-	}
-	err = r.db.Unscoped().Where("name = ?", body.Name).First(&paymentMethod).Update("deleted_at", nil).Error
-	if err != nil {
-		return err
-	}
-	body.ID = paymentMethod.ID
-
-	if err := r.UpdatePaymentMethod(body, context.Background()); err != nil {
 		return err
 	}
 	return nil
@@ -56,7 +34,7 @@ func (r *paymentMethodRepositoryImpl) DeletePaymentMethod(body *model.PaymentMet
 	if len(body.Member) > 0 || len(body.OnlineClass) > 0 || len(body.OfflineClass) > 0 || len(body.Trainer) > 0 {
 		return myerrors.ErrRecordIsUsed
 	}
-	res := r.db.WithContext(ctx).Delete(body)
+	res := r.db.WithContext(ctx).Unscoped().Delete(body)
 	if res.Error != nil {
 		return res.Error
 	}

@@ -5212,7 +5212,13 @@
                     }
                 ],
                 "tags": ["Payment Methods"],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/access"
+                    }
+                ],
                 "summary": "Get all payment methods",
+                "description": "Parameter acces diberikan dari product access, misal ketika user melakukan get terhadap offline class lalu terdapat field access_class true, maka berikan query parameter access dengan value true untuk menampilkan payment method member yang dimana id nya adalah 0, jika access_class false maka berikan juga query parameter access dengan value false maka tidak akan ditampilkan payment method khusus member. Hal ini juga berlaku untuk trainer booking",
                 "responses": {
                     "200": {
                         "description": "Success get payment methods",
@@ -6581,6 +6587,15 @@
                     "description": "category id"
                 },
                 "example": 1
+            },
+            "access": {
+                "in": "query",
+                "name": "access",
+                "schema":{
+                    "type": "string",
+                    "description": "access boolean true or false"
+                },
+                "example": "true"
             },
             "email": {
                 "in": "query",

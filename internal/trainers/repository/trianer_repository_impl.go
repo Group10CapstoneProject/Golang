@@ -14,25 +14,6 @@ type trainerRepositoryImpl struct {
 	db *gorm.DB
 }
 
-// CheckSkillIsDeleted implements TrainerRepository
-func (r *trainerRepositoryImpl) CheckSkillIsDeleted(body *model.Skill) error {
-	skill := model.Skill{}
-	err := r.db.Where("name = ?", body.Name).First(&model.Skill{}).Error
-	if err == nil {
-		return myerrors.ErrDuplicateRecord
-	}
-	err = r.db.Unscoped().Where("name = ?", body.Name).First(&skill).Update("deleted_at", nil).Error
-	if err != nil {
-		return err
-	}
-	body.ID = skill.ID
-
-	if err := r.UpdateSkill(body, context.Background()); err != nil {
-		return err
-	}
-	return nil
-}
-
 // CheckTrainerIsDeleted implements TrainerRepository
 func (r *trainerRepositoryImpl) CheckTrainerIsDeleted(body *model.Trainer) error {
 	trainer := model.Trainer{}
@@ -57,9 +38,6 @@ func (r *trainerRepositoryImpl) CreateSkill(body *model.Skill, ctx context.Conte
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
 		if strings.Contains(err.Error(), "Error 1062:") {
-			if err := r.CheckSkillIsDeleted(body); err == nil {
-				return nil
-			}
 			return myerrors.ErrDuplicateRecord
 		}
 		return err
@@ -123,7 +101,7 @@ func (r *trainerRepositoryImpl) DeleteSkill(body *model.Skill, ctx context.Conte
 	if len(check.TrainerSkill) != 0 {
 		return myerrors.ErrRecordIsUsed
 	}
-	res.Delete(body)
+	res.Unscoped().Delete(body)
 	if res.Error != nil {
 		return res.Error
 	}

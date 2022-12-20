@@ -90,7 +90,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	memberService := pkgMemberService.NewMemberService(memberRepository, imagekitService, notificationRepository)
 	fileService := pkgFileService.NewFileService(imagekitService)
 	onlineClassService := pkgOnlineClassService.NewOnlineClassService(onlineClassRepository, notificationRepository, imagekitService)
-	offlineClassService := pkgOfflineClassService.NewOfflineClassService(offlineClassRepository, notificationRepository, imagekitService)
+	offlineClassService := pkgOfflineClassService.NewOfflineClassService(offlineClassRepository, notificationRepository, imagekitService, memberRepository)
 	historyService := pkgHistoryService.NewHistoryService(memberRepository, onlineClassRepository, offlineClassRepository, trainerRepository)
 	trainerService := pkgTrainerService.NewTrainerService(trainerRepository, memberRepository, notificationRepository, imagekitService)
 	articleService := pkgArticleService.NewArticlesService(articleRepository)
