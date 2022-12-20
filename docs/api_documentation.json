@@ -4008,14 +4008,7 @@
                                 "price": 22000,
                                 "daily_slot": 2,
                                 "description": "Trainer muda",
-                                "trainer_skill": [
-                                    {
-                                        "skill_id": 3
-                                    },
-                                    {
-                                        "skill_id": 4
-                                    }
-                                ],
+                                "skills": [1, 2, 3, 4],
                                 "picture": "https://ik.imagekit.io/rnwxyz/trainer/33ed55c9-88f0-4370-9415-4c00838b97f5"
                             }
                         }
