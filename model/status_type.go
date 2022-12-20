@@ -9,5 +9,5 @@ const (
 	INACTIVE StatusType = "INACTIVE"
 	REJECT   StatusType = "REJECT"
 	DONE     StatusType = "DONE"
-	CENCEL   StatusType = "CENCEL"
+	CANCEL   StatusType = "CANCEL"
 )

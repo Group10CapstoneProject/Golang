@@ -19,10 +19,26 @@ type Member struct {
 	ExpiredAt       time.Time
 	ActivedAt       time.Time `gorm:"default:null"`
 	Duration        uint
-	Status          StatusType `gorm:"type:enum('PENDING', 'WAITING', 'ACTIVE', 'INACTIVE', 'REJECT', 'DONE', 'CENCEL');column:status"`
+	Status          StatusType `gorm:"type:enum('PENDING', 'WAITING', 'ACTIVE', 'INACTIVE', 'REJECT', 'DONE', 'CANCEL');column:status"`
 	ProofPayment    string
-	PaymentMethodId uint
+	PaymentMethodID *uint
 	PaymentMethod   PaymentMethod
 	Total           uint
 	Code            uuid.UUID
+}
+
+type MemberType struct {
+	ID                 uint `gorm:"primarykey"`
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
+	DeletedAt          gorm.DeletedAt `gorm:"index"`
+	Name               string         `gorm:"type:varchar(255);unique"`
+	Price              uint
+	Description        string
+	Picture            string
+	AccessOfflineClass *bool
+	AccessOnlineClass  *bool
+	AccessTrainer      *bool
+	AccessGym          *bool
+	Member             []Member
 }

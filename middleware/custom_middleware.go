@@ -41,7 +41,6 @@ func (j *customMiddleware) CustomJWTWithConfig(role string) echo.MiddlewareFunc 
 	config.ParseTokenFunc = func(auth string, c echo.Context) (interface{}, error) {
 		token, err := jwt.Parse(auth, config.KeyFunc)
 		if err != nil {
-			fmt.Println("sukses")
 			return nil, err
 		}
 		if !token.Valid {
@@ -71,6 +70,9 @@ func (j *customMiddleware) CustomJWTWithConfig(role string) echo.MiddlewareFunc 
 		}
 		if err == myerrors.ErrInvalidSession {
 			return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+		}
+		if err.Error() == "code=400, message=missing or malformed jwt" {
+			return err
 		}
 		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}

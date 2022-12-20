@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
 	"strings"
 	"time"
@@ -21,6 +22,33 @@ type onlineClassServiceImpl struct {
 	imagekitService        imgkit.ImagekitService
 }
 
+// CancelOnlineClassBooking implements OnlineClassService
+func (s *onlineClassServiceImpl) CancelOnlineClassBooking(id uint, userId uint, ctx context.Context) error {
+	onlineClassBooking, err := s.onlineClassRepository.FindOnlineClassBookingById(id, ctx)
+	if err != nil {
+		return err
+	}
+	if onlineClassBooking.User.ID != userId {
+		return myerrors.ErrPermission
+	}
+	if onlineClassBooking.Status == model.CANCEL {
+		return myerrors.ErrIsCanceled
+	}
+	if onlineClassBooking.Status != model.WAITING {
+		return myerrors.ErrCantCanceled
+	}
+	cancelonlineClassBooking := model.OnlineClassBooking{
+		ID:        id,
+		Status:    model.CANCEL,
+		ExpiredAt: time.Now(),
+	}
+	err = s.onlineClassRepository.UpdateOnlineClassBooking(&cancelonlineClassBooking, ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // CreateOnlineClass implements OnlineClassService
 func (s *onlineClassServiceImpl) CreateOnlineClass(request *dto.OnlineClassStoreRequest, ctx context.Context) error {
 	onlineClass := request.ToModel()
@@ -33,8 +61,9 @@ func (s *onlineClassServiceImpl) CreateOnlineClass(request *dto.OnlineClassStore
 // CreateOnlineClassBooking implements OnlineClassService
 func (s *onlineClassServiceImpl) CreateOnlineClassBooking(request *dto.OnlineClassBookingStoreRequest, ctx context.Context) (uint, error) {
 	onlineClassBooking := request.ToModel()
-	onlineClassBooking.ExpiredAt = time.Now().Add(24 * time.Hour)
-	onlineClassBooking.ActivedAt = time.Date(0001, 1, 1, 0, 0, 0, 0, time.UTC)
+	exp := time.Now().Add(24 * time.Hour)
+	onlineClassBooking.ExpiredAt = time.Date(exp.Year(), exp.Month(), exp.Day(), 23, 59, 59, 0, exp.Location())
+	onlineClassBooking.ActivedAt = time.Date(0001, 1, 1, 0, 0, 0, 0, exp.Location())
 	onlineClassBooking.Status = model.WAITING
 	result, err := s.onlineClassRepository.CreateOnlineClassBooking(onlineClassBooking, ctx)
 	if err != nil {
@@ -83,17 +112,6 @@ func (s *onlineClassServiceImpl) FindOnlineClassBookingById(id uint, ctx context
 	if err != nil {
 		return nil, err
 	}
-	if onlineClassBooking.Status != model.INACTIVE && time.Now().After(onlineClassBooking.ExpiredAt) {
-		onlineClassBooking.Status = model.INACTIVE
-		body := model.OnlineClassBooking{
-			ID:     onlineClassBooking.ID,
-			Status: model.INACTIVE,
-		}
-		err := s.onlineClassRepository.UpdateOnlineClassBooking(&body, ctx)
-		if err != nil {
-			return nil, err
-		}
-	}
 	var result dto.OnlineClassBookingDetailResource
 	result.FromModel(onlineClassBooking)
 	return &result, nil
@@ -120,10 +138,10 @@ func (s *onlineClassServiceImpl) FindOnlineClassBookings(page *model.Pagination,
 	result.FromModel(onlineClassBookings)
 
 	response := dto.OnlineClassBookingResponses{
-		Members: result,
-		Page:    uint(page.Page),
-		Limit:   uint(page.Limit),
-		Count:   uint(count),
+		OnlineClassBookings: result,
+		Page:                uint(page.Page),
+		Limit:               uint(page.Limit),
+		Count:               uint(count),
 	}
 	return &response, nil
 }
@@ -198,14 +216,18 @@ func (s *onlineClassServiceImpl) SetStatusOnlineClassBooking(request *dto.SetSta
 	onlineClassBooking := request.ToModel()
 
 	if onlineClassBooking.Status == model.ACTIVE && check.Status != model.ACTIVE && check.Status != model.INACTIVE {
-		onlineClassBooking.ExpiredAt = time.Now().Add(24 * 30 * time.Duration(check.Duration) * time.Hour)
+		exp := time.Now().Add(24 * 30 * time.Duration(check.Duration) * time.Hour)
+		onlineClassBooking.ExpiredAt = time.Date(exp.Year(), exp.Month(), exp.Day(), 23, 59, 59, 0, exp.Location())
 		onlineClassBooking.ActivedAt = time.Now()
 	} else if onlineClassBooking.Status == model.REJECT && check.Status != model.REJECT {
 		onlineClassBooking.ExpiredAt = time.Now()
 	}
 
 	if time.Now().After(check.ExpiredAt) {
-		onlineClassBooking.Status = model.INACTIVE
+		if check.Status == model.CANCEL {
+			return myerrors.ErrIsCanceled
+		}
+		return myerrors.ErrOrderExpired
 	}
 
 	err = s.onlineClassRepository.UpdateOnlineClassBooking(onlineClassBooking, ctx)
@@ -244,8 +266,17 @@ func (s *onlineClassServiceImpl) OnlineClassPayment(request *model.PaymentReques
 	if onlineClassBooking.UserID != request.UserID {
 		return myerrors.ErrPermission
 	}
-	if onlineClassBooking.ProofPayment != "" {
-		return myerrors.ErrAlredyPaid
+	switch onlineClassBooking.Status {
+	case model.ACTIVE:
+		return errors.New("online class booking is active")
+	case model.REJECT:
+		return errors.New("online class booking is rejected")
+	case model.INACTIVE:
+		return errors.New("online class booking is inactive")
+	case model.CANCEL:
+		return errors.New("online class booking is canceled")
+	case model.PENDING:
+		return errors.New("online class booking is already paid")
 	}
 	// create file buffer
 	buf := bytes.NewBuffer(nil)
@@ -261,10 +292,11 @@ func (s *onlineClassServiceImpl) OnlineClassPayment(request *model.PaymentReques
 		return myerrors.ErrFailedUpload
 	}
 	// update online class booking
+	exp := time.Now().Add(24 * time.Hour)
 	body := model.OnlineClassBooking{
 		ID:           id,
 		ProofPayment: url,
-		ExpiredAt:    time.Now().Add(24 * time.Hour),
+		ExpiredAt:    time.Date(exp.Year(), exp.Month(), exp.Day(), 23, 59, 59, 0, exp.Location()),
 		Status:       model.PENDING,
 	}
 	err = s.onlineClassRepository.UpdateOnlineClassBooking(&body, ctx)

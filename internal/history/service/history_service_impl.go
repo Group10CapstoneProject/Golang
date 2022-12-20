@@ -2,14 +2,13 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"sort"
-	"time"
 
 	"github.com/Group10CapstoneProject/Golang/internal/history/dto"
 	memberRepo "github.com/Group10CapstoneProject/Golang/internal/members/repository"
 	offlineClassRepo "github.com/Group10CapstoneProject/Golang/internal/offline_classes/repository"
 	onlineClassRepo "github.com/Group10CapstoneProject/Golang/internal/online_classes/repository"
+	trainerRepo "github.com/Group10CapstoneProject/Golang/internal/trainers/repository"
 	"github.com/Group10CapstoneProject/Golang/model"
 )
 
@@ -17,6 +16,7 @@ type historyServiceImpl struct {
 	memberRepository       memberRepo.MemberRepository
 	onlineClassRepository  onlineClassRepo.OnlineClassRepository
 	offlineClassRepository offlineClassRepo.OfflineClassRepository
+	trainerRepository      trainerRepo.TrainerRepository
 }
 
 // FindHistoryActivity implements HistoryService
@@ -48,6 +48,36 @@ func (s *historyServiceImpl) FindHistoryActivity(request *dto.HistoryActivityReq
 			for _, member := range members {
 				var resource dto.HistoryResource
 				resource.FromModelMembers(&member)
+				historyActivity = append(historyActivity, resource)
+			}
+		}
+	}
+	if request.Type == "trainer" || request.Type == "" {
+		cond := &model.TrainerBooking{
+			UserID: request.UserID,
+			Status: request.Status,
+		}
+		trainers, err := s.trainerRepository.ReadTrainerBooking(cond, ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, trainer := range trainers {
+			var resource dto.HistoryResource
+			resource.FromModelTrainer(&trainer)
+			historyActivity = append(historyActivity, resource)
+		}
+		if request.Status == "WAITING" {
+			cond := &model.TrainerBooking{
+				UserID: request.UserID,
+				Status: model.PENDING,
+			}
+			trainers, err := s.trainerRepository.ReadTrainerBooking(cond, ctx)
+			if err != nil {
+				return nil, err
+			}
+			for _, trainer := range trainers {
+				var resource dto.HistoryResource
+				resource.FromModelTrainer(&trainer)
 				historyActivity = append(historyActivity, resource)
 			}
 		}
@@ -113,17 +143,7 @@ func (s *historyServiceImpl) FindHistoryActivity(request *dto.HistoryActivityReq
 		}
 	}
 	sort.Slice(historyActivity, func(i, j int) bool {
-		timeI, err := time.Parse("2006-01-02 15:04:05", historyActivity[i].CreatedAt)
-		if err != nil {
-			fmt.Println(err.Error())
-			return false
-		}
-		timeJ, err := time.Parse("2006-01-02 15:04:05", historyActivity[j].CreatedAt)
-		if err != nil {
-			fmt.Println(err.Error())
-			return false
-		}
-		return timeI.After(timeJ)
+		return historyActivity[i].CreatedAt.After(historyActivity[j].CreatedAt)
 	})
 	return historyActivity, nil
 }
@@ -147,7 +167,7 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 		}
 		cond = &model.Member{
 			UserID: request.UserID,
-			Status: model.CENCEL,
+			Status: model.CANCEL,
 		}
 		members, err = s.memberRepository.ReadMembers(cond, ctx)
 		if err != nil {
@@ -214,7 +234,7 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 		}
 		cond = &model.OnlineClassBooking{
 			UserID: request.UserID,
-			Status: model.CENCEL,
+			Status: model.CANCEL,
 		}
 		onlineClasses, err = s.onlineClassRepository.ReadOnlineClassBooking(cond, ctx)
 		if err != nil {
@@ -255,7 +275,7 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 		}
 		cond = &model.OfflineClassBooking{
 			UserID: request.UserID,
-			Status: model.CENCEL,
+			Status: model.CANCEL,
 		}
 		offlineClasses, err = s.offlineClassRepository.ReadOfflineClassBookings(cond, ctx)
 		if err != nil {
@@ -293,18 +313,62 @@ func (s *historyServiceImpl) FindHistoryOrder(request *dto.HistoryOrderRequest, 
 			historyActivity = append(historyActivity, resource)
 		}
 	}
+	if request.Type == "trainer" || request.Type == "" {
+		cond := &model.TrainerBooking{
+			UserID: request.UserID,
+			Status: model.DONE,
+		}
+		trainers, err := s.trainerRepository.ReadTrainerBooking(cond, ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, trainer := range trainers {
+			var resource dto.HistoryResource
+			resource.FromModelTrainer(&trainer)
+			historyActivity = append(historyActivity, resource)
+		}
+		cond = &model.TrainerBooking{
+			UserID: request.UserID,
+			Status: model.CANCEL,
+		}
+		trainers, err = s.trainerRepository.ReadTrainerBooking(cond, ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, trainer := range trainers {
+			var resource dto.HistoryResource
+			resource.FromModelTrainer(&trainer)
+			historyActivity = append(historyActivity, resource)
+		}
+		cond = &model.TrainerBooking{
+			UserID: request.UserID,
+			Status: model.REJECT,
+		}
+		trainers, err = s.trainerRepository.ReadTrainerBooking(cond, ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, trainer := range trainers {
+			var resource dto.HistoryResource
+			resource.FromModelTrainer(&trainer)
+			historyActivity = append(historyActivity, resource)
+		}
+		cond = &model.TrainerBooking{
+			UserID: request.UserID,
+			Status: model.INACTIVE,
+		}
+		trainers, err = s.trainerRepository.ReadTrainerBooking(cond, ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, trainer := range trainers {
+			var resource dto.HistoryResource
+			resource.FromModelTrainer(&trainer)
+			historyActivity = append(historyActivity, resource)
+		}
+	}
 	sort.Slice(historyActivity, func(i, j int) bool {
-		timeI, err := time.Parse("2006-01-02 15:04:05", historyActivity[i].CreatedAt)
-		if err != nil {
-			fmt.Println(err.Error())
-			return false
-		}
-		timeJ, err := time.Parse("2006-01-02 15:04:05", historyActivity[j].CreatedAt)
-		if err != nil {
-			fmt.Println(err.Error())
-			return false
-		}
-		return timeI.After(timeJ)
+		return historyActivity[i].CreatedAt.After(historyActivity[j].CreatedAt)
 	})
 	return historyActivity, nil
 }
@@ -313,10 +377,12 @@ func NewHistoryService(
 	memberRepository memberRepo.MemberRepository,
 	onlineClassRepository onlineClassRepo.OnlineClassRepository,
 	offlineClassRepository offlineClassRepo.OfflineClassRepository,
+	trainerRepository trainerRepo.TrainerRepository,
 ) HistoryService {
 	return &historyServiceImpl{
 		memberRepository:       memberRepository,
 		onlineClassRepository:  onlineClassRepository,
 		offlineClassRepository: offlineClassRepository,
+		trainerRepository:      trainerRepository,
 	}
 }

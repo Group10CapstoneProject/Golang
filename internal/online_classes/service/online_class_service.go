@@ -15,6 +15,7 @@ type OnlineClassService interface {
 	FindOnlineClassBookingByUser(userId uint, ctx context.Context) (*dto.OnlineClassBookingResources, error)
 	UpdateOnlineClassBooking(request *dto.OnlineClassBookingUpdateRequest, ctx context.Context) error
 	SetStatusOnlineClassBooking(request *dto.SetStatusOnlineClassBooking, ctx context.Context) error
+	CancelOnlineClassBooking(id uint, userId uint, ctx context.Context) error
 	OnlineClassPayment(request *model.PaymentRequest, ctx context.Context) error
 	DeleteOnlineClassBooking(id uint, ctx context.Context) error
 

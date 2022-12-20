@@ -12,6 +12,7 @@ type OnlineClassController interface {
 	SetStatusOnlineClassBooking(c echo.Context) error
 	OnlineClassBookingPayment(c echo.Context) error
 	DeleteOnlineClassBooking(c echo.Context) error
+	CancelOnlineClassBooking(c echo.Context) error
 
 	// online class
 	CreateOnlineClass(c echo.Context) error

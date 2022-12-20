@@ -23,6 +23,26 @@ type onlineClassControllerImpl struct {
 	notificationService notifServ.NotificationService
 }
 
+// CancelOnlineClassBooking implements OnlineClassController
+func (d *onlineClassControllerImpl) CancelOnlineClassBooking(c echo.Context) error {
+	param := c.Param("id")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	claims := d.jwtService.GetClaims(&c)
+	userId := uint(claims["user_id"].(float64))
+	if err := d.onlineClassService.CancelOnlineClassBooking(uint(id), userId, c.Request().Context()); err != nil {
+		if err == myerrors.ErrPermission {
+			return echo.NewHTTPError(http.StatusForbidden, err.Error())
+		}
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "online class booking success canceled",
+	})
+}
+
 // CreateOnlineClass implements OnlineClassController
 func (d *onlineClassControllerImpl) CreateOnlineClass(c echo.Context) error {
 	var onlineClass dto.OnlineClassStoreRequest
@@ -55,13 +75,9 @@ func (d *onlineClassControllerImpl) CreateOnlineClassBooking(c echo.Context) err
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	result, err := d.onlineClassService.FindOnlineClassBookingById(id, c.Request().Context())
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
 	return c.JSON(http.StatusOK, echo.Map{
 		"message": "new online class booking success created",
-		"data":    result,
+		"data":    echo.Map{"id": id},
 	})
 }
 

@@ -23,11 +23,40 @@ type memberServiceImpl struct {
 	imagekitService        imgkit.ImagekitService
 }
 
+// CancelMember implements MemberService
+func (s *memberServiceImpl) CancelMember(id uint, userId uint, ctx context.Context) error {
+	member, err := s.memberRepository.FindMemberById(id, ctx)
+	if err != nil {
+		return err
+	}
+	if member.User.ID != userId {
+		return myerrors.ErrPermission
+	}
+	if member.Status == model.CANCEL {
+		return myerrors.ErrIsCanceled
+	}
+	if member.Status != model.WAITING {
+		return myerrors.ErrCantCanceled
+	}
+	cancelMember := model.Member{
+		ID:        id,
+		Status:    model.CANCEL,
+		ExpiredAt: time.Now(),
+	}
+	err = s.memberRepository.UpdateMember(&cancelMember, ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // CreateMember implements MemberService
 func (s *memberServiceImpl) CreateMember(request *dto.MemberStoreRequest, ctx context.Context) (uint, error) {
+	t := time.Now()
 	member := request.ToModel()
 	member.ExpiredAt = time.Now().Add(24 * time.Hour)
-	member.ActivedAt = time.Date(0001, 1, 1, 0, 0, 0, 0, time.UTC)
+	member.ExpiredAt = time.Date(member.ExpiredAt.Year(), member.ExpiredAt.Month(), member.ExpiredAt.Day(), 23, 59, 59, 0, t.Location())
+	member.ActivedAt = time.Date(0001, 1, 1, 0, 0, 0, 0, t.Location())
 	member.Status = model.WAITING
 	result, err := s.memberRepository.CreateMember(member, ctx)
 	if err != nil {
@@ -66,17 +95,6 @@ func (s *memberServiceImpl) FindMemberById(id uint, ctx context.Context) (*dto.M
 	member, err := s.memberRepository.FindMemberById(id, ctx)
 	if err != nil {
 		return nil, err
-	}
-	if member.Status != model.INACTIVE && time.Now().After(member.ExpiredAt) {
-		member.Status = model.INACTIVE
-		body := model.Member{
-			ID:     member.ID,
-			Status: model.INACTIVE,
-		}
-		err := s.memberRepository.UpdateMember(&body, ctx)
-		if err != nil {
-			return nil, err
-		}
 	}
 	var result dto.MemberDetailResource
 	result.FromModel(member)
@@ -137,15 +155,7 @@ func (s *memberServiceImpl) FindMembers(page *model.Pagination, ctx context.Cont
 // UpdateMember implements MemberService
 func (s *memberServiceImpl) UpdateMember(request *dto.MemberUpdateRequest, ctx context.Context) error {
 	member := request.ToModel()
-	check, err := s.memberRepository.FindMemberById(request.ID, ctx)
-	if err != nil {
-		return err
-	}
-	if time.Now().After(check.ExpiredAt) {
-		member.Status = model.INACTIVE
-	}
-
-	err = s.memberRepository.UpdateMember(member, ctx)
+	err := s.memberRepository.UpdateMember(member, ctx)
 	return err
 }
 
@@ -164,17 +174,19 @@ func (s *memberServiceImpl) SetStatusMember(request *dto.SetStatusMember, ctx co
 		return err
 	}
 	member := request.ToModel()
-
 	if member.Status == model.ACTIVE && check.Status != model.ACTIVE && check.Status != model.INACTIVE {
-		member.ExpiredAt = time.Now().Add(24 * 30 * time.Duration(check.Duration) * time.Hour)
-		member.Code = uuid.New()
+		exp := time.Now().Add(24 * 30 * time.Duration(check.Duration) * time.Hour)
+		member.ExpiredAt = time.Date(exp.Year(), exp.Month(), exp.Day(), 23, 59, 59, 0, exp.Location())
 		member.ActivedAt = time.Now()
+		member.Code = uuid.New()
 	} else if member.Status == model.REJECT && check.Status != model.REJECT {
 		member.ExpiredAt = time.Now()
 	}
-
 	if time.Now().After(check.ExpiredAt) {
-		member.Status = model.INACTIVE
+		if check.Status == model.CANCEL {
+			return myerrors.ErrIsCanceled
+		}
+		return myerrors.ErrOrderExpired
 	}
 
 	err = s.memberRepository.UpdateMember(member, ctx)
@@ -192,8 +204,17 @@ func (s *memberServiceImpl) MemberPayment(request *model.PaymentRequest, ctx con
 	if member.UserID != request.UserID {
 		return myerrors.ErrPermission
 	}
-	if member.ProofPayment != "" {
-		return errors.New("member already paid")
+	switch member.Status {
+	case model.ACTIVE:
+		return errors.New("member is active")
+	case model.REJECT:
+		return errors.New("member is rejected")
+	case model.INACTIVE:
+		return errors.New("member is inactive")
+	case model.CANCEL:
+		return errors.New("member is canceled")
+	case model.PENDING:
+		return errors.New("member is already paid")
 	}
 	// create file buffer
 	buf := bytes.NewBuffer(nil)
@@ -209,10 +230,11 @@ func (s *memberServiceImpl) MemberPayment(request *model.PaymentRequest, ctx con
 		return myerrors.ErrFailedUpload
 	}
 	// update member
+	exp := time.Now().Add(24 * time.Hour)
 	body := model.Member{
 		ID:           id,
 		ProofPayment: url,
-		ExpiredAt:    time.Now().Add(24 * time.Hour),
+		ExpiredAt:    time.Date(exp.Year(), exp.Month(), exp.Day(), 23, 59, 59, 0, exp.Location()),
 		Status:       model.PENDING,
 	}
 	err = s.memberRepository.UpdateMember(&body, ctx)

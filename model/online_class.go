@@ -21,8 +21,11 @@ type OnlineClass struct {
 	Tools                 string `gorm:"type:varchar(255)"`
 	TargetArea            string `gorm:"type:varchar(255)"`
 	Duration              uint
+	TrainerID             uint
+	Trainer               Trainer
 	Level                 string `gorm:"type:varchar(255)"`
 	Picture               string
+	OnlineClassBooking    []OnlineClassBooking
 }
 
 type OnlineClassCategory struct {
@@ -48,9 +51,9 @@ type OnlineClassBooking struct {
 	ExpiredAt       time.Time
 	ActivedAt       time.Time `gorm:"default:null"`
 	Duration        uint
-	Status          StatusType `gorm:"type:enum('PENDING', 'WAITING', 'ACTIVE', 'INACTIVE', 'REJECT', 'DONE', 'CENCEL');column:status"`
+	Status          StatusType `gorm:"type:enum('PENDING', 'WAITING', 'ACTIVE', 'INACTIVE', 'REJECT', 'DONE', 'CANCEL');column:status"`
 	ProofPayment    string
-	PaymentMethodId uint
+	PaymentMethodID *uint
 	PaymentMethod   PaymentMethod
 	Total           uint
 }

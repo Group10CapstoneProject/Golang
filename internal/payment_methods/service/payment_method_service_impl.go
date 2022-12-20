@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	"github.com/Group10CapstoneProject/Golang/internal/paymentMethods/dto"
-	paymentMethodRepo "github.com/Group10CapstoneProject/Golang/internal/paymentMethods/repository"
+	"github.com/Group10CapstoneProject/Golang/internal/payment_methods/dto"
+	paymentMethodRepo "github.com/Group10CapstoneProject/Golang/internal/payment_methods/repository"
 	"github.com/Group10CapstoneProject/Golang/model"
 )
 
@@ -22,7 +22,7 @@ func (s *paymentMehtodServiceImpl) CreatePaymentMethod(request *dto.PaymentMetho
 // DeletePaymentMethod implements PaymentMethodService
 func (s *paymentMehtodServiceImpl) DeletePaymentMethod(id uint, ctx context.Context) error {
 	paymentMethod := model.PaymentMethod{
-		ID: id,
+		ID: &id,
 	}
 	err := s.paymentMethodRepository.DeletePaymentMethod(&paymentMethod, ctx)
 	return err
@@ -40,8 +40,8 @@ func (s *paymentMehtodServiceImpl) FindPaymentMethodById(id uint, ctx context.Co
 }
 
 // FindPaymentMethods implements PaymentMethodService
-func (s *paymentMehtodServiceImpl) FindPaymentMethods(ctx context.Context) (*dto.PaymentMethodResources, error) {
-	paymentMethods, err := s.paymentMethodRepository.FindPaymentMethods(ctx)
+func (s *paymentMehtodServiceImpl) FindPaymentMethods(access bool, ctx context.Context) (*dto.PaymentMethodResources, error) {
+	paymentMethods, err := s.paymentMethodRepository.FindPaymentMethods(access, ctx)
 	if err != nil {
 		return nil, err
 	}

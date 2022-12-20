@@ -3,6 +3,7 @@ package dto
 import (
 	"time"
 
+	"github.com/Group10CapstoneProject/Golang/constans"
 	"github.com/Group10CapstoneProject/Golang/model"
 	"github.com/google/uuid"
 )
@@ -10,16 +11,16 @@ import (
 // offline class booking store and update request
 type OfflineClassBookingStoreRequest struct {
 	UserID          uint
-	OfflineCLassID  uint `json:"offline_class_id" validate:"required,gte=1"`
-	PaymentMethodId uint `json:"payment_method_id" validate:"required,gte=1"`
-	Total           uint `json:"total" validate:"required,gte=1"`
+	OfflineCLassID  uint  `json:"offline_class_id" validate:"required,gte=1"`
+	PaymentMethodID *uint `json:"payment_method_id" validate:"required,gte=0"`
+	Total           uint  `json:"total" validate:"required,gte=1"`
 }
 
 func (u *OfflineClassBookingStoreRequest) ToModel() *model.OfflineClassBooking {
 	return &model.OfflineClassBooking{
 		UserID:          u.UserID,
 		OfflineClassID:  u.OfflineCLassID,
-		PaymentMethodId: u.PaymentMethodId,
+		PaymentMethodID: u.PaymentMethodID,
 		Total:           u.Total,
 	}
 }
@@ -27,8 +28,8 @@ func (u *OfflineClassBookingStoreRequest) ToModel() *model.OfflineClassBooking {
 type OfflineClassBookingUpdateRequest struct {
 	ID              uint
 	UserID          uint   `json:"user_id,omitempty"`
-	OfflineCLassID  uint   `json:"member_type_id,,omitempty" validate:"omitempty,gte=1"`
-	PaymentMethodId uint   `json:"payment_method_id,omitempty" validate:"omitempty,gte=1"`
+	OfflineCLassID  uint   `json:"offline_class_id,,omitempty" validate:"omitempty,gte=1"`
+	PaymentMethodID *uint  `json:"payment_method_id,omitempty" validate:"omitempty,gte=0"`
 	ProofPayment    string `json:"proof_payment,omitempty" validate:"omitempty,url"`
 	Total           uint   `json:"total,omitempty" validate:"omitempty,gte=1"`
 }
@@ -38,7 +39,7 @@ func (u *OfflineClassBookingUpdateRequest) ToModel() *model.OfflineClassBooking 
 		ID:              u.ID,
 		UserID:          u.UserID,
 		OfflineClassID:  u.OfflineCLassID,
-		PaymentMethodId: u.PaymentMethodId,
+		PaymentMethodID: u.PaymentMethodID,
 		ProofPayment:    u.ProofPayment,
 		Total:           u.Total,
 	}
@@ -53,13 +54,14 @@ type OfflineClassStoreRequest struct {
 	Price                  uint   `json:"price" validate:"required,gte=1"`
 	Picture                string `json:"picture" validate:"required,url"`
 	Description            string `json:"description,omitempty"`
+	TrainerID              uint   `json:"trainer_id" validate:"required,gte=1"`
 	Location               string `json:"location" validate:"required"`
 	OfflineClassCategoryID uint   `json:"offline_class_category_id" validate:"required,gte=1"`
 }
 
 func (u *OfflineClassStoreRequest) ToModel() *model.OfflineClass {
-	layoutFormat := "2006-01-02 15:04:05"
-	time, err := time.Parse(layoutFormat, u.Time)
+	zone, _ := time.Now().Zone()
+	time, err := time.Parse(constans.FormatTime, u.Time+" "+zone)
 	if err != nil {
 		return nil
 	}
@@ -72,6 +74,7 @@ func (u *OfflineClassStoreRequest) ToModel() *model.OfflineClass {
 		Price:                  u.Price,
 		Picture:                u.Picture,
 		Description:            u.Description,
+		TrainerID:              u.TrainerID,
 		Location:               u.Location,
 		OfflineClassCategoryID: u.OfflineClassCategoryID,
 	}
@@ -79,20 +82,21 @@ func (u *OfflineClassStoreRequest) ToModel() *model.OfflineClass {
 
 type OfflineClassUpdateRequest struct {
 	ID                     uint
-	Title                  string `json:"title" validate:"required,name"`
-	Time                   string `json:"time" validate:"required,mytime"`
-	Duration               uint   `json:"duration" validate:"required,gte=1"`
-	Slot                   uint   `json:"slot" validate:"required,gte=1"`
-	Price                  uint   `json:"price" validate:"required,gte=1"`
-	Picture                string `json:"picture" validate:"required,url"`
+	Title                  string `json:"title" validate:"omitempty,name"`
+	Time                   string `json:"time" validate:"omitempty,mytime"`
+	Duration               uint   `json:"duration" validate:"omitempty,gte=1"`
+	Slot                   uint   `json:"slot" validate:"omitempty,gte=1"`
+	Price                  uint   `json:"price" validate:"omitempty,gte=1"`
+	Picture                string `json:"picture" validate:"omitempty,url"`
 	Description            string `json:"description,omitempty"`
-	Location               string `json:"location" validate:"required"`
-	OfflineClassCategoryID uint   `json:"offline_class_category_id" validate:"required,gte=1"`
+	Location               string `json:"location" validate:"omitempty"`
+	TrainerID              uint   `json:"trainer_id" validate:"omitempty,gte=1"`
+	OfflineClassCategoryID uint   `json:"offline_class_category_id" validate:"omitempty,gte=1"`
 }
 
 func (u *OfflineClassUpdateRequest) ToModel() *model.OfflineClass {
-	layoutFormat := "2006-01-02 15:04:05"
-	time, err := time.Parse(layoutFormat, u.Time)
+	zone, _ := time.Now().Zone()
+	time, err := time.Parse(constans.FormatTime, u.Time+" "+zone)
 	if err != nil {
 		return nil
 	}
@@ -107,6 +111,7 @@ func (u *OfflineClassUpdateRequest) ToModel() *model.OfflineClass {
 		Picture:                u.Picture,
 		Description:            u.Description,
 		Location:               u.Location,
+		TrainerID:              u.TrainerID,
 		OfflineClassCategoryID: u.OfflineClassCategoryID,
 	}
 }
@@ -155,7 +160,7 @@ func (u *SetStatusOfflineClassBooking) ToModel() *model.OfflineClassBooking {
 	}
 }
 
-// set status booking
+// take booking
 type TakeOfflineClassBooking struct {
 	Email string    `json:"email" validate:"required,email"`
 	Code  uuid.UUID `json:"code" validate:"required"`

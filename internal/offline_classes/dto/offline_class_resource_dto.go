@@ -9,15 +9,18 @@ import (
 
 // offline class resource
 type OfflineClassResource struct {
-	ID                     uint      `json:"id"`
-	Title                  string    `json:"title"`
-	Time                   time.Time `json:"time"`
-	Price                  uint      `json:"price"`
-	Duration               uint      `json:"duration"`
-	Slot                   uint      `json:"slot"`
-	SlotBooked             uint      `json:"slot_booked"`
-	Picture                string    `json:"picture"`
-	OfflineClassCategoryID uint      `json:"offline_class_category_id"`
+	ID                       uint      `json:"id"`
+	Title                    string    `json:"title"`
+	Time                     time.Time `json:"time"`
+	Price                    uint      `json:"price"`
+	Duration                 uint      `json:"duration"`
+	Slot                     uint      `json:"slot"`
+	SlotBooked               uint      `json:"slot_booked"`
+	Picture                  string    `json:"picture"`
+	OfflineClassCategoryID   uint      `json:"offline_class_category_id"`
+	OfflineClassCategoryName string    `json:"offline_class_category_name"`
+	TrainerID                uint      `json:"trainer_id"`
+	TrainerName              string    `json:"trainer_name"`
 }
 
 func (u *OfflineClassResource) FromModel(m *model.OfflineClass) {
@@ -30,6 +33,9 @@ func (u *OfflineClassResource) FromModel(m *model.OfflineClass) {
 	u.SlotBooked = m.SlotBooked
 	u.Picture = m.Picture
 	u.OfflineClassCategoryID = m.OfflineClassCategoryID
+	u.OfflineClassCategoryName = m.OfflineClassCategory.Name
+	u.TrainerID = m.TrainerID
+	u.TrainerName = m.Trainer.Name
 }
 
 type OfflineClassResources []OfflineClassResource
@@ -56,13 +62,14 @@ type OfflineClassDetailResource struct {
 	Description          string                       `json:"description"`
 	AccessClass          bool                         `json:"access_class"`
 	OfflineClassCategory OfflineClassCategoryResource `json:"offline_class_category"`
+	Trainer              TrainerResource              `json:"trainer"`
 }
 
 func (u *OfflineClassDetailResource) FromModel(m *model.OfflineClass) {
 	category := OfflineClassCategoryResource{}
 	category.FromModel(&m.OfflineClassCategory)
-	offlineClassBookings := OfflineClassBookingResources{}
-	offlineClassBookings.FromModel(m.OfflineClassBooking)
+	trainer := TrainerResource{}
+	trainer.FromModel(&m.Trainer)
 
 	u.ID = m.ID
 	u.Title = m.Title
@@ -76,6 +83,7 @@ func (u *OfflineClassDetailResource) FromModel(m *model.OfflineClass) {
 	u.Location = m.Location
 	u.Description = m.Description
 	u.OfflineClassCategory = category
+	u.Trainer = trainer
 }
 
 type OfflineClassResponses struct {
@@ -115,10 +123,10 @@ func (u *OfflineClassBookingResources) FromModel(m []model.OfflineClassBooking) 
 }
 
 type OfflineClassBookingResponses struct {
-	Members OfflineClassBookingResources `json:"offline_class_bookings"`
-	Page    uint                         `json:"page"`
-	Limit   uint                         `json:"limit"`
-	Count   uint                         `json:"count"`
+	OfflineClassBookings OfflineClassBookingResources `json:"offline_class_bookings"`
+	Page                 uint                         `json:"page"`
+	Limit                uint                         `json:"limit"`
+	Count                uint                         `json:"count"`
 }
 
 type OfflineClassBookingDetailResource struct {
@@ -155,7 +163,7 @@ func (u *OfflineClassBookingDetailResource) FromModel(m *model.OfflineClassBooki
 }
 
 type PaymentMethodResource struct {
-	ID            uint   `json:"id"`
+	ID            *uint  `json:"id"`
 	Name          string `json:"name"`
 	Description   string `json:"description"`
 	PaymentNumber string `json:"payment_number"`
@@ -230,4 +238,32 @@ func (u *OfflineClassByCategoryResource) FromModel(m *model.OfflineClassCategory
 	u.Description = m.Description
 	u.OfflineClassCount = uint(count)
 	u.OfflineClasses = offlineClasses
+}
+
+// trainer resource
+type TrainerResource struct {
+	ID      uint   `json:"id"`
+	Name    string `json:"name"`
+	Email   string `json:"email"`
+	Phone   string `json:"phone"`
+	Age     uint   `json:"age"`
+	Gender  string `json:"gender"`
+	Picture string `json:"picture"`
+}
+
+func (u *TrainerResource) FromModel(m *model.Trainer) {
+	age := uint(time.Now().Year() - m.Dob.Year())
+	if time.Now().Month() < m.Dob.Month() {
+		age--
+	} else if time.Now().Month() == m.Dob.Month() && time.Now().Day() < m.Dob.Day() {
+		age--
+	}
+
+	u.ID = m.ID
+	u.Name = m.Name
+	u.Email = m.Email
+	u.Phone = m.Phone
+	u.Age = age
+	u.Gender = m.Gender
+	u.Picture = m.Picture
 }

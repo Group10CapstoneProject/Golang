@@ -31,11 +31,16 @@ func MigrateDB(db *gorm.DB) error {
 		model.MemberType{},
 		model.Notification{},
 		model.Member{},
+		model.Skill{},
+		model.Trainer{},
+		model.TrainerSkill{},
+		model.TrainerBooking{},
 		model.OnlineClassCategory{},
 		model.OnlineClass{},
 		model.OnlineClassBooking{},
 		model.OfflineClassCategory{},
 		model.OfflineClass{},
 		model.OfflineClassBooking{},
+		model.Articles{},
 	)
 }

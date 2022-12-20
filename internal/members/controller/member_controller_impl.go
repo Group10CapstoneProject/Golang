@@ -22,6 +22,26 @@ type memberControllerImpl struct {
 	notificationService notifServ.NotificationService
 }
 
+// CancelMember implements MemberController
+func (d *memberControllerImpl) CancelMember(c echo.Context) error {
+	param := c.Param("id")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	claims := d.jwtService.GetClaims(&c)
+	userId := uint(claims["user_id"].(float64))
+	if err := d.memberService.CancelMember(uint(id), userId, c.Request().Context()); err != nil {
+		if err == myerrors.ErrPermission {
+			return echo.NewHTTPError(http.StatusForbidden, err.Error())
+		}
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "member success canceled",
+	})
+}
+
 // CreateMember implements MemberController
 func (d *memberControllerImpl) CreateMember(c echo.Context) error {
 	var member dto.MemberStoreRequest
@@ -37,13 +57,9 @@ func (d *memberControllerImpl) CreateMember(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	result, err := d.memberService.FindMemberById(id, c.Request().Context())
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
 	return c.JSON(http.StatusOK, echo.Map{
 		"message": "new member success created",
-		"data":    result,
+		"data":    echo.Map{"id": id},
 	})
 }
 
@@ -72,9 +88,6 @@ func (d *memberControllerImpl) DeleteMember(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
 	if err := d.memberService.DeleteMember(uint(id), c.Request().Context()); err != nil {
-		if err == myerrors.ErrRecordNotFound {
-			return echo.NewHTTPError(http.StatusNotFound, err.Error())
-		}
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
@@ -90,9 +103,6 @@ func (d *memberControllerImpl) DeleteMemberType(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, "not found")
 	}
 	if err := d.memberService.DeleteMemberType(uint(id), c.Request().Context()); err != nil {
-		if err == myerrors.ErrRecordNotFound {
-			return echo.NewHTTPError(http.StatusNotFound, err.Error())
-		}
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
