@@ -13,25 +13,6 @@ type onlineClassRepositoryImpl struct {
 	db *gorm.DB
 }
 
-// CheckOnlineClassCategoryIsDeleted implements OnlineClassRepository
-func (r *onlineClassRepositoryImpl) CheckOnlineClassCategoryIsDeleted(body *model.OnlineClassCategory) error {
-	onlineClassCategory := model.OnlineClassCategory{}
-	err := r.db.Where("name = ?", body.Name).First(&model.OnlineClassCategory{}).Error
-	if err == nil {
-		return myerrors.ErrDuplicateRecord
-	}
-	err = r.db.Unscoped().Where("name = ?", body.Name).First(&onlineClassCategory).Update("deleted_at", nil).Error
-	if err != nil {
-		return err
-	}
-	body.ID = onlineClassCategory.ID
-
-	if err := r.UpdateOnlineClassCategory(body, context.Background()); err != nil {
-		return err
-	}
-	return nil
-}
-
 // CreateOnlineClass implements OnlineClassRepository
 func (r *onlineClassRepositoryImpl) CreateOnlineClass(body *model.OnlineClass, ctx context.Context) error {
 	err := r.db.WithContext(ctx).Create(body).Error
@@ -61,9 +42,6 @@ func (r *onlineClassRepositoryImpl) CreateOnlineClassCategory(body *model.Online
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
 		if strings.Contains(err.Error(), "Error 1062:") {
-			if err := r.CheckOnlineClassCategoryIsDeleted(body); err == nil {
-				return nil
-			}
 			return myerrors.ErrDuplicateRecord
 		}
 		return err
@@ -113,7 +91,7 @@ func (r *onlineClassRepositoryImpl) DeleteOnlineClassCategory(body *model.Online
 	if len(check.OnlineClass) != 0 {
 		return myerrors.ErrRecordIsUsed
 	}
-	res.Delete(body)
+	res.Unscoped().Delete(body)
 	if res.Error != nil {
 		return res.Error
 	}

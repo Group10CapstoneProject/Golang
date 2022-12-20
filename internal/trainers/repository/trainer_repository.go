@@ -28,7 +28,6 @@ type TrainerRepository interface {
 	CreateSkill(body *model.Skill, ctx context.Context) error
 	FindSkills(ctx context.Context) ([]model.Skill, error)
 	FindSkillById(id uint, ctx context.Context) (*model.Skill, error)
-	CheckSkillIsDeleted(body *model.Skill) error
 	UpdateSkill(body *model.Skill, ctx context.Context) error
 	DeleteSkill(body *model.Skill, ctx context.Context) error
 }

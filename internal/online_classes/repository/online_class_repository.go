@@ -27,7 +27,6 @@ type OnlineClassRepository interface {
 	CreateOnlineClassCategory(body *model.OnlineClassCategory, ctx context.Context) error
 	FindOnlineClassCategories(ctx context.Context) ([]model.OnlineClassCategory, error)
 	FindOnlineClassCategoryById(id uint, ctx context.Context) (*model.OnlineClassCategory, error)
-	CheckOnlineClassCategoryIsDeleted(body *model.OnlineClassCategory) error
 	UpdateOnlineClassCategory(body *model.OnlineClassCategory, ctx context.Context) error
 	DeleteOnlineClassCategory(body *model.OnlineClassCategory, ctx context.Context) error
 }

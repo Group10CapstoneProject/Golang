@@ -20,7 +20,6 @@ type OfflineClassRepository interface {
 	FindOfflineClassCategoryById(id uint, ctx context.Context) (*model.OfflineClassCategory, error)
 	UpdateOfflineClassCategory(body *model.OfflineClassCategory, ctx context.Context) error
 	DeleteOfflineClassCategory(body *model.OfflineClassCategory, ctx context.Context) error
-	CheckOfflineClassCategoryIsDeleted(body *model.OfflineClassCategory) error
 	// offline class booking
 	CreateOfflineClassBooking(body *model.OfflineClassBooking, ctx context.Context) (*model.OfflineClassBooking, error)
 	FindOfflineClassBookings(page *model.Pagination, cond *model.OfflineClassBooking, ctx context.Context) ([]model.OfflineClassBooking, int, error)

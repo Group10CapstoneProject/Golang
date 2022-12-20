@@ -7,6 +7,7 @@ import (
 	"io"
 	"time"
 
+	memberRepo "github.com/Group10CapstoneProject/Golang/internal/members/repository"
 	notifRepo "github.com/Group10CapstoneProject/Golang/internal/notifications/repository"
 	"github.com/Group10CapstoneProject/Golang/internal/offline_classes/dto"
 	offlineClassRepo "github.com/Group10CapstoneProject/Golang/internal/offline_classes/repository"
@@ -20,6 +21,7 @@ type offlineClassServiceImpl struct {
 	offlineClassRepository offlineClassRepo.OfflineClassRepository
 	notificationRepository notifRepo.NotificationRepository
 	imagekitService        imgkit.ImagekitService
+	memberRepository       memberRepo.MemberRepository
 }
 
 // CancelOfflineClassBooking implements OfflineClassService
@@ -65,10 +67,33 @@ func (s *offlineClassServiceImpl) CreateOfflineClass(request *dto.OfflineClassSt
 func (s *offlineClassServiceImpl) CreateOfflineClassBooking(request *dto.OfflineClassBookingStoreRequest, ctx context.Context) (uint, error) {
 	offlineClassBooking := request.ToModel()
 	t := time.Now()
-	exp := time.Now().Add(24 * time.Hour)
-	offlineClassBooking.ExpiredAt = time.Date(exp.Year(), exp.Month(), exp.Day(), 23, 59, 59, 0, exp.Location())
-	offlineClassBooking.ActivedAt = time.Date(0001, 1, 1, 0, 0, 0, 0, t.Location())
-	offlineClassBooking.Status = model.WAITING
+	if *offlineClassBooking.PaymentMethodID == 0 {
+		member, err := s.memberRepository.ReadMembers(&model.Member{
+			UserID: offlineClassBooking.UserID,
+			Status: model.ACTIVE,
+		}, ctx)
+		if err != nil {
+			return 0, err
+		}
+		if len(member) == 0 || !*member[0].MemberType.AccessOfflineClass {
+			return 0, myerrors.ErrPaymentMethod
+		}
+		check, err := s.offlineClassRepository.FindOfflineClassById(offlineClassBooking.OfflineClassID, ctx)
+		if err != nil {
+			return 0, err
+		}
+		exp := check.Time
+		offlineClassBooking.ExpiredAt = time.Date(exp.Year(), exp.Month(), exp.Day(), 23, 59, 59, 0, exp.Location())
+		offlineClassBooking.ActivedAt = time.Now()
+		offlineClassBooking.ProofPayment = "https://ik.imagekit.io/rnwxyz/gymmember.png"
+		offlineClassBooking.Code = uuid.New()
+		offlineClassBooking.Status = model.ACTIVE
+	} else {
+		exp := time.Now().Add(24 * time.Hour)
+		offlineClassBooking.ExpiredAt = time.Date(exp.Year(), exp.Month(), exp.Day(), 23, 59, 59, 0, exp.Location())
+		offlineClassBooking.ActivedAt = time.Date(0001, 1, 1, 0, 0, 0, 0, t.Location())
+		offlineClassBooking.Status = model.WAITING
+	}
 	result, err := s.offlineClassRepository.CreateOfflineClassBooking(offlineClassBooking, ctx)
 	if err != nil {
 		return 0, err
@@ -371,10 +396,11 @@ func (s *offlineClassServiceImpl) CheckOfflineClassBookings(request *dto.TakeOff
 	return &result, nil
 }
 
-func NewOfflineClassService(offlineClassRepository offlineClassRepo.OfflineClassRepository, notificationRepository notifRepo.NotificationRepository, imagekitService imgkit.ImagekitService) OfflineClassService {
+func NewOfflineClassService(offlineClassRepository offlineClassRepo.OfflineClassRepository, notificationRepository notifRepo.NotificationRepository, imagekitService imgkit.ImagekitService, memberRepository memberRepo.MemberRepository) OfflineClassService {
 	return &offlineClassServiceImpl{
 		offlineClassRepository: offlineClassRepository,
 		notificationRepository: notificationRepository,
 		imagekitService:        imagekitService,
+		memberRepository:       memberRepository,
 	}
 }

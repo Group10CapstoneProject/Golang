@@ -21,7 +21,6 @@ type MemberRepository interface {
 	CreateMemberType(body *model.MemberType, ctx context.Context) error
 	FindMemberTypes(ctx context.Context) ([]model.MemberType, error)
 	FindMemberTypeById(id uint, ctx context.Context) (*model.MemberType, error)
-	CheckMemberTypeIsDeleted(body *model.MemberType) error
 	UpdateMemberType(body *model.MemberType, ctx context.Context) error
 	DeleteMemberType(body *model.MemberType, ctx context.Context) error
 }

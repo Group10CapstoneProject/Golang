@@ -33,30 +33,8 @@ func (r *memberRepositoryImpl) CreateMemberType(body *model.MemberType, ctx cont
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
 		if strings.Contains(err.Error(), "Error 1062:") {
-			if err := r.CheckMemberTypeIsDeleted(body); err == nil {
-				return nil
-			}
 			return myerrors.ErrDuplicateRecord
 		}
-		return err
-	}
-	return nil
-}
-
-// CheckMemberTypeIsDeleted implements MemberRepository
-func (r *memberRepositoryImpl) CheckMemberTypeIsDeleted(body *model.MemberType) error {
-	memberType := model.MemberType{}
-	err := r.db.Where("name = ?", body.Name).First(&model.MemberType{}).Error
-	if err == nil {
-		return myerrors.ErrDuplicateRecord
-	}
-	err = r.db.Unscoped().Where("name = ?", body.Name).First(&memberType).Update("deleted_at", nil).Error
-	if err != nil {
-		return err
-	}
-	body.ID = memberType.ID
-
-	if err := r.UpdateMemberType(body, context.Background()); err != nil {
 		return err
 	}
 	return nil
@@ -84,7 +62,7 @@ func (r *memberRepositoryImpl) DeleteMemberType(body *model.MemberType, ctx cont
 	if len(check.Member) != 0 {
 		return myerrors.ErrRecordIsUsed
 	}
-	res.Delete(body)
+	res.Unscoped().Delete(body)
 	if res.Error != nil {
 		return res.Error
 	}

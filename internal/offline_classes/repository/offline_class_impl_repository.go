@@ -43,30 +43,8 @@ func (r *offlineClassRepositoryImpl) CreateOfflineClassCategory(body *model.Offl
 	err := r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
 		if strings.Contains(err.Error(), "Error 1062:") {
-			if err := r.CheckOfflineClassCategoryIsDeleted(body); err == nil {
-				return nil
-			}
 			return myerrors.ErrDuplicateRecord
 		}
-		return err
-	}
-	return nil
-}
-
-// CheckOfflineClassCategoryIsDeleted implements OnlineClassRepository
-func (r *offlineClassRepositoryImpl) CheckOfflineClassCategoryIsDeleted(body *model.OfflineClassCategory) error {
-	onlineClassCategory := model.OnlineClassCategory{}
-	err := r.db.Where("name = ?", body.Name).First(&model.OnlineClassCategory{}).Error
-	if err == nil {
-		return myerrors.ErrDuplicateRecord
-	}
-	err = r.db.Unscoped().Where("name = ?", body.Name).First(&onlineClassCategory).Update("deleted_at", nil).Error
-	if err != nil {
-		return err
-	}
-	body.ID = onlineClassCategory.ID
-
-	if err := r.UpdateOfflineClassCategory(body, context.Background()); err != nil {
 		return err
 	}
 	return nil
@@ -114,7 +92,7 @@ func (r *offlineClassRepositoryImpl) DeleteOfflineClassCategory(body *model.Offl
 	if len(check.OfflineClass) != 0 {
 		return myerrors.ErrRecordIsUsed
 	}
-	res.Delete(body)
+	res.Unscoped().Delete(body)
 	if res.Error != nil {
 		return res.Error
 	}
