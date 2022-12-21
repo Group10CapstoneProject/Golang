@@ -40,11 +40,12 @@ func (r *offlineClassRepositoryImpl) CreateOfflineClassBooking(body *model.Offli
 
 // CreateOfflineClassCategory implements OfflineClassRepository
 func (r *offlineClassRepositoryImpl) CreateOfflineClassCategory(body *model.OfflineClassCategory, ctx context.Context) error {
-	err := r.db.WithContext(ctx).Create(body).Error
+	err := r.db.WithContext(ctx).Model(&model.OfflineClassCategory{}).First(&model.OfflineClassCategory{}, "name = ?", body.Name).Error
+	if err == nil {
+		return myerrors.ErrDuplicateRecord
+	}
+	err = r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
-		if strings.Contains(err.Error(), "Error 1062:") {
-			return myerrors.ErrDuplicateRecord
-		}
 		return err
 	}
 	return nil
@@ -92,7 +93,7 @@ func (r *offlineClassRepositoryImpl) DeleteOfflineClassCategory(body *model.Offl
 	if len(check.OfflineClass) != 0 {
 		return myerrors.ErrRecordIsUsed
 	}
-	res.Unscoped().Delete(body)
+	res.Delete(body)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -241,11 +242,12 @@ func (r *offlineClassRepositoryImpl) UpdateOfflineClassBooking(body *model.Offli
 
 // UpdateOfflineClassCategory implements OfflineClassRepository
 func (r *offlineClassRepositoryImpl) UpdateOfflineClassCategory(body *model.OfflineClassCategory, ctx context.Context) error {
+	err := r.db.WithContext(ctx).Model(&model.OfflineClassCategory{}).First(&model.OfflineClassCategory{}, "id != ? AND name = ?", body.ID, body.Name).Error
+	if err == nil {
+		return myerrors.ErrDuplicateRecord
+	}
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Error 1062:") {
-			return myerrors.ErrDuplicateRecord
-		}
 		return res.Error
 	}
 	if res.RowsAffected == 0 {

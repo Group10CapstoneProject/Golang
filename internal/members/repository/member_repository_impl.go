@@ -30,11 +30,12 @@ func (r *memberRepositoryImpl) CreateMember(body *model.Member, ctx context.Cont
 
 // CreateMemberType implements MemberRepository
 func (r *memberRepositoryImpl) CreateMemberType(body *model.MemberType, ctx context.Context) error {
-	err := r.db.WithContext(ctx).Create(body).Error
+	err := r.db.WithContext(ctx).First(&model.MemberType{}, "name = ?", body.Name).Error
+	if err == nil {
+		return myerrors.ErrDuplicateRecord
+	}
+	err = r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
-		if strings.Contains(err.Error(), "Error 1062:") {
-			return myerrors.ErrDuplicateRecord
-		}
 		return err
 	}
 	return nil
@@ -62,7 +63,7 @@ func (r *memberRepositoryImpl) DeleteMemberType(body *model.MemberType, ctx cont
 	if len(check.Member) != 0 {
 		return myerrors.ErrRecordIsUsed
 	}
-	res.Unscoped().Delete(body)
+	res.Delete(body)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -182,11 +183,12 @@ func (r *memberRepositoryImpl) MemberInactive(body model.Member, ctx context.Con
 
 // UpdateMemberType implements MemberRepository
 func (r *memberRepositoryImpl) UpdateMemberType(body *model.MemberType, ctx context.Context) error {
+	err := r.db.WithContext(ctx).Model(&model.MemberType{}).First(&model.MemberType{}, "id != ? AND name = ?", body.ID, body.Name).Error
+	if err == nil {
+		return myerrors.ErrDuplicateRecord
+	}
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Error 1062:") {
-			return myerrors.ErrDuplicateRecord
-		}
 		return res.Error
 	}
 	if res.RowsAffected == 0 {

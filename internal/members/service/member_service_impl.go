@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"time"
 
@@ -162,7 +161,6 @@ func (s *memberServiceImpl) UpdateMember(request *dto.MemberUpdateRequest, ctx c
 // UpdateMemberType implements MemberService
 func (s *memberServiceImpl) UpdateMemberType(request *dto.MemberTypeUpdateRequest, ctx context.Context) error {
 	memberType := request.ToModel()
-	fmt.Println(memberType)
 	err := s.memberRepository.UpdateMemberType(memberType, ctx)
 	return err
 }

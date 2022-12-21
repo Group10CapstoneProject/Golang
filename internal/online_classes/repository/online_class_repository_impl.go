@@ -39,11 +39,12 @@ func (r *onlineClassRepositoryImpl) CreateOnlineClassBooking(body *model.OnlineC
 
 // CreateOnlineClassCategory implements OnlineClassRepository
 func (r *onlineClassRepositoryImpl) CreateOnlineClassCategory(body *model.OnlineClassCategory, ctx context.Context) error {
-	err := r.db.WithContext(ctx).Create(body).Error
+	err := r.db.WithContext(ctx).Model(&model.OnlineClassCategory{}).First(&model.OnlineClassCategory{}, "name = ?", body.Name).Error
+	if err == nil {
+		return myerrors.ErrDuplicateRecord
+	}
+	err = r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
-		if strings.Contains(err.Error(), "Error 1062:") {
-			return myerrors.ErrDuplicateRecord
-		}
 		return err
 	}
 	return nil
@@ -91,7 +92,7 @@ func (r *onlineClassRepositoryImpl) DeleteOnlineClassCategory(body *model.Online
 	if len(check.OnlineClass) != 0 {
 		return myerrors.ErrRecordIsUsed
 	}
-	res.Unscoped().Delete(body)
+	res.Delete(body)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -215,11 +216,12 @@ func (r *onlineClassRepositoryImpl) UpdateOnlineClassBooking(body *model.OnlineC
 
 // UpdateOnlineClassCategory implements OnlineClassRepository
 func (r *onlineClassRepositoryImpl) UpdateOnlineClassCategory(body *model.OnlineClassCategory, ctx context.Context) error {
+	err := r.db.WithContext(ctx).Model(&model.OnlineClassCategory{}).First(&model.OnlineClassCategory{}, "id != ? AND name = ?", body.ID, body.Name).Error
+	if err == nil {
+		return myerrors.ErrDuplicateRecord
+	}
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Error 1062:") {
-			return myerrors.ErrDuplicateRecord
-		}
 		return res.Error
 	}
 	if res.RowsAffected == 0 {

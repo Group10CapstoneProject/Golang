@@ -35,11 +35,12 @@ func (r *trainerRepositoryImpl) CheckTrainerIsDeleted(body *model.Trainer) error
 
 // CreateSkill implements TrainerRepository
 func (r *trainerRepositoryImpl) CreateSkill(body *model.Skill, ctx context.Context) error {
-	err := r.db.WithContext(ctx).Create(body).Error
+	err := r.db.WithContext(ctx).Model(&model.Skill{}).First(&model.Skill{}, "name = ?", body.ID, body.Name).Error
+	if err == nil {
+		return myerrors.ErrDuplicateRecord
+	}
+	err = r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
-		if strings.Contains(err.Error(), "Error 1062:") {
-			return myerrors.ErrDuplicateRecord
-		}
 		return err
 	}
 	return nil
@@ -101,7 +102,7 @@ func (r *trainerRepositoryImpl) DeleteSkill(body *model.Skill, ctx context.Conte
 	if len(check.TrainerSkill) != 0 {
 		return myerrors.ErrRecordIsUsed
 	}
-	res.Unscoped().Delete(body)
+	res.Delete(body)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -277,11 +278,12 @@ func (r *trainerRepositoryImpl) ReadTrainerBooking(cond *model.TrainerBooking, c
 
 // UpdateSkill implements TrainerRepository
 func (r *trainerRepositoryImpl) UpdateSkill(body *model.Skill, ctx context.Context) error {
+	err := r.db.WithContext(ctx).Model(&model.Skill{}).First(&model.Skill{}, "id != ? AND name = ?", body.ID, body.Name).Error
+	if err == nil {
+		return myerrors.ErrDuplicateRecord
+	}
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Error 1062:") {
-			return myerrors.ErrDuplicateRecord
-		}
 		return res.Error
 	}
 	if res.RowsAffected == 0 {
