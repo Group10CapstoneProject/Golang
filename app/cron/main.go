@@ -30,11 +30,22 @@ func main() {
 
 	// set task yang akan dijalankan scheduler
 	// gunakan crontab string untuk mengatur jadwal
-	scheduler.AddFunc("* 00 * * *", func() { UpdateMembers(db) })
-	scheduler.AddFunc("* 00 * * *", func() { UpdateOfflineClassBooking(db) })
-	scheduler.AddFunc("* 00 * * *", func() { UpdateOnlineClassBooking(db) })
-	scheduler.AddFunc("* 00 * * *", func() { UpdateTrainerBooking(db) })
-
+	_, err = scheduler.AddFunc("* 00 * * *", func() { UpdateMembers(db) })
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = scheduler.AddFunc("* 00 * * *", func() { UpdateOfflineClassBooking(db) })
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = scheduler.AddFunc("* 00 * * *", func() { UpdateOnlineClassBooking(db) })
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = scheduler.AddFunc("* 00 * * *", func() { UpdateTrainerBooking(db) })
+	if err != nil {
+		fmt.Println(err)
+	}
 	// start scheduler
 	go scheduler.Start()
 
