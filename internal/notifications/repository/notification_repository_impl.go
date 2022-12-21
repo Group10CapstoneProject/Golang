@@ -27,7 +27,12 @@ func (r *notificationRepositoryImpl) DeleteNotification(body *model.Notification
 func (r *notificationRepositoryImpl) FindNotifications(ctx context.Context) ([]model.Notification, int, error) {
 	notifications := []model.Notification{}
 	var count int64
-	err := r.db.WithContext(ctx).Preload("User").Find(&notifications).Count(&count).Error
+	err := r.db.WithContext(ctx).
+		Preload("User").
+		Order("id DESC").
+		Find(&notifications).
+		Count(&count).
+		Error
 	if err != nil {
 		return nil, 0, err
 	}

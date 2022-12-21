@@ -126,7 +126,10 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassBookingByUser(userId uint, 
 		Preload("OfflineClass.Trainer").
 		Preload("OfflineClass.OfflineClassCategory").
 		Preload("PaymentMethod").
-		Find(&offlineClassBookings).Count(&count).Error
+		Order("id DESC").
+		Find(&offlineClassBookings).
+		Count(&count).
+		Error
 	return offlineClassBookings, err
 }
 
@@ -147,6 +150,7 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassBookings(page *model.Pagina
 		Count(&count).
 		Offset(offset).
 		Limit(page.Limit).
+		Order("id DESC").
 		Find(&offlineClassBooking).
 		Error
 
@@ -178,6 +182,7 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassCategories(cond *model.Offl
 	offlineClassCategorys := []model.OfflineClassCategory{}
 	err := r.db.WithContext(ctx).Model(&model.OfflineClassCategory{}).
 		Preload("OfflineClass").
+		Order("id DESC").
 		Find(&offlineClassCategorys).
 		Error
 
@@ -185,9 +190,14 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassCategories(cond *model.Offl
 }
 
 // FindOfflineClasses implements OfflineClassRepository
-func (r *offlineClassRepositoryImpl) FindOfflineClasses(cond *model.OfflineClass, ctx context.Context) ([]model.OfflineClass, error) {
+func (r *offlineClassRepositoryImpl) FindOfflineClasses(cond *model.OfflineClass, title string, ctx context.Context) ([]model.OfflineClass, error) {
 	offlineClasses := []model.OfflineClass{}
-	err := r.db.WithContext(ctx).Model(&model.OfflineClass{}).Preload(clause.Associations).
+	res := r.db.WithContext(ctx).Model(&model.OfflineClass{})
+	if title != "" {
+		res.Where("title LIKE ?", "%"+title+"%")
+	}
+	err := res.Preload(clause.Associations).
+		Order("id DESC").
 		Find(&offlineClasses, cond).
 		Error
 
@@ -202,8 +212,9 @@ func (r *offlineClassRepositoryImpl) ReadOfflineClassBookings(cond *model.Offlin
 		Preload("User").
 		Preload("OfflineClass").
 		Preload("OfflineClass.Trainer").
+		Order("updated_at DESC").
 		Find(&offlineClassBooking, cond).
-		Order("updated_at DESC").Error
+		Error
 	if err != nil {
 		return nil, err
 	}

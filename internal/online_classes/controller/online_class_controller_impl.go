@@ -285,7 +285,8 @@ func (d *onlineClassControllerImpl) GetOnlineClassDetail(c echo.Context) error {
 
 // GetOnlineClasses implements OnlineClassController
 func (d *onlineClassControllerImpl) GetOnlineClasses(c echo.Context) error {
-	onlineClasses, err := d.onlineClassService.FindOnlineClasses(c.Request().Context())
+	q := c.QueryParam("q")
+	onlineClasses, err := d.onlineClassService.FindOnlineClasses(q, c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}

@@ -10,6 +10,7 @@ import (
 	"github.com/Group10CapstoneProject/Golang/internal/members/dto"
 	memberRepo "github.com/Group10CapstoneProject/Golang/internal/members/repository"
 	notifRepo "github.com/Group10CapstoneProject/Golang/internal/notifications/repository"
+	userRepo "github.com/Group10CapstoneProject/Golang/internal/users/repository"
 	"github.com/Group10CapstoneProject/Golang/model"
 	"github.com/Group10CapstoneProject/Golang/utils/imgkit"
 	"github.com/Group10CapstoneProject/Golang/utils/myerrors"
@@ -20,6 +21,34 @@ type memberServiceImpl struct {
 	memberRepository       memberRepo.MemberRepository
 	notificationRepository notifRepo.NotificationRepository
 	imagekitService        imgkit.ImagekitService
+	userRepository         userRepo.UserRepository
+}
+
+// CreateMemberFromAdmin implements MemberService
+func (s *memberServiceImpl) CreateMemberFromAdmin(request *dto.MemberAdminStoreRequest, ctx context.Context) (uint, error) {
+	user, err := s.userRepository.FindUserByEmail(&request.Email, ctx)
+	if err != nil {
+		return 0, err
+	}
+	exp := time.Now().Add(24 * 30 * time.Duration(request.Duration) * time.Hour)
+	idPayment := uint(0)
+	newMember := model.Member{
+		UserID:          user.ID,
+		MemberTypeID:    request.MemberTypeID,
+		Duration:        request.Duration,
+		Total:           request.Total,
+		Status:          model.ACTIVE,
+		Code:            uuid.New(),
+		ExpiredAt:       time.Date(exp.Year(), exp.Month(), exp.Day(), 23, 59, 59, 0, exp.Location()),
+		ActivedAt:       time.Now(),
+		PaymentMethodID: &idPayment,
+		ProofPayment:    "https://ik.imagekit.io/rnwxyz/gymmember.png",
+	}
+	result, err := s.memberRepository.CreateMember(&newMember, ctx)
+	if err != nil {
+		return 0, err
+	}
+	return result.ID, nil
 }
 
 // CancelMember implements MemberService
@@ -252,10 +281,11 @@ func (s *memberServiceImpl) MemberPayment(request *model.PaymentRequest, ctx con
 	return nil
 }
 
-func NewMemberService(memberRepository memberRepo.MemberRepository, imagekit imgkit.ImagekitService, notificationRepository notifRepo.NotificationRepository) MemberService {
+func NewMemberService(memberRepository memberRepo.MemberRepository, imagekit imgkit.ImagekitService, notificationRepository notifRepo.NotificationRepository, userRepository userRepo.UserRepository) MemberService {
 	return &memberServiceImpl{
 		memberRepository:       memberRepository,
 		notificationRepository: notificationRepository,
 		imagekitService:        imagekit,
+		userRepository:         userRepository,
 	}
 }

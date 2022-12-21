@@ -21,7 +21,7 @@ type OnlineClassService interface {
 
 	// online class
 	CreateOnlineClass(request *dto.OnlineClassStoreRequest, ctx context.Context) error
-	FindOnlineClasses(ctx context.Context) (*dto.OnlineClassResources, error)
+	FindOnlineClasses(q string, ctx context.Context) (*dto.OnlineClassResources, error)
 	CheckAccessOnlineClass(userId uint, onlineClassId uint, ctx context.Context) (bool, error)
 	FindOnlineClassById(id uint, ctx context.Context) (*dto.OnlineClassDetailResource, error)
 	UpdateOnlineClass(request *dto.OnlineClassUpdateRequest, ctx context.Context) error

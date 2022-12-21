@@ -197,8 +197,8 @@ func (s *onlineClassServiceImpl) FindOnlineClassCategories(ctx context.Context) 
 }
 
 // FindOnlineClasss implements OnlineClassService
-func (s *onlineClassServiceImpl) FindOnlineClasses(ctx context.Context) (*dto.OnlineClassResources, error) {
-	onlineClasses, err := s.onlineClassRepository.FindOnlineClasses(ctx)
+func (s *onlineClassServiceImpl) FindOnlineClasses(q string, ctx context.Context) (*dto.OnlineClassResources, error) {
+	onlineClasses, err := s.onlineClassRepository.FindOnlineClasses(q, ctx)
 	if err != nil {
 		return nil, err
 	}

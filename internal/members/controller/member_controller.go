@@ -5,6 +5,7 @@ import "github.com/labstack/echo/v4"
 type MemberController interface {
 	// member
 	CreateMember(c echo.Context) error
+	CreateMemberAdmin(c echo.Context) error
 	GetMembers(c echo.Context) error
 	GetMemberDetail(c echo.Context) error
 	GetMemberUser(c echo.Context) error

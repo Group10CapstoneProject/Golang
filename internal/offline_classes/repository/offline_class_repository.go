@@ -9,7 +9,7 @@ import (
 type OfflineClassRepository interface {
 	// offline class
 	CreateOfflineClass(body *model.OfflineClass, ctx context.Context) error
-	FindOfflineClasses(cond *model.OfflineClass, ctx context.Context) ([]model.OfflineClass, error)
+	FindOfflineClasses(cond *model.OfflineClass, title string, ctx context.Context) ([]model.OfflineClass, error)
 	FindOfflineClassById(id uint, ctx context.Context) (*model.OfflineClass, error)
 	UpdateOfflineClass(body *model.OfflineClass, ctx context.Context) error
 	OperationOfflineClassSlot(body *model.OfflineClass, operation string, ctx context.Context) error

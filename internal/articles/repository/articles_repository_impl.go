@@ -33,7 +33,10 @@ func (r *articlesRepositoryImpl) DeleteArticles(body *model.Articles, ctx contex
 // FindArticles implements ArticlesRepository
 func (r *articlesRepositoryImpl) FindArticles(ctx context.Context) ([]model.Articles, error) {
 	articles := []model.Articles{}
-	err := r.db.WithContext(ctx).Find(&articles).Error
+	err := r.db.WithContext(ctx).
+		Order("id DESC").
+		Find(&articles).
+		Error
 	return articles, err
 }
 

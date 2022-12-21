@@ -104,7 +104,10 @@ func (r *memberRepositoryImpl) FindMemberByUser(userId uint, ctx context.Context
 // FindMemberTypes implements MemberRepository
 func (r *memberRepositoryImpl) FindMemberTypes(ctx context.Context) ([]model.MemberType, error) {
 	memberTypes := []model.MemberType{}
-	err := r.db.WithContext(ctx).Find(&memberTypes).Error
+	err := r.db.WithContext(ctx).
+		Order("id DESC").
+		Find(&memberTypes).
+		Error
 	return memberTypes, err
 }
 
@@ -131,6 +134,7 @@ func (r *memberRepositoryImpl) FindMembers(page *model.Pagination, ctx context.C
 		Count(&count).
 		Offset(offset).
 		Limit(page.Limit).
+		Order("id DESC").
 		Find(&members).
 		Error
 
@@ -203,8 +207,9 @@ func (r *memberRepositoryImpl) ReadMembers(body *model.Member, ctx context.Conte
 	err := r.db.WithContext(ctx).
 		Model(&model.Member{}).
 		Preload(clause.Associations).
+		Order("updated_at DESC").
 		Find(&members, body).
-		Order("updated_at DESC").Error
+		Error
 	if err != nil {
 		return nil, err
 	}
