@@ -14,6 +14,4 @@ ENV TZ=Asia/Jakarta
 
 COPY --from=builder /app/* .
 
-CMD ["./main.app"]
-
-ENTRYPOINT ["./cron.app"]
+CMD ["./main.app;./cron.app"]
