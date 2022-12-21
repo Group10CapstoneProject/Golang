@@ -4,7 +4,6 @@ WORKDIR /app
 COPY . .
 
 RUN CGO_ENABLED=1 GOOS=linux go build -tags netgo -o main.app ./app/rest
-RUN CGO_ENABLED=1 GOOS=linux go build -tags netgo -o cron.app ./app/cron
 
 FROM alpine:latest
 
@@ -12,6 +11,6 @@ FROM alpine:latest
 RUN apk add --no-cache tzdata
 ENV TZ=Asia/Jakarta
 
-COPY --from=builder /app/* .
+COPY --from=builder /app/main.app .
 
-CMD ["./main.app;./cron.app"]
+CMD ["./main.app"]
