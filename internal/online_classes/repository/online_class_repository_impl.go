@@ -122,7 +122,9 @@ func (r *onlineClassRepositoryImpl) FindOnlineClassBookingByUser(userId uint, ct
 		Preload("OnlineClass").
 		Preload("OnlineClass.OnlineClassCategory").
 		Preload("PaymentMethod").
-		Find(&onlineClassBooking).Error
+		Order("id DESC").
+		Find(&onlineClassBooking).
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -146,6 +148,7 @@ func (r *onlineClassRepositoryImpl) FindOnlineClassBookings(page *model.Paginati
 		Count(&count).
 		Offset(offset).
 		Limit(page.Limit).
+		Order("id DESC").
 		Find(&onlineClassBooking).
 		Error
 
@@ -173,14 +176,25 @@ func (r *onlineClassRepositoryImpl) FindOnlineClassCategoryById(id uint, ctx con
 // FindOnlineClassCategorys implements OnlineClassRepository
 func (r *onlineClassRepositoryImpl) FindOnlineClassCategories(ctx context.Context) ([]model.OnlineClassCategory, error) {
 	onlineClassCategories := []model.OnlineClassCategory{}
-	err := r.db.WithContext(ctx).Preload("OnlineClass").Find(&onlineClassCategories).Error
+	err := r.db.WithContext(ctx).
+		Preload("OnlineClass").
+		Order("id DESC").
+		Find(&onlineClassCategories).
+		Error
 	return onlineClassCategories, err
 }
 
 // FindOnlineClasss implements OnlineClassRepository
-func (r *onlineClassRepositoryImpl) FindOnlineClasses(ctx context.Context) ([]model.OnlineClass, error) {
+func (r *onlineClassRepositoryImpl) FindOnlineClasses(title string, ctx context.Context) ([]model.OnlineClass, error) {
 	onlineClasses := []model.OnlineClass{}
-	err := r.db.WithContext(ctx).Preload("OnlineClassCategory").Find(&onlineClasses).Error
+	res := r.db.WithContext(ctx).Model(&model.OnlineClass{})
+	if title != "" {
+		res.Where("title LIKE ?", "%"+title+"%")
+	}
+	err := res.Preload("OnlineClassCategory").
+		Order("id DESC").
+		Find(&onlineClasses).
+		Error
 	return onlineClasses, err
 }
 
@@ -237,8 +251,9 @@ func (r *onlineClassRepositoryImpl) ReadOnlineClassBooking(cond *model.OnlineCla
 		Model(&model.OnlineClassBooking{}).
 		Preload("User").
 		Preload("OnlineClass").
+		Order("updated_at DESC").
 		Find(&onlineClassBooking, cond).
-		Order("updated_at DESC").Error
+		Error
 	if err != nil {
 		return nil, err
 	}

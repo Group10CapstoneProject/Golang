@@ -68,7 +68,9 @@ func (r *userRepositoryImpl) FindUsers(page *model.Pagination, role string, ctx 
 			Where("(name LIKE ? OR email LIKE ?) AND role = ?", "%"+page.Q+"%", "%"+page.Q+"%", role).
 			Offset(offset).
 			Limit(page.Limit).
-			Find(&users).Error
+			Order("id DESC").
+			Find(&users).
+			Error
 		if err != nil {
 			return nil, 0, err
 		}
@@ -85,7 +87,9 @@ func (r *userRepositoryImpl) FindUsers(page *model.Pagination, role string, ctx 
 		Where("role = ?", role).
 		Offset(offset).
 		Limit(page.Limit).
-		Find(&users).Error
+		Order("id DESC").
+		Find(&users).
+		Error
 	if err != nil {
 		return nil, 0, err
 	}

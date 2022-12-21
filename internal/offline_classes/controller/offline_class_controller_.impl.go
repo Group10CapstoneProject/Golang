@@ -293,7 +293,8 @@ func (d *offlineclassControllerImpl) GetOfflineClassDetail(c echo.Context) error
 
 // GetOfflineClasses implements OfflineClassController
 func (d *offlineclassControllerImpl) GetOfflineClasses(c echo.Context) error {
-	offlineClasses, err := d.offlineClassService.FindOfflineClasses(c.Request().Context())
+	q := c.QueryParam("q")
+	offlineClasses, err := d.offlineClassService.FindOfflineClasses(q, c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}

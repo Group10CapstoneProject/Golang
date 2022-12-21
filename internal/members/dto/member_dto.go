@@ -26,6 +26,14 @@ func (u *MemberStoreRequest) ToModel() *model.Member {
 	}
 }
 
+// member admin store and update request
+type MemberAdminStoreRequest struct {
+	Email        string `json:"email" validate:"required,email"`
+	MemberTypeID uint   `json:"member_type_id" validate:"required,gte=1"`
+	Duration     uint   `json:"duration" validate:"required,gte=1"`
+	Total        uint   `json:"total" validate:"required,gte=1"`
+}
+
 type MemberUpdateRequest struct {
 	ID              uint  `json:"id,omitempty"`
 	MemberTypeID    uint  `json:"member_type_id,omitempty" validate:"omitempty,gte=1"`

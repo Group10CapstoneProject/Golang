@@ -157,7 +157,11 @@ func (r *trainerRepositoryImpl) FindSkillById(id uint, ctx context.Context) (*mo
 // FindSkills implements TrainerRepository
 func (r *trainerRepositoryImpl) FindSkills(ctx context.Context) ([]model.Skill, error) {
 	skills := []model.Skill{}
-	err := r.db.WithContext(ctx).Find(&skills).Preload(clause.Associations).Error
+	err := r.db.WithContext(ctx).
+		Preload(clause.Associations).
+		Order("id DESC").
+		Find(&skills).
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +190,9 @@ func (r *trainerRepositoryImpl) FindTrainerBookingByUser(userId uint, ctx contex
 	err := r.db.WithContext(ctx).Where("user_id = ?", userId).
 		Preload("User").
 		Preload("Trainer").
-		Find(&trainerBookings).Error
+		Order("id DESC").
+		Find(&trainerBookings).
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -211,6 +217,7 @@ func (r *trainerRepositoryImpl) FindTrainerBookings(page *model.Pagination, ctx 
 		Count(&count).
 		Offset(offset).
 		Limit(page.Limit).
+		Order("id DESC").
 		Find(&trainerBooking).
 		Error
 
@@ -255,7 +262,10 @@ func (r *trainerRepositoryImpl) FindTrainers(cond *model.Trainer, priceOrder str
 	if cond.Gender != "" {
 		res.Where("gender = ?", cond.Gender)
 	}
-	err := res.Find(&traieners).Error
+	err := res.
+		Order("id DESC").
+		Find(&traieners).
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -268,6 +278,7 @@ func (r *trainerRepositoryImpl) ReadTrainerBooking(cond *model.TrainerBooking, c
 	err := r.db.WithContext(ctx).
 		Model(&model.TrainerBooking{}).
 		Preload(clause.Associations).
+		Order("id DESC").
 		Find(&trainerBookings, cond).
 		Error
 	if err != nil {

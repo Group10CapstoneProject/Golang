@@ -18,7 +18,7 @@ type OnlineClassRepository interface {
 
 	// online class
 	CreateOnlineClass(body *model.OnlineClass, ctx context.Context) error
-	FindOnlineClasses(ctx context.Context) ([]model.OnlineClass, error)
+	FindOnlineClasses(title string, ctx context.Context) ([]model.OnlineClass, error)
 	FindOnlineClassById(id uint, ctx context.Context) (*model.OnlineClass, error)
 	UpdateOnlineClass(body *model.OnlineClass, ctx context.Context) error
 	DeleteOnlineClass(body *model.OnlineClass, ctx context.Context) error
