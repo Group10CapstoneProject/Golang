@@ -30,21 +30,31 @@ func (s *memberServiceImpl) CreateMemberFromAdmin(request *dto.MemberAdminStoreR
 	if err != nil {
 		return 0, err
 	}
-	exp := time.Now().Add(24 * 30 * time.Duration(request.Duration) * time.Hour)
 	idPayment := uint(0)
+	t := time.Now().Add(24 * time.Hour)
 	newMember := model.Member{
 		UserID:          user.ID,
 		MemberTypeID:    request.MemberTypeID,
 		Duration:        request.Duration,
 		Total:           request.Total,
-		Status:          model.ACTIVE,
-		Code:            uuid.New(),
-		ExpiredAt:       time.Date(exp.Year(), exp.Month(), exp.Day(), 23, 59, 59, 0, exp.Location()),
-		ActivedAt:       time.Now(),
+		Status:          model.PENDING,
+		ExpiredAt:       time.Date(t.Year(), t.Month(), t.Day(), 23, 59, 59, 0, t.Location()),
 		PaymentMethodID: &idPayment,
 		ProofPayment:    "https://ik.imagekit.io/rnwxyz/gymmember.png",
 	}
 	result, err := s.memberRepository.CreateMember(&newMember, ctx)
+	if err != nil {
+		return 0, err
+	}
+	exp := time.Now().Add(24 * 30 * time.Duration(request.Duration) * time.Hour)
+	setActive := model.Member{
+		ID:        result.ID,
+		Status:    model.ACTIVE,
+		ActivedAt: time.Now(),
+		Code:      uuid.New(),
+		ExpiredAt: time.Date(exp.Year(), exp.Month(), exp.Day(), 23, 59, 59, 0, exp.Location()),
+	}
+	err = s.memberRepository.UpdateMember(&setActive, ctx)
 	if err != nil {
 		return 0, err
 	}
