@@ -23,7 +23,7 @@ type OfflineClassService interface {
 
 	// offline class
 	CreateOfflineClass(request *dto.OfflineClassStoreRequest, ctx context.Context) error
-	FindOfflineClasses(q string, ctx context.Context) (*dto.OfflineClassResources, error)
+	FindOfflineClasses(cond *dto.OfflineClassFilter, ctx context.Context) (*dto.OfflineClassResources, error)
 	CheckAccessOfflineClass(userId uint, offlineClassId uint, ctx context.Context) (bool, error)
 	FindOfflineClassById(id uint, ctx context.Context) (*dto.OfflineClassDetailResource, error)
 	UpdateOfflineClass(request *dto.OfflineClassUpdateRequest, ctx context.Context) error

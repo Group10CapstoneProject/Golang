@@ -37,7 +37,7 @@ func (s *dashboardServiceImpl) GetDashboard(ctx context.Context) (*dto.Dashboard
 		return nil, err
 	}
 	memberType := len(memberTypeData)
-	offlineClassData, err := s.offlineClassRepository.FindOfflineClasses(&model.OfflineClass{}, "", ctx)
+	offlineClassData, err := s.offlineClassRepository.FindOfflineClasses(&model.OfflineClass{}, "", "", "", ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -220,8 +220,10 @@ func (s *offlineClassServiceImpl) FindOfflineClassCategoryById(id uint, ctx cont
 }
 
 // FindOfflineClasses implements OfflineClassService
-func (s *offlineClassServiceImpl) FindOfflineClasses(q string, ctx context.Context) (*dto.OfflineClassResources, error) {
-	offlineClasses, err := s.offlineClassRepository.FindOfflineClasses(&model.OfflineClass{}, q, ctx)
+func (s *offlineClassServiceImpl) FindOfflineClasses(cond *dto.OfflineClassFilter, ctx context.Context) (*dto.OfflineClassResources, error) {
+	offlineClasses, err := s.offlineClassRepository.FindOfflineClasses(&model.OfflineClass{
+		OfflineClassCategoryID: cond.CategoryId,
+	}, cond.Q, cond.OrderByPrice, cond.Time, ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -190,14 +190,21 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassCategories(cond *model.Offl
 }
 
 // FindOfflineClasses implements OfflineClassRepository
-func (r *offlineClassRepositoryImpl) FindOfflineClasses(cond *model.OfflineClass, title string, ctx context.Context) ([]model.OfflineClass, error) {
+func (r *offlineClassRepositoryImpl) FindOfflineClasses(cond *model.OfflineClass, title string, priceOrder string, date string, ctx context.Context) ([]model.OfflineClass, error) {
 	offlineClasses := []model.OfflineClass{}
 	res := r.db.WithContext(ctx).Model(&model.OfflineClass{})
 	if title != "" {
 		res.Where("title LIKE ?", "%"+title+"%")
 	}
+	if priceOrder != "" {
+		res.Order("price " + priceOrder)
+	} else {
+		res.Order("id DESC")
+	}
+	if date != "" {
+		res.Where("DATE(time) = ?", date)
+	}
 	err := res.Preload(clause.Associations).
-		Order("id DESC").
 		Find(&offlineClasses, cond).
 		Error
 
