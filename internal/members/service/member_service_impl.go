@@ -116,7 +116,10 @@ func (s *memberServiceImpl) DeleteMember(id uint, ctx context.Context) error {
 		ID: id,
 	}
 	err := s.memberRepository.DeleteMember(&member, ctx)
-	return err
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // DeleteMemberType implements MemberService
@@ -194,14 +197,20 @@ func (s *memberServiceImpl) FindMembers(page *model.Pagination, ctx context.Cont
 func (s *memberServiceImpl) UpdateMember(request *dto.MemberUpdateRequest, ctx context.Context) error {
 	member := request.ToModel()
 	err := s.memberRepository.UpdateMember(member, ctx)
-	return err
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // UpdateMemberType implements MemberService
 func (s *memberServiceImpl) UpdateMemberType(request *dto.MemberTypeUpdateRequest, ctx context.Context) error {
 	memberType := request.ToModel()
 	err := s.memberRepository.UpdateMemberType(memberType, ctx)
-	return err
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // SetStatusMember implements MemberService

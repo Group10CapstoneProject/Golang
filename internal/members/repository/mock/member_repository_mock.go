@@ -14,7 +14,7 @@ type MemberRepositoryMock struct {
 // member
 func (m *MemberRepositoryMock) CreateMember(body *model.Member, ctx context.Context) (*model.Member, error) {
 	args := m.Called()
-	return args.Get(0).(*model.Member), args.Error(0)
+	return args.Get(0).(*model.Member), args.Error(1)
 }
 
 func (m *MemberRepositoryMock) FindMembers(page *model.Pagination, ctx context.Context) ([]model.Member, int, error) {
