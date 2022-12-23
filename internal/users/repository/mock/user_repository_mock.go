@@ -35,3 +35,12 @@ func (m *UserRepositoryMock) FindUsers(page *model.Pagination, role string, ctx 
 	args := m.Called()
 	return args.Get(0).([]model.User), args.Get(1).(int), args.Error(2)
 }
+
+func (m *UserRepositoryMock) UpdateUser(user *model.User, ctx context.Context) error {
+	args := m.Called()
+	return args.Error(0)
+}
+func (m *UserRepositoryMock) DeleteUser(user *model.User, ctx context.Context) error {
+	args := m.Called()
+	return args.Error(0)
+}

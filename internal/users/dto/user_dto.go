@@ -39,6 +39,20 @@ func (u *UsersResponse) FromModel(model []model.User) {
 	}
 }
 
+type UpdateUser struct {
+	ID    uint
+	Name  string `json:"name,omitempty" validate:"omitempty,personname"`
+	Email string `json:"email,omitempty" validate:"omitempty,email"`
+}
+
+func (u *UpdateUser) ToModel() *model.User {
+	return &model.User{
+		ID:    u.ID,
+		Name:  u.Name,
+		Email: u.Email,
+	}
+}
+
 type PageResponse struct {
 	Users UsersResponse `json:"users"`
 	Page  uint          `json:"page"`

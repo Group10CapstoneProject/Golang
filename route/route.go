@@ -130,15 +130,18 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	userAdmin := users.Group("/admin")
 	userAdmin.POST("", userController.NewAadmin, md.CustomJWTWithConfig(roleSuperadmin)).Name = "create-admin"
 	userAdmin.GET("", userController.GetAdmins, md.CustomJWTWithConfig(roleSuperadmin)).Name = "get-all-admins"
+	userAdmin.GET("/:id", userController.GetAdminDetail, md.CustomJWTWithConfig(roleSuperadmin)).Name = "get-admin"
+	userAdmin.PUT("/:id", userController.UpdateAdmin, md.CustomJWTWithConfig(roleSuperadmin)).Name = "update-admin"
+	userAdmin.DELETE("/:id", userController.DeleteAdmin, md.CustomJWTWithConfig(roleSuperadmin)).Name = "delete-admin"
 
 	// payment methods
 	paymentMethods := v1.Group("/payment-methods")
 	paymentMethods.POST("", paymentMethodController.CreatePaymentMethod, md.CustomJWTWithConfig(roleAdmin)).Name = "create-payment-method"
 	paymentMethods.GET("", paymentMethodController.GetPaymentMethods, md.CustomJWTWithConfig(allAccess)).Name = "get-all-payment-methods"
 	paymentMethodDetails := paymentMethods.Group("/details")
-	paymentMethodDetails.GET("/:id", paymentMethodController.GetPaymentMethodDetail, md.CustomJWTWithConfig(allAccess)).Name = "get-payment-method-detail"
-	paymentMethodDetails.PUT("/:id", paymentMethodController.UpdatePaymentMethod, md.CustomJWTWithConfig(roleAdmin)).Name = "update-payment-method"
-	paymentMethodDetails.DELETE("/:id", paymentMethodController.DeletePaymentMethod, md.CustomJWTWithConfig(roleAdmin)).Name = "delete-payment-method"
+	paymentMethodDetails.GET("/:id", paymentMethodController.GetPaymentMethodDetail, md.CustomJWTWithConfig(roleSuperadmin)).Name = "get-payment-method-detail"
+	paymentMethodDetails.PUT("/:id", paymentMethodController.UpdatePaymentMethod, md.CustomJWTWithConfig(roleSuperadmin)).Name = "update-payment-method"
+	paymentMethodDetails.DELETE("/:id", paymentMethodController.DeletePaymentMethod, md.CustomJWTWithConfig(roleSuperadmin)).Name = "delete-payment-method"
 
 	// members
 	members := v1.Group("/members")

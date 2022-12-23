@@ -15,6 +15,28 @@ type userServiceImpl struct {
 	password       password.PasswordHash
 }
 
+// DeleteUser implements UserService
+func (s *userServiceImpl) DeleteUser(userId *uint, ctx context.Context) error {
+	user := model.User{
+		ID: *userId,
+	}
+	err := s.userRepository.DeleteUser(&user, ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// UpdateUser implements UserService
+func (s *userServiceImpl) UpdateUser(user *dto.UpdateUser, ctx context.Context) error {
+	userUpdate := user.ToModel()
+	err := s.userRepository.UpdateUser(userUpdate, ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // FindAdmins implements UserService
 func (*userServiceImpl) FindAdmins(page model.Pagination, ctx context.Context) (*dto.PageResponse, error) {
 	panic("unimplemented")

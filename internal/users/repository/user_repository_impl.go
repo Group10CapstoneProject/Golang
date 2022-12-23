@@ -13,6 +13,35 @@ type userRepositoryImpl struct {
 	db *gorm.DB
 }
 
+// DeleteUser implements UserRepository
+func (r *userRepositoryImpl) DeleteUser(user *model.User, ctx context.Context) error {
+	res := r.db.WithContext(ctx).Delete(user)
+	err := res.Error
+	if err != nil {
+		return err
+	}
+	if res.RowsAffected == 0 {
+		return myerrors.ErrRecordNotFound
+	}
+	return nil
+}
+
+// UpdateUser implements UserRepository
+func (r *userRepositoryImpl) UpdateUser(user *model.User, ctx context.Context) error {
+	res := r.db.WithContext(ctx).Model(user).Updates(user)
+	err := res.Error
+	if err != nil {
+		if strings.Contains(err.Error(), "Error 1062:") {
+			return myerrors.ErrEmailAlredyExist
+		}
+		return err
+	}
+	if res.RowsAffected == 0 {
+		return myerrors.ErrRecordNotFound
+	}
+	return nil
+}
+
 // CreateUser implements UserRepostiory
 func (r *userRepositoryImpl) CreateUser(model *model.User, ctx context.Context) error {
 	err := r.db.WithContext(ctx).Create(model).Error
