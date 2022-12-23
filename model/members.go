@@ -32,7 +32,7 @@ type MemberType struct {
 	CreatedAt          time.Time
 	UpdatedAt          time.Time
 	DeletedAt          gorm.DeletedAt `gorm:"index"`
-	Name               string         `gorm:"type:varchar(255);unique"`
+	Name               string         `gorm:"type:varchar(255)"`
 	Price              uint
 	Description        string
 	Picture            string

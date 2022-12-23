@@ -14,25 +14,6 @@ type trainerRepositoryImpl struct {
 	db *gorm.DB
 }
 
-// CheckSkillIsDeleted implements TrainerRepository
-func (r *trainerRepositoryImpl) CheckSkillIsDeleted(body *model.Skill) error {
-	skill := model.Skill{}
-	err := r.db.Where("name = ?", body.Name).First(&model.Skill{}).Error
-	if err == nil {
-		return myerrors.ErrDuplicateRecord
-	}
-	err = r.db.Unscoped().Where("name = ?", body.Name).First(&skill).Update("deleted_at", nil).Error
-	if err != nil {
-		return err
-	}
-	body.ID = skill.ID
-
-	if err := r.UpdateSkill(body, context.Background()); err != nil {
-		return err
-	}
-	return nil
-}
-
 // CheckTrainerIsDeleted implements TrainerRepository
 func (r *trainerRepositoryImpl) CheckTrainerIsDeleted(body *model.Trainer) error {
 	trainer := model.Trainer{}
@@ -54,14 +35,12 @@ func (r *trainerRepositoryImpl) CheckTrainerIsDeleted(body *model.Trainer) error
 
 // CreateSkill implements TrainerRepository
 func (r *trainerRepositoryImpl) CreateSkill(body *model.Skill, ctx context.Context) error {
-	err := r.db.WithContext(ctx).Create(body).Error
+	err := r.db.WithContext(ctx).Model(&model.Skill{}).First(&model.Skill{}, "name = ?", body.ID, body.Name).Error
+	if err == nil {
+		return myerrors.ErrDuplicateRecord
+	}
+	err = r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
-		if strings.Contains(err.Error(), "Error 1062:") {
-			if err := r.CheckSkillIsDeleted(body); err == nil {
-				return nil
-			}
-			return myerrors.ErrDuplicateRecord
-		}
 		return err
 	}
 	return nil
@@ -178,7 +157,11 @@ func (r *trainerRepositoryImpl) FindSkillById(id uint, ctx context.Context) (*mo
 // FindSkills implements TrainerRepository
 func (r *trainerRepositoryImpl) FindSkills(ctx context.Context) ([]model.Skill, error) {
 	skills := []model.Skill{}
-	err := r.db.WithContext(ctx).Find(&skills).Preload(clause.Associations).Error
+	err := r.db.WithContext(ctx).
+		Preload(clause.Associations).
+		Order("id DESC").
+		Find(&skills).
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -207,7 +190,9 @@ func (r *trainerRepositoryImpl) FindTrainerBookingByUser(userId uint, ctx contex
 	err := r.db.WithContext(ctx).Where("user_id = ?", userId).
 		Preload("User").
 		Preload("Trainer").
-		Find(&trainerBookings).Error
+		Order("id DESC").
+		Find(&trainerBookings).
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -232,6 +217,7 @@ func (r *trainerRepositoryImpl) FindTrainerBookings(page *model.Pagination, ctx 
 		Count(&count).
 		Offset(offset).
 		Limit(page.Limit).
+		Order("id DESC").
 		Find(&trainerBooking).
 		Error
 
@@ -276,7 +262,10 @@ func (r *trainerRepositoryImpl) FindTrainers(cond *model.Trainer, priceOrder str
 	if cond.Gender != "" {
 		res.Where("gender = ?", cond.Gender)
 	}
-	err := res.Find(&traieners).Error
+	err := res.
+		Order("id DESC").
+		Find(&traieners).
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -289,6 +278,7 @@ func (r *trainerRepositoryImpl) ReadTrainerBooking(cond *model.TrainerBooking, c
 	err := r.db.WithContext(ctx).
 		Model(&model.TrainerBooking{}).
 		Preload(clause.Associations).
+		Order("id DESC").
 		Find(&trainerBookings, cond).
 		Error
 	if err != nil {
@@ -299,11 +289,12 @@ func (r *trainerRepositoryImpl) ReadTrainerBooking(cond *model.TrainerBooking, c
 
 // UpdateSkill implements TrainerRepository
 func (r *trainerRepositoryImpl) UpdateSkill(body *model.Skill, ctx context.Context) error {
+	err := r.db.WithContext(ctx).Model(&model.Skill{}).First(&model.Skill{}, "id != ? AND name = ?", body.ID, body.Name).Error
+	if err == nil {
+		return myerrors.ErrDuplicateRecord
+	}
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Error 1062:") {
-			return myerrors.ErrDuplicateRecord
-		}
 		return res.Error
 	}
 	if res.RowsAffected == 0 {

@@ -36,3 +36,12 @@ func (m *UserServiceMock) FindUser(userId *uint, ctx context.Context) (*dto.User
 	args := m.Called()
 	return args.Get(0).(*dto.UserResponse), args.Error(1)
 }
+
+func (m *UserServiceMock) UpdateUser(user *dto.UpdateUser, ctx context.Context) error {
+	args := m.Called()
+	return args.Error(0)
+}
+func (m *UserServiceMock) DeleteUser(userId *uint, ctx context.Context) error {
+	args := m.Called()
+	return args.Error(0)
+}

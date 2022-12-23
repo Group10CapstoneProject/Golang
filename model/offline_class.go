@@ -33,7 +33,7 @@ type OfflineClassCategory struct {
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	DeletedAt    gorm.DeletedAt `gorm:"index"`
-	Name         string         `gorm:"type:varchar(255);uniqueIndex"`
+	Name         string         `gorm:"type:varchar(255)"`
 	Description  string         `gorm:"type:varchar(255)"`
 	Picture      string
 	OfflineClass []OfflineClass

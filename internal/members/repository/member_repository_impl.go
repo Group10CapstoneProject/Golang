@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/Group10CapstoneProject/Golang/model"
@@ -24,39 +23,17 @@ func (r *memberRepositoryImpl) CreateMember(body *model.Member, ctx context.Cont
 		}
 		return nil, err
 	}
-	fmt.Println(body.ID)
 	return body, nil
 }
 
 // CreateMemberType implements MemberRepository
 func (r *memberRepositoryImpl) CreateMemberType(body *model.MemberType, ctx context.Context) error {
-	err := r.db.WithContext(ctx).Create(body).Error
-	if err != nil {
-		if strings.Contains(err.Error(), "Error 1062:") {
-			if err := r.CheckMemberTypeIsDeleted(body); err == nil {
-				return nil
-			}
-			return myerrors.ErrDuplicateRecord
-		}
-		return err
-	}
-	return nil
-}
-
-// CheckMemberTypeIsDeleted implements MemberRepository
-func (r *memberRepositoryImpl) CheckMemberTypeIsDeleted(body *model.MemberType) error {
-	memberType := model.MemberType{}
-	err := r.db.Where("name = ?", body.Name).First(&model.MemberType{}).Error
+	err := r.db.WithContext(ctx).First(&model.MemberType{}, "name = ?", body.Name).Error
 	if err == nil {
 		return myerrors.ErrDuplicateRecord
 	}
-	err = r.db.Unscoped().Where("name = ?", body.Name).First(&memberType).Update("deleted_at", nil).Error
+	err = r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
-		return err
-	}
-	body.ID = memberType.ID
-
-	if err := r.UpdateMemberType(body, context.Background()); err != nil {
 		return err
 	}
 	return nil
@@ -102,6 +79,9 @@ func (r *memberRepositoryImpl) FindMemberById(id uint, ctx context.Context) (*mo
 		Preload("MemberType").
 		Preload("PaymentMethod").
 		First(&member).Error
+	if err != nil {
+		return nil, err
+	}
 	return &member, err
 }
 
@@ -125,15 +105,24 @@ func (r *memberRepositoryImpl) FindMemberByUser(userId uint, ctx context.Context
 // FindMemberTypes implements MemberRepository
 func (r *memberRepositoryImpl) FindMemberTypes(ctx context.Context) ([]model.MemberType, error) {
 	memberTypes := []model.MemberType{}
-	err := r.db.WithContext(ctx).Find(&memberTypes).Error
-	return memberTypes, err
+	err := r.db.WithContext(ctx).
+		Order("id DESC").
+		Find(&memberTypes).
+		Error
+	if err != nil {
+		return nil, err
+	}
+	return memberTypes, nil
 }
 
 // FindMemberTypeById implements MemberRepository
 func (r *memberRepositoryImpl) FindMemberTypeById(id uint, ctx context.Context) (*model.MemberType, error) {
 	memberType := model.MemberType{}
 	err := r.db.WithContext(ctx).Where("id = ?", id).First(&memberType).Error
-	return &memberType, err
+	if err != nil {
+		return nil, err
+	}
+	return &memberType, nil
 }
 
 // FindMembers implements MemberRepository
@@ -152,10 +141,13 @@ func (r *memberRepositoryImpl) FindMembers(page *model.Pagination, ctx context.C
 		Count(&count).
 		Offset(offset).
 		Limit(page.Limit).
+		Order("id DESC").
 		Find(&members).
 		Error
-
-	return members, int(count), err
+	if err != nil {
+		return members, 0, err
+	}
+	return members, int(count), nil
 }
 
 // UpdateMember implements MemberRepository
@@ -204,11 +196,12 @@ func (r *memberRepositoryImpl) MemberInactive(body model.Member, ctx context.Con
 
 // UpdateMemberType implements MemberRepository
 func (r *memberRepositoryImpl) UpdateMemberType(body *model.MemberType, ctx context.Context) error {
+	err := r.db.WithContext(ctx).Model(&model.MemberType{}).First(&model.MemberType{}, "id != ? AND name = ?", body.ID, body.Name).Error
+	if err == nil {
+		return myerrors.ErrDuplicateRecord
+	}
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Error 1062:") {
-			return myerrors.ErrDuplicateRecord
-		}
 		return res.Error
 	}
 	if res.RowsAffected == 0 {
@@ -223,8 +216,9 @@ func (r *memberRepositoryImpl) ReadMembers(body *model.Member, ctx context.Conte
 	err := r.db.WithContext(ctx).
 		Model(&model.Member{}).
 		Preload(clause.Associations).
+		Order("updated_at DESC").
 		Find(&members, body).
-		Order("updated_at DESC").Error
+		Error
 	if err != nil {
 		return nil, err
 	}

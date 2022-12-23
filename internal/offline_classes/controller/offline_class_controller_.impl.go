@@ -293,7 +293,22 @@ func (d *offlineclassControllerImpl) GetOfflineClassDetail(c echo.Context) error
 
 // GetOfflineClasses implements OfflineClassController
 func (d *offlineclassControllerImpl) GetOfflineClasses(c echo.Context) error {
-	offlineClasses, err := d.offlineClassService.FindOfflineClasses(c.Request().Context())
+	var filter dto.OfflineClassFilter
+	cid := c.QueryParam("category_id")
+	if cid != "" {
+		id, err := strconv.Atoi(cid)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		filter.CategoryId = uint(id)
+	}
+	filter.Time = c.QueryParam("time")
+	filter.OrderByPrice = c.QueryParam("order_by_price")
+	filter.Q = c.QueryParam("q")
+	if err := c.Validate(filter); err != nil {
+		return err
+	}
+	offlineClasses, err := d.offlineClassService.FindOfflineClasses(&filter, c.Request().Context())
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}

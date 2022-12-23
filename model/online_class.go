@@ -33,7 +33,7 @@ type OnlineClassCategory struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   gorm.DeletedAt `gorm:"index"`
-	Name        string         `gorm:"type:varchar(255);uniqueIndex"`
+	Name        string         `gorm:"type:varchar(255)"`
 	Description string
 	Picture     string
 	OnlineClass []OnlineClass

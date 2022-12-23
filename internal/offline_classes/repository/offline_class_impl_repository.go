@@ -40,33 +40,12 @@ func (r *offlineClassRepositoryImpl) CreateOfflineClassBooking(body *model.Offli
 
 // CreateOfflineClassCategory implements OfflineClassRepository
 func (r *offlineClassRepositoryImpl) CreateOfflineClassCategory(body *model.OfflineClassCategory, ctx context.Context) error {
-	err := r.db.WithContext(ctx).Create(body).Error
-	if err != nil {
-		if strings.Contains(err.Error(), "Error 1062:") {
-			if err := r.CheckOfflineClassCategoryIsDeleted(body); err == nil {
-				return nil
-			}
-			return myerrors.ErrDuplicateRecord
-		}
-		return err
-	}
-	return nil
-}
-
-// CheckOfflineClassCategoryIsDeleted implements OnlineClassRepository
-func (r *offlineClassRepositoryImpl) CheckOfflineClassCategoryIsDeleted(body *model.OfflineClassCategory) error {
-	onlineClassCategory := model.OnlineClassCategory{}
-	err := r.db.Where("name = ?", body.Name).First(&model.OnlineClassCategory{}).Error
+	err := r.db.WithContext(ctx).Model(&model.OfflineClassCategory{}).First(&model.OfflineClassCategory{}, "name = ?", body.Name).Error
 	if err == nil {
 		return myerrors.ErrDuplicateRecord
 	}
-	err = r.db.Unscoped().Where("name = ?", body.Name).First(&onlineClassCategory).Update("deleted_at", nil).Error
+	err = r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
-		return err
-	}
-	body.ID = onlineClassCategory.ID
-
-	if err := r.UpdateOfflineClassCategory(body, context.Background()); err != nil {
 		return err
 	}
 	return nil
@@ -147,7 +126,10 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassBookingByUser(userId uint, 
 		Preload("OfflineClass.Trainer").
 		Preload("OfflineClass.OfflineClassCategory").
 		Preload("PaymentMethod").
-		Find(&offlineClassBookings).Count(&count).Error
+		Order("id DESC").
+		Find(&offlineClassBookings).
+		Count(&count).
+		Error
 	return offlineClassBookings, err
 }
 
@@ -168,6 +150,7 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassBookings(page *model.Pagina
 		Count(&count).
 		Offset(offset).
 		Limit(page.Limit).
+		Order("id DESC").
 		Find(&offlineClassBooking).
 		Error
 
@@ -199,6 +182,7 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassCategories(cond *model.Offl
 	offlineClassCategorys := []model.OfflineClassCategory{}
 	err := r.db.WithContext(ctx).Model(&model.OfflineClassCategory{}).
 		Preload("OfflineClass").
+		Order("id DESC").
 		Find(&offlineClassCategorys).
 		Error
 
@@ -206,9 +190,21 @@ func (r *offlineClassRepositoryImpl) FindOfflineClassCategories(cond *model.Offl
 }
 
 // FindOfflineClasses implements OfflineClassRepository
-func (r *offlineClassRepositoryImpl) FindOfflineClasses(cond *model.OfflineClass, ctx context.Context) ([]model.OfflineClass, error) {
+func (r *offlineClassRepositoryImpl) FindOfflineClasses(cond *model.OfflineClass, title string, priceOrder string, date string, ctx context.Context) ([]model.OfflineClass, error) {
 	offlineClasses := []model.OfflineClass{}
-	err := r.db.WithContext(ctx).Model(&model.OfflineClass{}).Preload(clause.Associations).
+	res := r.db.WithContext(ctx).Model(&model.OfflineClass{})
+	if title != "" {
+		res.Where("title LIKE ?", "%"+title+"%")
+	}
+	if priceOrder != "" {
+		res.Order("price " + priceOrder)
+	} else {
+		res.Order("id DESC")
+	}
+	if date != "" {
+		res.Where("DATE(time) = ?", date)
+	}
+	err := res.Preload(clause.Associations).
 		Find(&offlineClasses, cond).
 		Error
 
@@ -223,8 +219,9 @@ func (r *offlineClassRepositoryImpl) ReadOfflineClassBookings(cond *model.Offlin
 		Preload("User").
 		Preload("OfflineClass").
 		Preload("OfflineClass.Trainer").
+		Order("updated_at DESC").
 		Find(&offlineClassBooking, cond).
-		Order("updated_at DESC").Error
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -263,11 +260,12 @@ func (r *offlineClassRepositoryImpl) UpdateOfflineClassBooking(body *model.Offli
 
 // UpdateOfflineClassCategory implements OfflineClassRepository
 func (r *offlineClassRepositoryImpl) UpdateOfflineClassCategory(body *model.OfflineClassCategory, ctx context.Context) error {
+	err := r.db.WithContext(ctx).Model(&model.OfflineClassCategory{}).First(&model.OfflineClassCategory{}, "id != ? AND name = ?", body.ID, body.Name).Error
+	if err == nil {
+		return myerrors.ErrDuplicateRecord
+	}
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Error 1062:") {
-			return myerrors.ErrDuplicateRecord
-		}
 		return res.Error
 	}
 	if res.RowsAffected == 0 {

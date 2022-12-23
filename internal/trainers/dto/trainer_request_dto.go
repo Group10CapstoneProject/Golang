@@ -62,16 +62,16 @@ func (u *TrainerBookingUpdateRequest) ToModel() *model.TrainerBooking {
 
 // trainer store and update request
 type TrainerStoreRequest struct {
-	Name         string               `json:"name" validate:"required,personname"`
-	Email        string               `json:"email" validate:"required,email"`
-	Phone        string               `json:"phone" validate:"required,numeric,min=11,max=13"`
-	Dob          string               `json:"dob" validate:"required,dob"`
-	Gender       string               `json:"gender" validate:"required,gender"`
-	Price        uint                 `json:"price" validate:"required,gte=1"`
-	DailySlot    uint                 `json:"daily_slot" validate:"required,gte=1"`
-	Description  string               `json:"description,omitempty"`
-	TrainerSkill TrainerSkillRequests `json:"trainer_skill" validate:"required"`
-	Picture      string               `json:"picture" validate:"required,url"`
+	Name         string `json:"name" validate:"required,personname"`
+	Email        string `json:"email" validate:"required,email"`
+	Phone        string `json:"phone" validate:"required,numeric,min=11,max=13"`
+	Dob          string `json:"dob" validate:"required,dob"`
+	Gender       string `json:"gender" validate:"required,gender"`
+	Price        uint   `json:"price" validate:"required,gte=1"`
+	DailySlot    uint   `json:"daily_slot" validate:"required,gte=1"`
+	Description  string `json:"description,omitempty"`
+	TrainerSkill []uint `json:"skills" validate:"required"`
+	Picture      string `json:"picture" validate:"required,url"`
 }
 
 func (u *TrainerStoreRequest) ToModel() *model.Trainer {
@@ -79,7 +79,13 @@ func (u *TrainerStoreRequest) ToModel() *model.Trainer {
 	if err != nil {
 		return nil
 	}
-	trainerSkill := u.TrainerSkill.ToModel()
+	var trainerSkill []model.TrainerSkill
+	for _, id := range u.TrainerSkill {
+		a := &model.TrainerSkill{
+			SkillID: id,
+		}
+		trainerSkill = append(trainerSkill, *a)
+	}
 
 	return &model.Trainer{
 		Name:         u.Name,
@@ -97,16 +103,16 @@ func (u *TrainerStoreRequest) ToModel() *model.Trainer {
 
 type TrainerUpdateRequest struct {
 	ID           uint
-	Name         string               `json:"name,omitempty" validate:"omitempty,personname"`
-	Email        string               `json:"email,omitempty" validate:"omitempty,email"`
-	Phone        string               `json:"phone,omitempty" validate:"omitempty,numeric,min=11,max=13"`
-	Dob          string               `json:"dob,omitempty" validate:"omitempty,dob"`
-	Gender       string               `json:"gender,omitempty" validate:"omitempty,gender"`
-	Price        uint                 `json:"price,omitempty" validate:"omitempty,gte=1"`
-	DailySlot    uint                 `json:"daily_slot,omitempty" validate:"omitempty,gte=1"`
-	Description  string               `json:"description,omitempty"`
-	TrainerSkill TrainerSkillRequests `json:"trainer_skill,omitempty" validate:"omitempty"`
-	Picture      string               `json:"picture,omitempty" validate:"omitempty,url"`
+	Name         string `json:"name,omitempty" validate:"omitempty,personname"`
+	Email        string `json:"email,omitempty" validate:"omitempty,email"`
+	Phone        string `json:"phone,omitempty" validate:"omitempty,numeric,min=11,max=13"`
+	Dob          string `json:"dob,omitempty" validate:"omitempty,dob"`
+	Gender       string `json:"gender,omitempty" validate:"omitempty,gender"`
+	Price        uint   `json:"price,omitempty" validate:"omitempty,gte=1"`
+	DailySlot    uint   `json:"daily_slot,omitempty" validate:"omitempty,gte=1"`
+	Description  string `json:"description,omitempty"`
+	TrainerSkill []uint `json:"skills,omitempty" validate:"omitempty"`
+	Picture      string `json:"picture,omitempty" validate:"omitempty,url"`
 }
 
 func (u *TrainerUpdateRequest) ToModel() *model.Trainer {
@@ -114,7 +120,13 @@ func (u *TrainerUpdateRequest) ToModel() *model.Trainer {
 	if err != nil {
 		return nil
 	}
-	trainerSkill := u.TrainerSkill.ToModel()
+	var trainerSkill []model.TrainerSkill
+	for _, id := range u.TrainerSkill {
+		a := &model.TrainerSkill{
+			SkillID: id,
+		}
+		trainerSkill = append(trainerSkill, *a)
+	}
 
 	return &model.Trainer{
 		ID:           u.ID,
@@ -129,28 +141,6 @@ func (u *TrainerUpdateRequest) ToModel() *model.Trainer {
 		TrainerSkill: trainerSkill,
 		Picture:      u.Picture,
 	}
-}
-
-// trainer skill store and update request
-type TrainerSkillRequest struct {
-	SkillID uint `json:"skill_id" validate:"required,gte=1"`
-}
-
-func (u *TrainerSkillRequest) ToModel() *model.TrainerSkill {
-	return &model.TrainerSkill{
-		SkillID: u.SkillID,
-	}
-}
-
-type TrainerSkillRequests []TrainerSkillRequest
-
-func (u *TrainerSkillRequests) ToModel() []model.TrainerSkill {
-	var trainerSkill []model.TrainerSkill
-	for _, skill := range *u {
-		a := skill.ToModel()
-		trainerSkill = append(trainerSkill, *a)
-	}
-	return trainerSkill
 }
 
 // skill store and update request

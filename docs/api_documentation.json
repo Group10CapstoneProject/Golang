@@ -775,7 +775,7 @@
                     }
                 ],
                 "tags": ["Members"],
-                "summary": "Get member  or all members",
+                "summary": "[ADMIN] Get member  or all members",
                 "description": "To get all members and only admin or superadmin account have permission to this feature",
                 "responses": {
                     "200": {
@@ -887,7 +887,7 @@
                     }
                 ],
                 "tags": ["Members"],
-                "summary": "Create new members or booking",
+                "summary": "[USER] Create new members or booking",
                 "description": "To create or booking membership",
                 "requestBody":{
                     "required": true,
@@ -1023,7 +1023,7 @@
                     }
                 ],
                 "tags": ["Members"],
-                "summary": "Delete member",
+                "summary": "[ADMIN] Delete member",
                 "description": "Only admin can delete member",
                 "responses": {
                     "200": {
@@ -1062,7 +1062,7 @@
                     }
                 ],
                 "tags": ["Members"],
-                "summary": "Update member",
+                "summary": "[ADMIN] Update member",
                 "description": "Update member from user or from admin",
                 "requestBody":{
                     "required": true,
@@ -1186,7 +1186,7 @@
                     }
                 ],
                 "tags": ["Member Types"],
-                "summary": "Create new member types",
+                "summary": "[ADMIN] Create new member types",
                 "description": "Only admin can create member type",
                 "requestBody":{
                     "required": true,
@@ -1304,7 +1304,7 @@
                     }
                 ],
                 "tags": ["Member Types"],
-                "summary": "Update member types",
+                "summary": "[ADMIN] Update member types",
                 "description": "Only admin can update member types",
                 "requestBody":{
                     "required": true,
@@ -1374,7 +1374,7 @@
                     }
                 ],
                 "tags": ["Member Types"],
-                "summary": "Delete member types",
+                "summary": "[ADMIN] Delete member types",
                 "description": "Only admin can delete member type",
                 "responses": {
                     "200": {
@@ -1421,7 +1421,7 @@
                     }
                 ],
                 "tags": ["Members"],
-                "summary": "Get user member history",
+                "summary": "[USER] Get user member history",
                 "description": "Get membersip history from user login or from user token",
                 "responses": {
                     "200": {
@@ -1476,7 +1476,7 @@
                     }
                 ],
                 "tags": ["Members"],
-                "summary": "Set member status",
+                "summary": "[ADMIN] Set member status",
                 "description": "Only admin can set member status. Status set allowed (ACTIVE, INACTIVE, REJECT)",
                 "requestBody":{
                     "required": true,
@@ -1543,7 +1543,7 @@
                     }
                 ],
                 "tags": ["Members"],
-                "summary": "Cancel Members",
+                "summary": "[USER] Cancel Members",
                 "description": "Only user can cancel the order that are created, id is member id or member booking id when create member",
                 "responses": {
                     "200": {
@@ -1587,7 +1587,7 @@
                         "$ref":"#/components/parameters/idUint"
                     }
                 ],
-                "summary": "Upload proof of membership payment",
+                "summary": "[USER] Upload proof of membership payment",
                 "security": [
                     {
                         "AccessToken":[]
@@ -4008,14 +4008,7 @@
                                 "price": 22000,
                                 "daily_slot": 2,
                                 "description": "Trainer muda",
-                                "trainer_skill": [
-                                    {
-                                        "skill_id": 3
-                                    },
-                                    {
-                                        "skill_id": 4
-                                    }
-                                ],
+                                "skills": [1, 2, 3, 4],
                                 "picture": "https://ik.imagekit.io/rnwxyz/trainer/33ed55c9-88f0-4370-9415-4c00838b97f5"
                             }
                         }
@@ -5212,7 +5205,13 @@
                     }
                 ],
                 "tags": ["Payment Methods"],
+                "parameters": [
+                    {
+                        "$ref":"#/components/parameters/access"
+                    }
+                ],
                 "summary": "Get all payment methods",
+                "description": "Parameter acces diberikan dari product access, misal ketika user melakukan get terhadap offline class lalu terdapat field access_class true, maka berikan query parameter access dengan value true untuk menampilkan payment method member yang dimana id nya adalah 0, jika access_class false maka berikan juga query parameter access dengan value false maka tidak akan ditampilkan payment method khusus member. Hal ini juga berlaku untuk trainer booking",
                 "responses": {
                     "200": {
                         "description": "Success get payment methods",
@@ -6581,6 +6580,15 @@
                     "description": "category id"
                 },
                 "example": 1
+            },
+            "access": {
+                "in": "query",
+                "name": "access",
+                "schema":{
+                    "type": "string",
+                    "description": "access boolean true or false"
+                },
+                "example": "true"
             },
             "email": {
                 "in": "query",

@@ -174,3 +174,10 @@ func (u *TakeOfflineClassBooking) ToModel() *model.OfflineClassBooking {
 		Code: u.Code,
 	}
 }
+
+type OfflineClassFilter struct {
+	Time         string `json:"time,omitempty" validate:"omitempty,mydate"`
+	CategoryId   uint   `json:"category_id,omitempty" validate:"omitempty,gte=1"`
+	OrderByPrice string `json:"order_by_price,omitempty" validate:"omitempty,ordertype"`
+	Q            string
+}

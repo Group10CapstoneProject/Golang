@@ -63,6 +63,25 @@ func (d *memberControllerImpl) CreateMember(c echo.Context) error {
 	})
 }
 
+// CreateMemberAdmin implements MemberController
+func (d *memberControllerImpl) CreateMemberAdmin(c echo.Context) error {
+	var member dto.MemberAdminStoreRequest
+	if err := c.Bind(&member); err != nil {
+		return err
+	}
+	if err := c.Validate(member); err != nil {
+		return err
+	}
+	id, err := d.memberService.CreateMemberFromAdmin(&member, c.Request().Context())
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "new member success created",
+		"data":    echo.Map{"id": id},
+	})
+}
+
 // CreateMemberType implements MemberController
 func (d *memberControllerImpl) CreateMemberType(c echo.Context) error {
 	var memberType dto.MemberTypeStoreRequest

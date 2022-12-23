@@ -9,7 +9,7 @@ import (
 type OfflineClassRepository interface {
 	// offline class
 	CreateOfflineClass(body *model.OfflineClass, ctx context.Context) error
-	FindOfflineClasses(cond *model.OfflineClass, ctx context.Context) ([]model.OfflineClass, error)
+	FindOfflineClasses(cond *model.OfflineClass, title string, priceOrder string, date string, ctx context.Context) ([]model.OfflineClass, error)
 	FindOfflineClassById(id uint, ctx context.Context) (*model.OfflineClass, error)
 	UpdateOfflineClass(body *model.OfflineClass, ctx context.Context) error
 	OperationOfflineClassSlot(body *model.OfflineClass, operation string, ctx context.Context) error
@@ -20,7 +20,6 @@ type OfflineClassRepository interface {
 	FindOfflineClassCategoryById(id uint, ctx context.Context) (*model.OfflineClassCategory, error)
 	UpdateOfflineClassCategory(body *model.OfflineClassCategory, ctx context.Context) error
 	DeleteOfflineClassCategory(body *model.OfflineClassCategory, ctx context.Context) error
-	CheckOfflineClassCategoryIsDeleted(body *model.OfflineClassCategory) error
 	// offline class booking
 	CreateOfflineClassBooking(body *model.OfflineClassBooking, ctx context.Context) (*model.OfflineClassBooking, error)
 	FindOfflineClassBookings(page *model.Pagination, cond *model.OfflineClassBooking, ctx context.Context) ([]model.OfflineClassBooking, int, error)

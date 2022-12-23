@@ -13,25 +13,6 @@ type onlineClassRepositoryImpl struct {
 	db *gorm.DB
 }
 
-// CheckOnlineClassCategoryIsDeleted implements OnlineClassRepository
-func (r *onlineClassRepositoryImpl) CheckOnlineClassCategoryIsDeleted(body *model.OnlineClassCategory) error {
-	onlineClassCategory := model.OnlineClassCategory{}
-	err := r.db.Where("name = ?", body.Name).First(&model.OnlineClassCategory{}).Error
-	if err == nil {
-		return myerrors.ErrDuplicateRecord
-	}
-	err = r.db.Unscoped().Where("name = ?", body.Name).First(&onlineClassCategory).Update("deleted_at", nil).Error
-	if err != nil {
-		return err
-	}
-	body.ID = onlineClassCategory.ID
-
-	if err := r.UpdateOnlineClassCategory(body, context.Background()); err != nil {
-		return err
-	}
-	return nil
-}
-
 // CreateOnlineClass implements OnlineClassRepository
 func (r *onlineClassRepositoryImpl) CreateOnlineClass(body *model.OnlineClass, ctx context.Context) error {
 	err := r.db.WithContext(ctx).Create(body).Error
@@ -58,14 +39,12 @@ func (r *onlineClassRepositoryImpl) CreateOnlineClassBooking(body *model.OnlineC
 
 // CreateOnlineClassCategory implements OnlineClassRepository
 func (r *onlineClassRepositoryImpl) CreateOnlineClassCategory(body *model.OnlineClassCategory, ctx context.Context) error {
-	err := r.db.WithContext(ctx).Create(body).Error
+	err := r.db.WithContext(ctx).Model(&model.OnlineClassCategory{}).First(&model.OnlineClassCategory{}, "name = ?", body.Name).Error
+	if err == nil {
+		return myerrors.ErrDuplicateRecord
+	}
+	err = r.db.WithContext(ctx).Create(body).Error
 	if err != nil {
-		if strings.Contains(err.Error(), "Error 1062:") {
-			if err := r.CheckOnlineClassCategoryIsDeleted(body); err == nil {
-				return nil
-			}
-			return myerrors.ErrDuplicateRecord
-		}
 		return err
 	}
 	return nil
@@ -143,7 +122,9 @@ func (r *onlineClassRepositoryImpl) FindOnlineClassBookingByUser(userId uint, ct
 		Preload("OnlineClass").
 		Preload("OnlineClass.OnlineClassCategory").
 		Preload("PaymentMethod").
-		Find(&onlineClassBooking).Error
+		Order("id DESC").
+		Find(&onlineClassBooking).
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -167,6 +148,7 @@ func (r *onlineClassRepositoryImpl) FindOnlineClassBookings(page *model.Paginati
 		Count(&count).
 		Offset(offset).
 		Limit(page.Limit).
+		Order("id DESC").
 		Find(&onlineClassBooking).
 		Error
 
@@ -194,14 +176,25 @@ func (r *onlineClassRepositoryImpl) FindOnlineClassCategoryById(id uint, ctx con
 // FindOnlineClassCategorys implements OnlineClassRepository
 func (r *onlineClassRepositoryImpl) FindOnlineClassCategories(ctx context.Context) ([]model.OnlineClassCategory, error) {
 	onlineClassCategories := []model.OnlineClassCategory{}
-	err := r.db.WithContext(ctx).Preload("OnlineClass").Find(&onlineClassCategories).Error
+	err := r.db.WithContext(ctx).
+		Preload("OnlineClass").
+		Order("id DESC").
+		Find(&onlineClassCategories).
+		Error
 	return onlineClassCategories, err
 }
 
 // FindOnlineClasss implements OnlineClassRepository
-func (r *onlineClassRepositoryImpl) FindOnlineClasses(ctx context.Context) ([]model.OnlineClass, error) {
+func (r *onlineClassRepositoryImpl) FindOnlineClasses(title string, ctx context.Context) ([]model.OnlineClass, error) {
 	onlineClasses := []model.OnlineClass{}
-	err := r.db.WithContext(ctx).Preload("OnlineClassCategory").Find(&onlineClasses).Error
+	res := r.db.WithContext(ctx).Model(&model.OnlineClass{})
+	if title != "" {
+		res.Where("title LIKE ?", "%"+title+"%")
+	}
+	err := res.Preload("OnlineClassCategory").
+		Order("id DESC").
+		Find(&onlineClasses).
+		Error
 	return onlineClasses, err
 }
 
@@ -237,11 +230,12 @@ func (r *onlineClassRepositoryImpl) UpdateOnlineClassBooking(body *model.OnlineC
 
 // UpdateOnlineClassCategory implements OnlineClassRepository
 func (r *onlineClassRepositoryImpl) UpdateOnlineClassCategory(body *model.OnlineClassCategory, ctx context.Context) error {
+	err := r.db.WithContext(ctx).Model(&model.OnlineClassCategory{}).First(&model.OnlineClassCategory{}, "id != ? AND name = ?", body.ID, body.Name).Error
+	if err == nil {
+		return myerrors.ErrDuplicateRecord
+	}
 	res := r.db.WithContext(ctx).Model(body).Updates(body)
 	if res.Error != nil {
-		if strings.Contains(res.Error.Error(), "Error 1062:") {
-			return myerrors.ErrDuplicateRecord
-		}
 		return res.Error
 	}
 	if res.RowsAffected == 0 {
@@ -257,8 +251,9 @@ func (r *onlineClassRepositoryImpl) ReadOnlineClassBooking(cond *model.OnlineCla
 		Model(&model.OnlineClassBooking{}).
 		Preload("User").
 		Preload("OnlineClass").
+		Order("updated_at DESC").
 		Find(&onlineClassBooking, cond).
-		Order("updated_at DESC").Error
+		Error
 	if err != nil {
 		return nil, err
 	}

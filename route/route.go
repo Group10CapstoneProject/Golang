@@ -9,6 +9,8 @@ import (
 	pkgAuthController "github.com/Group10CapstoneProject/Golang/internal/auth/controller"
 	pkgAuthRepostiory "github.com/Group10CapstoneProject/Golang/internal/auth/repository"
 	pkgAuthService "github.com/Group10CapstoneProject/Golang/internal/auth/service"
+	pkgDashboardController "github.com/Group10CapstoneProject/Golang/internal/dashboard/controller"
+	pkgDashboardService "github.com/Group10CapstoneProject/Golang/internal/dashboard/service"
 	pkgFileController "github.com/Group10CapstoneProject/Golang/internal/file/controller"
 	pkgFileService "github.com/Group10CapstoneProject/Golang/internal/file/service"
 	pkgHistoryController "github.com/Group10CapstoneProject/Golang/internal/history/controller"
@@ -87,13 +89,14 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	userService := pkgUserService.NewUserService(userRepository, passwordService)
 	paymentMethodService := pkgPaymentMethodService.NewPaymentMethodService(paymentMethodRepository)
 	noticationService := pkgNotificationService.NewNotificationService(notificationRepository)
-	memberService := pkgMemberService.NewMemberService(memberRepository, imagekitService, notificationRepository)
+	memberService := pkgMemberService.NewMemberService(memberRepository, imagekitService, notificationRepository, userRepository)
 	fileService := pkgFileService.NewFileService(imagekitService)
 	onlineClassService := pkgOnlineClassService.NewOnlineClassService(onlineClassRepository, notificationRepository, imagekitService)
-	offlineClassService := pkgOfflineClassService.NewOfflineClassService(offlineClassRepository, notificationRepository, imagekitService)
+	offlineClassService := pkgOfflineClassService.NewOfflineClassService(offlineClassRepository, notificationRepository, imagekitService, memberRepository)
 	historyService := pkgHistoryService.NewHistoryService(memberRepository, onlineClassRepository, offlineClassRepository, trainerRepository)
 	trainerService := pkgTrainerService.NewTrainerService(trainerRepository, memberRepository, notificationRepository, imagekitService)
 	articleService := pkgArticleService.NewArticlesService(articleRepository)
+	dashboardService := pkgDashboardService.NewDashboardService(userRepository, memberRepository, offlineClassRepository, onlineClassRepository, trainerRepository)
 
 	// init controller
 	userController := pkgUserController.NewUserController(userService, jwtService)
@@ -107,6 +110,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	historyController := pkgHistoryController.NewHistoryController(historyService, jwtService)
 	trainerController := pkgTrainerController.NewTrainerController(memberService, jwtService, noticationService, trainerService)
 	articleController := pkgArticleController.NewArticlesController(articleService)
+	dashboardController := pkgDashboardController.NewDashboardController(dashboardService)
 
 	// int route
 	// auth
@@ -126,15 +130,18 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	userAdmin := users.Group("/admin")
 	userAdmin.POST("", userController.NewAadmin, md.CustomJWTWithConfig(roleSuperadmin)).Name = "create-admin"
 	userAdmin.GET("", userController.GetAdmins, md.CustomJWTWithConfig(roleSuperadmin)).Name = "get-all-admins"
+	userAdmin.GET("/:id", userController.GetAdminDetail, md.CustomJWTWithConfig(roleSuperadmin)).Name = "get-admin"
+	userAdmin.PUT("/:id", userController.UpdateAdmin, md.CustomJWTWithConfig(roleSuperadmin)).Name = "update-admin"
+	userAdmin.DELETE("/:id", userController.DeleteAdmin, md.CustomJWTWithConfig(roleSuperadmin)).Name = "delete-admin"
 
 	// payment methods
 	paymentMethods := v1.Group("/payment-methods")
 	paymentMethods.POST("", paymentMethodController.CreatePaymentMethod, md.CustomJWTWithConfig(roleAdmin)).Name = "create-payment-method"
 	paymentMethods.GET("", paymentMethodController.GetPaymentMethods, md.CustomJWTWithConfig(allAccess)).Name = "get-all-payment-methods"
 	paymentMethodDetails := paymentMethods.Group("/details")
-	paymentMethodDetails.GET("/:id", paymentMethodController.GetPaymentMethodDetail, md.CustomJWTWithConfig(allAccess)).Name = "get-payment-method-detail"
-	paymentMethodDetails.PUT("/:id", paymentMethodController.UpdatePaymentMethod, md.CustomJWTWithConfig(roleAdmin)).Name = "update-payment-method"
-	paymentMethodDetails.DELETE("/:id", paymentMethodController.DeletePaymentMethod, md.CustomJWTWithConfig(roleAdmin)).Name = "delete-payment-method"
+	paymentMethodDetails.GET("/:id", paymentMethodController.GetPaymentMethodDetail, md.CustomJWTWithConfig(roleSuperadmin)).Name = "get-payment-method-detail"
+	paymentMethodDetails.PUT("/:id", paymentMethodController.UpdatePaymentMethod, md.CustomJWTWithConfig(roleSuperadmin)).Name = "update-payment-method"
+	paymentMethodDetails.DELETE("/:id", paymentMethodController.DeletePaymentMethod, md.CustomJWTWithConfig(roleSuperadmin)).Name = "delete-payment-method"
 
 	// members
 	members := v1.Group("/members")
@@ -144,6 +151,7 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	members.POST("/pay/:id", memberController.MemberPayment, md.CustomJWTWithConfig(roleUser)).Name = "member-payment"
 	members.GET("/user", memberController.GetMemberUser, md.CustomJWTWithConfig(roleUser)).Name = "get-member-user"
 	members.POST("/cancel/:id", memberController.CancelMember, md.CustomJWTWithConfig(roleUser)).Name = "cancle-member"
+	members.POST("/admin", memberController.CreateMemberAdmin, md.CustomJWTWithConfig(roleAdmin)).Name = "create-member-from-admin"
 	memberDetails := members.Group("/details")
 	memberDetails.GET("/:id", memberController.GetMemberDetail, md.CustomJWTWithConfig(allAccess)).Name = "get-member-detail"
 	memberDetails.PUT("/:id", memberController.UpdateMember, md.CustomJWTWithConfig(roleAdmin)).Name = "update-member"
@@ -269,6 +277,10 @@ func InitRoutes(e *echo.Echo, db *gorm.DB) {
 	articleDetails.GET("/:id", articleController.GetArticlesDetail, md.CustomJWTWithConfig(allAccess)).Name = "get-article-detail"
 	articleDetails.PUT("/:id", articleController.UpdateArticles, md.CustomJWTWithConfig(roleAdmin)).Name = "update-article"
 	articleDetails.DELETE("/:id", articleController.DeleteArticles, md.CustomJWTWithConfig(roleAdmin)).Name = "delete-article"
+
+	// dashboard
+	dashboard := v1.Group("/dashboard")
+	dashboard.GET("", dashboardController.GetDashboard, md.CustomJWTWithConfig(roleAdmin)).Name = "get-dashboard"
 
 	// create default user (superadmin)
 	if err := userService.CreateSuperadmin(&model.User{

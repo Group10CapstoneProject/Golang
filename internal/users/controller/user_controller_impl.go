@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Group10CapstoneProject/Golang/constans"
 	"github.com/Group10CapstoneProject/Golang/internal/users/dto"
@@ -14,6 +15,82 @@ import (
 type userControllerImpl struct {
 	userService userService.UserService
 	jwtService  jwtServ.JWTService
+}
+
+// DeleteAdmin implements UserController
+func (d *userControllerImpl) DeleteAdmin(c echo.Context) error {
+	param := c.Param("id")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "not fount")
+	}
+	idUint := uint(id)
+	admin, err := d.userService.FindUser(&idUint, c.Request().Context())
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	if admin.Role != constans.Role_admin {
+		return echo.NewHTTPError(http.StatusBadRequest, "record not found")
+	}
+	err = d.userService.DeleteUser(&idUint, c.Request().Context())
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "success delete admin",
+	})
+}
+
+// GetAdminDetail implements UserController
+func (d *userControllerImpl) GetAdminDetail(c echo.Context) error {
+	param := c.Param("id")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "not fount")
+	}
+	idUint := uint(id)
+	admin, err := d.userService.FindUser(&idUint, c.Request().Context())
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	if admin.Role != constans.Role_admin {
+		return echo.NewHTTPError(http.StatusBadRequest, "record not found")
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "success get admin",
+		"data":    admin,
+	})
+}
+
+// UpdateAdmin implements UserController
+func (d *userControllerImpl) UpdateAdmin(c echo.Context) error {
+	param := c.Param("id")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "not fount")
+	}
+	idUint := uint(id)
+	admin, err := d.userService.FindUser(&idUint, c.Request().Context())
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	if admin.Role != constans.Role_admin {
+		return echo.NewHTTPError(http.StatusBadRequest, "record not found")
+	}
+	var user dto.UpdateUser
+	if err := c.Bind(&user); err != nil {
+		return err
+	}
+	if err := c.Validate(user); err != nil {
+		return err
+	}
+	user.ID = idUint
+	if err := d.userService.UpdateUser(&user, c.Request().Context()); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "success update admin",
+	})
 }
 
 // Signup implements UserController

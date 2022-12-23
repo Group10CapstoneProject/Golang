@@ -27,6 +27,9 @@ func (d *authControllerImpl) Login(c echo.Context) error {
 	}
 	token, err := d.authService.Login(credential, c.Request().Context())
 	if err != nil {
+		if err == myerrors.ErrPermission {
+			return echo.NewHTTPError(http.StatusForbidden, err.Error())
+		}
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
