@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/Group10CapstoneProject/Golang/model"
@@ -24,7 +23,6 @@ func (r *memberRepositoryImpl) CreateMember(body *model.Member, ctx context.Cont
 		}
 		return nil, err
 	}
-	fmt.Println(body.ID)
 	return body, nil
 }
 
@@ -81,6 +79,9 @@ func (r *memberRepositoryImpl) FindMemberById(id uint, ctx context.Context) (*mo
 		Preload("MemberType").
 		Preload("PaymentMethod").
 		First(&member).Error
+	if err != nil {
+		return nil, err
+	}
 	return &member, err
 }
 
@@ -108,14 +109,20 @@ func (r *memberRepositoryImpl) FindMemberTypes(ctx context.Context) ([]model.Mem
 		Order("id DESC").
 		Find(&memberTypes).
 		Error
-	return memberTypes, err
+	if err != nil {
+		return nil, err
+	}
+	return memberTypes, nil
 }
 
 // FindMemberTypeById implements MemberRepository
 func (r *memberRepositoryImpl) FindMemberTypeById(id uint, ctx context.Context) (*model.MemberType, error) {
 	memberType := model.MemberType{}
 	err := r.db.WithContext(ctx).Where("id = ?", id).First(&memberType).Error
-	return &memberType, err
+	if err != nil {
+		return nil, err
+	}
+	return &memberType, nil
 }
 
 // FindMembers implements MemberRepository
@@ -137,8 +144,10 @@ func (r *memberRepositoryImpl) FindMembers(page *model.Pagination, ctx context.C
 		Order("id DESC").
 		Find(&members).
 		Error
-
-	return members, int(count), err
+	if err != nil {
+		return members, 0, err
+	}
+	return members, int(count), nil
 }
 
 // UpdateMember implements MemberRepository
